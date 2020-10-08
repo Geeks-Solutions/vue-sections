@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <Sections admin />
+      <Sections admin :pageName="pageName" :variations="variations" :project_id="project_id" />
   </div>
 </template>
 
@@ -11,6 +11,18 @@ import Sections from './sections'
 export default {
   components:{
     Sections
+  },
+  computed:{
+    variations() {
+      return []
+    }
+  },
+  data(){
+    return {
+      project_id:"5f5ef6682a4e7d1a619112b7",
+      pageName:'contact_ud'
+
+    }
   }
 }
 </script>

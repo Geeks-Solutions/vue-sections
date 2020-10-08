@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     component() {
-      return () => import(`../project-specific/views/${this.props.name}`);
+      return () => import(`../../configs/views/${this.props.name}`);
     },
     id() {
       if (this.savedView.id) {

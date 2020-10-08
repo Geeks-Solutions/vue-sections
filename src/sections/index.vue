@@ -25,7 +25,7 @@
       </button>
       <button class="hp-button grey" @click="restoreVariations">
         <div class="btn-icon"><BackIcon /></div>
-        <!-- <div class="btn-text">{{ $t("Restore") }}</div> -->
+        <div class="btn-text">{{ $t("Restore") }}</div>
       </button>
     </div>
     <!-- page buttons part 2-->
@@ -222,6 +222,9 @@ import loader from "../configs/loader";
 import Vue from "vue";
 import Loading from "./components/Loading";
 
+
+import axios from 'axios'
+// axios.defaults.headers.common['origin'] = 'http://localhost:5060' // for all requests
 export default {
   layout: "dashboard",
   components: {
@@ -248,6 +251,10 @@ export default {
       type: String,
       default: ""
     },
+    project_id:{
+      type:String,
+      default:''
+    },
     admin: {
       type: Boolean,
       default: false
@@ -272,7 +279,7 @@ export default {
     return {
       dismissCountDown: 0,
       editMode: false,
-      selectedVariation: "default",
+      selectedVariation: this.pageName,
       types: [
         ...localTypes,
         ...staticTypes
@@ -290,8 +297,8 @@ export default {
       savedView: {},
       // all saved variations
       displayVariations: {
-        default: {
-          name: "default",
+        [this.pageName]: {
+          name: this.pageName,
           views: {},
           altered: false
         }
@@ -374,6 +381,28 @@ export default {
   //     }
   //   }
   // },
+  mounted(){
+    // this.loading = true
+    const URL = process.env.VUE_APP_SERVER_URL + `/api/v1/project/${this.project_id}/page/${this.pageName}`
+    axios.post(URL).then(res=>{
+      const sections = res.data.sections
+        const views = {}
+        if (sections) 
+         sections.map(section => {
+            if (section.id) {
+              views[section.id] = section
+            }
+          })
+          Vue.set(this.displayVariations, this.activeVariation.pageName, {
+            name: this.activeVariation.pageName,
+            views: { ...views }
+          })
+          this.selectedVariation = this.activeVariation.pageName
+          this.loading = false
+        }
+    )
+
+  },
   methods: {
     openEditMode() {
       // CALL QUERIES and fill display variables
@@ -408,6 +437,7 @@ export default {
       //     }
       //   })
       // })
+      this.originalVariations = this.displayVariations
       this.editMode = !this.editMode;
     },
     formatName,
@@ -525,26 +555,20 @@ export default {
         }
         sections.push({ ...refactorView });
       });
-      // const variables = {
-      //   page: variationName,
-      //   variations: [],
-      //   sections
-      // }
-      // this.$apollo
-      //   .mutate({
-      //     mutation: saveSections,
-      //     variables,
-      //     context: {
-      //       headers: this.headers
-      //     }
-      //   })
-      //   .then(res => {
-      //     this.displayVariations[this.pageName].altered = false
-      //     this.loading = false
-      //     // this.view  = res.data.options
-      //   }).catch(()=>{
-      //     this.loading = false
-      //   })
+      
+      const variables = {
+        page: variationName,
+        variations: [],
+        sections
+      }
+      const URL = process.env.VUE_APP_SERVER_URL +`/api/v1/project/${this.project_id}/page/${variationName}`
+      axios.put(URL,variables).then(()=>{
+           this.displayVariations[variationName].altered = false
+           this.loading = false
+      }).catch((err)=>{
+        console.log(err)
+          this.loading = false
+      })
     },
     saveVariation() {
       this.loading = true;
@@ -829,5 +853,11 @@ button {
       width: 20px;
       height: 20px;;
     }
+  }
+  .bg-light-grey {
+    background: lightgrey;
+  }
+  .danger {
+    color:white
   }
 </style>
