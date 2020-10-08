@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import { base64Img } from "../../sections/helpers";
+import { base64Img } from "../../base/helpers";
 export default {
   data() {
     return {

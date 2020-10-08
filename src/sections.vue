@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-      <Sections admin :pageName="pageName" :variations="variations" :project_id="project_id" />
+      <SectionsMain admin :pageName="pageName" :variations="variations" :project_id="project_id" />
   </div>
 </template>
 
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import Sections from './sections'
+import SectionsMain from './base'
 export default {
   components:{
-    Sections
+    SectionsMain
   },
   computed:{
     variations() {
@@ -20,8 +20,7 @@ export default {
   data(){
     return {
       project_id:"5f5ef6682a4e7d1a619112b7",
-      pageName:'contact_ud'
-
+      pageName:'contact_us'
     }
   }
 }

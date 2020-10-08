@@ -5,9 +5,12 @@
   "scripts": {
     "serve": "vue-cli-service serve --port 5060",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-comp-vue": "vue-cli-service build --inline-vue --target wc --name sections-vue ./src/main.js",
+    "build-comp": "vue-cli-service build --target wc --name sections-vue ./src/main.js"
   },
   "dependencies": {
+    "@vue/web-component-wrapper": "^1.2.0",
     "axios": "^0.20.0",
     "bootstrap": "^4.5.2",
     "bootstrap-vue": "^2.17.3",
@@ -15,6 +18,7 @@
     "dotenv": "^8.2.0",
     "i18n": "^0.13.2",
     "vue": "^2.6.12",
+    "vue-cookies": "^1.7.4",
     "vue-i18n": "^8.21.1",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.2.0",

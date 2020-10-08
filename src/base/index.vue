@@ -224,7 +224,6 @@ import Loading from "./components/Loading";
 
 
 import axios from 'axios'
-// axios.defaults.headers.common['origin'] = 'http://localhost:5060' // for all requests
 export default {
   layout: "dashboard",
   components: {
@@ -381,6 +380,10 @@ export default {
   //     }
   //   }
   // },
+  created(){
+axios.defaults.headers.put['sections-auth-token'] = this.$cookies.get("sections-auth-token") // for all requests
+
+  },
   mounted(){
     // this.loading = true
     const URL = process.env.VUE_APP_SERVER_URL + `/api/v1/project/${this.project_id}/page/${this.pageName}`
@@ -388,9 +391,12 @@ export default {
       const sections = res.data.sections
         const views = {}
         if (sections) 
+        console.log(sections)
          sections.map(section => {
             if (section.id) {
               views[section.id] = section
+            }else {
+              views['test'] = section
             }
           })
           Vue.set(this.displayVariations, this.activeVariation.pageName, {

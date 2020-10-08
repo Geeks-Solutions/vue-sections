@@ -12,7 +12,7 @@ export default {
   },
   computed: {
     html() {
-      if (this.section.settings) {
+      if (this.section) {
         return this.section.settings;
       }
       return "not found";
