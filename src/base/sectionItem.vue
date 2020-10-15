@@ -23,7 +23,7 @@ export default {
     getIcon() {
       return () =>
         import(
-          `../configs/type-icons/${this.title.replace(/ /g, "_")}`
+          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/type-icons/${this.title.replace(/ /g, "_")}`
         );
     }
   }

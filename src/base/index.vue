@@ -17,15 +17,15 @@
         @click="(currentSection = null), (isModalOpen = true), (savedView = {})"
       >
         <div class="btn-icon"><PlusIcon /></div>
-        <div class="btn-text">{{ $t("Add") }}</div>
+        <div class="btn-text">{{ ("Add") }}</div>
       </button>
       <button class="hp-button" @click="saveVariation">
         <div class="btn-icon"><CheckIcon /></div>
-        <div class="btn-text">{{ $t("Save") }}</div>
+        <div class="btn-text">{{ ("Save") }}</div>
       </button>
       <button class="hp-button grey" @click="restoreVariations">
         <div class="btn-icon"><BackIcon /></div>
-        <div class="btn-text">{{ $t("Restore") }}</div>
+        <div class="btn-text">{{ ("Restore") }}</div>
       </button>
     </div>
     <!-- page buttons part 2-->
@@ -56,7 +56,7 @@
         :class="selectedVariation === pageName ? 'danger' : 'grey'"
         @click="selectedVariation = pageName"
       >
-        <div class="btn-text">{{ pageName + " " + $t("Main") }}</div>
+        <div class="btn-text">{{ pageName + " " + ("Main") }}</div>
       </button>
       <div v-for="(v, idx) in variations" :key="idx">
         <button
@@ -75,7 +75,7 @@
           @click="synch()"
         >
           <div class="icon" :class="{ synched }"><SyncIcon /></div>
-          <span>{{ $t("Synchronise") }}</span>
+          <span>{{ ("Synchronise") }}</span>
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@
     <b-modal class="modal" v-model="isModalOpen" centered>
       <div class="section-modal-content">
         <div class="text-center h8 my-3  pb-3" v-if="!currentSection">
-          {{ $t("Add") }}
+          {{ ("Add") }}
         </div>
         <div class="closeIcon" @click="isModalOpen = false"><CloseIcon /></div>
         <div
@@ -105,7 +105,7 @@
             @click="currentSection = type"
           >
             <SectionItem
-              v-if="!type.name.includes('local')"
+              v-if="type.name && !type.name.includes('local')"
               class="bg-light-blue "
               :title="formatName(type.name)"
               :icon="type.name"
@@ -211,14 +211,10 @@ import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync";
 import LinkIcon from "./icons/link";
 
-// import local types
-import localTypes from "../configs/localTypes";
-import staticTypes from "../configs/staticTypes";
 
-
+import camelCase from 'lodash/camelCase'
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
-import loader from "../configs/loader";
 import Vue from "vue";
 import Loading from "./components/Loading";
 
@@ -244,7 +240,6 @@ export default {
     draggable,
     LinkIcon
   },
-  mixins: [loader],
   props: {
     pageName: {
       type: String,
@@ -275,13 +270,13 @@ export default {
   },
 
   data() {
+    
     return {
       dismissCountDown: 0,
       editMode: false,
       selectedVariation: this.pageName,
       types: [
-        ...localTypes,
-        ...staticTypes
+        ...this.getStaticTypes()
       ],
       sectionTypes: [],
       originalVariations: {},
@@ -305,6 +300,7 @@ export default {
     };
   },
   computed: {
+
     activeVariation() {
       // If variation true return its page name
       const activeVar = this.variations.filter(variation => variation.active);
@@ -381,7 +377,7 @@ export default {
   //   }
   // },
   created(){
-axios.defaults.headers.put['sections-auth-token'] = this.$cookies.get("sections-auth-token") // for all requests
+    // axios.defaults.headers.put['sections-auth-token'] = this.$cookies.get("sections-auth-token") // for all requests
 
   },
   mounted(){
@@ -410,6 +406,24 @@ axios.defaults.headers.put['sections-auth-token'] = this.$cookies.get("sections-
 
   },
   methods: {
+    getStaticTypes () {
+      const staticTypes = []
+      const types = require.context(`${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views`, false)
+      types.keys().forEach(fileName => {
+      const name = camelCase(
+      // Gets the file name regardless of folder depth
+       fileName
+        .split('/')
+        .pop()
+        .replace(/\.\w+$/, '')
+    )
+        staticTypes.push({
+          name,
+          type:"static"
+        })
+      })
+      return [...new Set(staticTypes)]
+    },
     openEditMode() {
       // CALL QUERIES and fill display variables
       // const allVars = this.variations.slice(0)

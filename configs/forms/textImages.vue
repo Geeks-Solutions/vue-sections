@@ -37,7 +37,8 @@
   </div>
 </template>
 <script>
-import { base64Img } from "../../base/helpers";
+import { base64Img } from "@/base/helpers";
+// const {base64Img} = () => import("../../base/helpers")
 export default {
   data() {
     return {

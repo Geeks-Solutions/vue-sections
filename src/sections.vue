@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <SectionsMain admin :pageName="pageName" :variations="variations" :project_id="project_id" />
+      <SectionsMain :admin="admin" :pageName="pageName" :variations="variations" :project_id="project_id" />
   </div>
 </template>
 
@@ -9,6 +9,24 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import SectionsMain from './base'
 export default {
+  props:{
+    pageName:{
+      type:String,
+      default:'default'
+    },
+    admin:{
+      type:Boolean,
+      default:true
+    },
+    project_id:{
+      type:String,
+      default:'5f5ef6682a4e7d1a619112b7'
+    },
+    configsPath:{
+      type:String,
+      default:''
+    }
+  },
   components:{
     SectionsMain
   },
@@ -17,11 +35,5 @@ export default {
       return []
     }
   },
-  data(){
-    return {
-      project_id:"5f5ef6682a4e7d1a619112b7",
-      pageName:'contact_us'
-    }
-  }
 }
 </script>

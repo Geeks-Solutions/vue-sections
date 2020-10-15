@@ -1,14 +1,20 @@
 {
   "name": "sections",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --port 5060",
-    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-comp-vue": "vue-cli-service build --inline-vue --target wc --name sections-vue ./src/main.js",
-    "build-comp": "vue-cli-service build --target wc --name sections-vue ./src/main.js"
+    "build-comp-vue": "vue-cli-service build --inline-vue --target wc --name sections-bo ./src/main.js",
+    "build-comp": "vue-cli-service build --target wc --name sections-bo ./src/main.js",
+    "build-package": "vue-cli-service build --target lib --name sections-bo ./src/main.js",
+    "dev": "vue serve sections.vue",
+    "build": "bili --name index --plugin vue --vue.css false"
   },
+  "files": [
+    "dist/*",
+    "src/*",
+    "*.json"
+  ],
   "dependencies": {
     "@vue/web-component-wrapper": "^1.2.0",
     "axios": "^0.20.0",
@@ -32,10 +38,12 @@
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
+    "bili": "^5.0.5",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
-    "vue-template-compiler": "^2.6.11"
+    "rollup-plugin-vue": "^6.0.0-beta.10",
+    "vue-template-compiler": "^2.6.12"
   }
 }
