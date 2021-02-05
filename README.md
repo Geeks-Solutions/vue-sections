@@ -1,2 +1,2 @@
-# Vue Sections Lib
+# vue-sections
 
