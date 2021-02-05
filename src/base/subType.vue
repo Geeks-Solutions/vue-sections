@@ -1,45 +1,45 @@
 <template>
   <div class="sub-types">
     <div>
-    <div class="text-video" v-if="name">
-      <component :is="getComponentForm" :ref="name" />
+      <div class="text-video" v-if="name">
+        <component :is="getComponentForm" :ref="name" />
+      </div>
     </div>
-    </div>
-      <button
-        class="bg-light-blue mt-4 submit-btn"
-        type="button"
-        @click="sendJsonData"
-      >
-        Submit data
-      </button>
+    <button
+      class="bg-light-blue mt-4 submit-btn"
+      type="button"
+      @click="sendJsonData"
+    >
+      Submit data
+    </button>
   </div>
 </template>
 
 <script>
-
-
 export default {
   props: {
     name: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   methods: {
     sendJsonData() {
-        const settings = this.$refs[this.name].settings;
-        this.$emit("addStatic", settings);
-    }
+      const settings = this.$refs[this.name].settings;
+      this.$emit("addStatic", settings);
+    },
   },
-  computed:{
-    getComponentForm(){
-    return () => import(`${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/forms/${this.name}`)
-    }
-  }
+  computed: {
+    getComponentForm() {
+      return () =>
+        import(
+          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/forms/${this.name}`
+        );
+    },
+  },
 };
 </script>
-<style lang="less">
-
+<style lang="scss">
 .submit-btn {
   border: none;
   font-size: 16px;

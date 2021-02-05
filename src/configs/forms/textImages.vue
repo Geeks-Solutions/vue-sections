@@ -27,7 +27,7 @@
     <div class="h8 mt-5">Images</div>
     <div class="mobile-images mt-4">
       <div class="img-input" v-for="(img, idx) in settings.images" :key="idx">
-        <input type="file" accept="images/*" @change="e => upload(e, idx)" />
+        <input type="file" accept="images/*" @change="(e) => upload(e, idx)" />
         <button class="addMore" type="button" @click="addImage">
           add +
         </button>
@@ -47,20 +47,20 @@ export default {
         content: {
           en: {
             title: "",
-            description: ""
+            description: "",
           },
           fr: {
             title: "",
-            description: ""
-          }
+            description: "",
+          },
         },
         images: [
           {
             file: "",
-            filename: ""
-          }
-        ]
-      }
+            filename: "",
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -71,15 +71,15 @@ export default {
       const newfile = await base64Img(e.target.files[0]);
       const image = {
         file: newfile.base64,
-        filename: newfile.name
+        filename: newfile.name,
       };
       this.settings.images[idx] = image;
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 textarea,
 input {
   font-size: 15px;
@@ -93,12 +93,12 @@ input {
 .french {
   margin: 0 50px;
   display: block;
-  input,textarea {
-      width: 400px;
-      margin: 10px;
-      border-radius: 3px;
-      padding: 7px;
-      
+  input,
+  textarea {
+    width: 400px;
+    margin: 10px;
+    border-radius: 3px;
+    padding: 7px;
   }
 }
 
@@ -117,5 +117,4 @@ input {
     margin: 0 20px;
   }
 }
-
 </style>

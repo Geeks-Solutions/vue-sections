@@ -16,31 +16,34 @@
 </template>
 
 <script>
-import subType from "../subType";
+import subType from "../subType.vue";
 export default {
   components: {
-    subType
+    subType,
   },
   props: {
     props: {
       type: Object,
-      default:()=> {}
+      default: () => {},
     },
     savedView: {
       type: Object,
-      default:()=> {}
-    }
+      default: () => {},
+    },
   },
   data() {
     return {
       myHtml: "",
       elements: [],
-      imported: false
+      imported: false,
     };
   },
   computed: {
     component() {
-      return () => import(`${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views/${this.props.name}`);
+      return () =>
+        import(
+          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views/${this.props.name}`
+        );
     },
     id() {
       if (this.savedView.id) {
@@ -53,7 +56,7 @@ export default {
         return this.savedView.weight;
       }
       return null;
-    }
+    },
   },
 
   mounted() {
@@ -71,14 +74,14 @@ export default {
         type: "static",
         settings,
         id: this.id,
-        weight: this.weight
+        weight: this.weight,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="less">
+<style lang="scss">
 .dashboard {
   button {
     background: black;

@@ -16,21 +16,23 @@ export default {
   props: {
     title: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   computed: {
     getIcon() {
       return () =>
         import(
-          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/type-icons/${this.title.replace(/ /g, "_")}`
+          `${
+            process.env.VUE_APP_RELATIVE_CONFIG_PATH
+          }/type-icons/${this.title.replace(/ /g, "_")}`
         );
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .item {
   color: white;
   display: flex;

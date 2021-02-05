@@ -2,7 +2,7 @@
   <div class="load_container" v-if="loading || loadingNum > 0">
     <div class="load_overlay"></div>
     <div class="load_image">
-      <img src="@/assets/loading.gif" />
+      <!-- <img src="@/assets/loading.gif" /> -->
     </div>
   </div>
 </template>
@@ -12,17 +12,17 @@ export default {
   props: {
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     loadingNum: {
       type: Number,
-      default: 0
-    }
-  }
+      default: 0,
+    },
+  },
 };
 </script>
 
-<style lang="less">
+<style lang="scss">
 .load_container {
   position: fixed;
   width: 100vw;

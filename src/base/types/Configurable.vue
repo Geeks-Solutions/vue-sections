@@ -92,16 +92,16 @@ export default {
   props: {
     props: {
       type: Object,
-      default: {}
+      default: {},
     },
     savedView: {
       type: Object,
-      default: {}
+      default: {},
     },
     headers: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   apollo: {
     // getSectionOptions: {
@@ -125,7 +125,7 @@ export default {
       errorMessage: "",
       settings: {},
       options: [{}],
-      optionValues: {}
+      optionValues: {},
     };
   },
   computed: {
@@ -140,7 +140,7 @@ export default {
         return this.savedView.weight;
       }
       return null;
-    }
+    },
   },
   mounted() {
     // edit
@@ -150,7 +150,7 @@ export default {
       this.savedView.renderData.map((rdata) => {
         const keys = Object.keys(rdata.settings);
         const obj = {};
-        keys.map(key => {
+        keys.map((key) => {
           obj[key] = rdata.settings[key];
         });
         options.push(obj);
@@ -208,9 +208,9 @@ export default {
       this.errorMessage = "";
       let errorMessage = "";
 
-      this.options.map(opt => {
+      this.options.map((opt) => {
         const fields = this.props.fields[0];
-        fields.map(field => {
+        fields.map((field) => {
           if (!opt[field.name] || opt[field.name] === "no-value") {
             errorMessage =
               "You must fill your current fields before adding new one";
@@ -250,9 +250,9 @@ export default {
     addConfigurable() {
       this.errorMessage = "";
       let errorMessage = "";
-      this.options.map(opt => {
+      this.options.map((opt) => {
         const fields = this.props.fields[0];
-        fields.map(field => {
+        fields.map((field) => {
           if (!opt[field.name] || opt[field.name] === "no-value") {
             errorMessage =
               "You must fill your current fields before submitting.";
@@ -295,12 +295,12 @@ export default {
       //     this.errorMessage = 'Something went wrong, please try again later'
       //     this.$emit('loading')
       //   })
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .element {
   margin: 15px;
   flex-direction: column;

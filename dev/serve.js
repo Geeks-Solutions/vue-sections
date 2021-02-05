@@ -1,20 +1,23 @@
-import Vue from 'vue'
-import sections from './sections'
+import Vue from 'vue';
+import Dev from './serve.vue';
+// To register individual components where they are used (serve.vue) instead of using the
+// library as a whole, comment/remove this import and it's corresponding "Vue.use" call
 import VueQuillEditor from 'vue-quill-editor'
-import { BootstrapVue } from 'bootstrap-vue'
 import VueCookies from 'vue-cookies'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
-import i18n from './i18n'
-// // Install BootstrapVue
-Vue.use(BootstrapVue)
+import i18n from "../src/i18n"
+
+import VueSections from '@/entry.esm';
+Vue.use(VueSections);
+
+// Install BootstrapVue
 Vue.use(VueCookies)
-// // Optionally install the BootstrapVue icon components plugin
+
+// Optionally install the BootstrapVue icon components plugin
 Vue.use(VueQuillEditor /* { default global options } */)
 // Vue.config.productionTip = false
 // require('dotenv').config()
-
-
 
 const requireComponent = require.context(
   // The relative path of the components folder
@@ -24,6 +27,8 @@ const requireComponent = require.context(
   // The regular expression used to match base component filenames
 //   /Base[A-Z]\w+\.(vue|js)$/
 )
+
+Vue.config.productionTip = false;
 
 requireComponent.keys().forEach(fileName => {
   // Get component config
@@ -48,14 +53,9 @@ requireComponent.keys().forEach(fileName => {
     componentConfig.default || componentConfig
   )
 })
-// initialize standard Vue app 
+
+
 new Vue({
   i18n,
-  render: h => h(sections)
-}).$mount('#app')
-
-
-// compile to a web component
-// import wrap from "@vue/web-component-wrapper";
-// window.customElements.define("sections-bo", wrap(Vue, sections));
-
+  render: (h) => h(Dev),
+}).$mount('#app');
