@@ -160,31 +160,31 @@
         @end="drag = false"
         handle=".handle"
       >
-        <transition-group>
-          <section v-for="(view, index) in currentViews" :key="index">
-            <div class="section-view">
-              <div
-                class="controls d-flex justify-content-center"
-                v-if="admin && editMode"
-              >
-                <LinkIcon v-if="view.linkedTo" />
-                <div @click="edit(view)" v-if="editable(view.type)">
-                  <EditIcon class="edit-icon" />
-                </div>
-                <DragIcon class="drag-icon handle" />
-                <div @click="deleteView(view.id)">
-                  <TrashIcon class="trash-icon" />
-                </div>
+        <!-- <transition-group> -->
+        <section v-for="(view, index) in currentViews" :key="index">
+          <div class="section-view">
+            <div
+              class="controls d-flex justify-content-center"
+              v-if="admin && editMode"
+            >
+              <LinkIcon v-if="view.linkedTo" />
+              <div @click="edit(view)" v-if="editable(view.type)">
+                <EditIcon class="edit-icon" />
               </div>
-              <div class="view-component">
-                <component
-                  :is="getSectionViewCompName(view.name)"
-                  :section="view"
-                />
+              <DragIcon class="drag-icon handle" />
+              <div @click="deleteView(view.id)">
+                <TrashIcon class="trash-icon" />
               </div>
             </div>
-          </section>
-        </transition-group>
+            <div class="view-component">
+              <component
+                :is="getSectionViewCompName(view.name)"
+                :section="view"
+              />
+            </div>
+          </div>
+        </section>
+        <!-- </transition-group> -->
       </draggable>
     </div>
     <Loading :loading="loading" />
@@ -240,7 +240,7 @@ export default {
     draggable,
     LinkIcon,
     BAlert,
-    BModal
+    BModal,
   },
   props: {
     pageName: {

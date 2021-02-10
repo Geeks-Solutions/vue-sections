@@ -2,8 +2,6 @@ import Vue from 'vue';
 import Dev from './serve.vue';
 // To register individual components where they are used (serve.vue) instead of using the
 // library as a whole, comment/remove this import and it's corresponding "Vue.use" call
-import VueQuillEditor from 'vue-quill-editor'
-import VueCookies from 'vue-cookies'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 import i18n from "../src/i18n"
@@ -11,11 +9,6 @@ import i18n from "../src/i18n"
 import VueSections from '@/entry.esm';
 Vue.use(VueSections);
 
-// Install BootstrapVue
-Vue.use(VueCookies)
-
-// Optionally install the BootstrapVue icon components plugin
-Vue.use(VueQuillEditor /* { default global options } */)
 // Vue.config.productionTip = false
 // require('dotenv').config()
 
