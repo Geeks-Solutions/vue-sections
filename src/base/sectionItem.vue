@@ -21,12 +21,12 @@ export default {
   },
   computed: {
     getIcon() {
-      return () =>
-        import(
-          `${
-            process.env.VUE_APP_RELATIVE_CONFIG_PATH
-          }/type-icons/${this.title.replace(/ /g, "_")}`
-        );
+      // return () =>
+      //   import(
+      //     `${
+      //       process.env.VUE_APP_RELATIVE_CONFIG_PATH
+      //     }/type-icons/${this.title.replace(/ /g, "_")}`
+      //   );
     },
   },
 };

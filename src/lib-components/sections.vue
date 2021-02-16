@@ -2,7 +2,7 @@
   <div id="app">
     <SectionsMain
       :admin="admin"
-      :pageName="'contact_us'"
+      :pageName="pageName"
       :variations="variations"
       :project_id="project_id"
     />
@@ -18,15 +18,15 @@ export default {
   props: {
     pageName: {
       type: String,
-      default: "default",
+      default: "",
     },
     admin: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     project_id: {
       type: String,
-      default: "5f5ef6682a4e7d1a619112b7",
+      default: "",
     },
     configsPath: {
       type: String,

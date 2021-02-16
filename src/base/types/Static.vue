@@ -40,10 +40,10 @@ export default {
   },
   computed: {
     component() {
-      return () =>
-        import(
-          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views/${this.props.name}`
-        );
+      // return () =>
+      //   import(
+      //     `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views/${this.props.name}`
+      //   );
     },
     id() {
       if (this.savedView.id) {

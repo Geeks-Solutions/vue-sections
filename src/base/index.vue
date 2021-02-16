@@ -33,7 +33,7 @@
       class="bg-light-grey p-3 d-flex justify-content-center part2"
       v-if="admin && editMode"
     >
-      <BAlert
+      <b-alert
         :show="dismissCountDown"
         variant="warning"
         @dismissed="dismissCountDown = 0"
@@ -50,7 +50,7 @@
           :value="dismissCountDown"
           height="4px"
         ></b-progress>
-      </BAlert>
+      </b-alert>
       <button
         class="hp-button "
         :class="selectedVariation === pageName ? 'danger' : 'grey'"
@@ -83,7 +83,7 @@
     <!-- ------------------------------------------------------------------------------------------- -->
 
     <!-- page section types popup 'edit' -->
-    <BModal class="modal" v-model="isModalOpen" centered>
+    <b-modal class="modal" v-model="isModalOpen" centered>
       <div class="section-modal-content">
         <div class="text-center h8 my-3  pb-3" v-if="!currentSection">
           {{ "Add" }}
@@ -147,7 +147,7 @@
           </div>
         </div>
       </div>
-    </BModal>
+    </b-modal>
 
     <!-- ------------------------------------------------------------------------------------------- -->
 
@@ -198,7 +198,7 @@ import Dynamic from "./types/Dynamic.vue";
 import Configurable from "./types/Configurable.vue";
 import Local from "./types/Local.vue";
 
-import { BAlert, BModal } from "bootstrap-vue";
+import { BAlert, BModal, VBModal } from "bootstrap-vue";
 
 // import other comps
 import SectionItem from "./sectionItem.vue";
@@ -239,8 +239,11 @@ export default {
     CloseIcon,
     draggable,
     LinkIcon,
-    BAlert,
-    BModal,
+    "b-alert": BAlert,
+    "b-modal": BModal,
+  },
+  directives: {
+    "b-modal": VBModal,
   },
   props: {
     pageName: {
@@ -335,49 +338,6 @@ export default {
       },
     },
   },
-  // apollo: {
-  //   sectionTypes: {
-  //     query: sectionTypes,
-  //     result({ data, loading, networkStatus }) {
-  //       if (!loading && data) {
-  //         this.types = [...data.sectionTypes, ...localTypes]
-  //       }
-  //     }
-  //   },
-  //   getSections: {
-  //     query: getSections,
-  //     variables() {
-  //       return {
-  //         page: this.activeVariation.pageName,
-  //         reactiveTrigger:this.reactiveTrigger
-  //       }
-  //     },
-  //     context() {
-  //       return {
-  //         headers: this.headers
-  //       }
-  //     },
-  //     result({ data, loading, networkStatus }) {
-  //       if (!loading && data.getSections) {
-  //         const views = {}
-  //         data.getSections.sections.map(section => {
-  //           if (section.id) {
-  //             views[section.id] = section
-  //           }
-  //         })
-  //         Vue.set(this.displayVariations, this.activeVariation.pageName, {
-  //           name: this.activeVariation.pageName,
-  //           views: { ...views }
-  //         })
-  //         this.selectedVariation = this.activeVariation.pageName
-  //         this.loading = loading
-  //       }
-  //     }
-  //   }
-  // },
-  created() {
-    // axios.defaults.headers.put['sections-auth-token'] = this.$cookies.get("sections-auth-token") // for all requests
-  },
   mounted() {
     // this.loading = true
     const timestamp = new Date().getTime();
@@ -409,15 +369,8 @@ export default {
     });
   },
   methods: {
-    getStaticTypes() {
-      const staticTypes = [];
-      // const internal_types = require.context(`../src/configs/views`, false);
-      const internal_types = {};
-      const external_types = require.context(
-        `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views`,
-        false
-      );
-      const types = { ...internal_types, ...external_types };
+    build_comp(staticTypes, types, path) {
+      let names = [];
       types.keys().forEach((fileName) => {
         const name = camelCase(
           // Gets the file name regardless of folder depth
@@ -426,11 +379,40 @@ export default {
             .pop()
             .replace(/\.\w+$/, "")
         );
-        staticTypes.push({
-          name,
-          type: "static",
-        });
+
+        if (!names.includes(name)) {
+          staticTypes.push({
+            name,
+            type: "static",
+            path,
+          });
+          names.push(name);
+        }
       });
+      return staticTypes;
+    },
+    getStaticTypes() {
+      let staticTypes = [];
+      const ext_path = process.env.VUE_APP_RELATIVE_CONFIG_PATH;
+      const int_path = "@/../src/configs";
+      // const internal_types = require.context(`${int_path}/views`, false);
+      console.log("ext_path", ext_path);
+
+      // const internal_types = {};
+      let external_types = {};
+      try {
+        external_types = require.context(`${ext_path}/views`, false);
+        staticTypes = this.build_comp(
+          staticTypes,
+          { ...external_types },
+          ext_path
+        );
+      } catch (error) {
+        console.log(error);
+        // console.log("Folder not found: ", `${ext_path}/views`);
+      }
+      // staticTypes = this.build_comp(staticTypes, internal_types, int_path);
+
       return [...new Set(staticTypes)];
     },
     openEditMode() {

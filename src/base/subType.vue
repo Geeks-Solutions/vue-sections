@@ -31,10 +31,10 @@ export default {
   },
   computed: {
     getComponentForm() {
-      return () =>
-        import(
-          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/forms/${this.name}`
-        );
+      // return () =>
+      //   import(
+      //     `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/forms/${this.name}`
+      //   );
     },
   },
 };
