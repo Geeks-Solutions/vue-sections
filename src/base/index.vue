@@ -109,6 +109,7 @@
               class="bg-light-blue "
               :title="formatName(type.name)"
               :icon="type.name"
+              :path="type.path"
             />
           </div>
         </div>
@@ -384,7 +385,7 @@ export default {
           staticTypes.push({
             name,
             type: "static",
-            path,
+            path: `@/../src/configs/type-icons/wysiwyg.vue`,
           });
           names.push(name);
         }
@@ -393,25 +394,29 @@ export default {
     },
     getStaticTypes() {
       let staticTypes = [];
-      const ext_path = process.env.VUE_APP_RELATIVE_CONFIG_PATH;
-      const int_path = "@/../src/configs";
-      // const internal_types = require.context(`${int_path}/views`, false);
-      console.log("ext_path", ext_path);
-
+      const internal_types = require.context("../src/configs/views", false);
       // const internal_types = {};
       let external_types = {};
       try {
-        external_types = require.context(`${ext_path}/views`, false);
+        external_types = require.context(
+          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views`,
+          false
+        );
         staticTypes = this.build_comp(
           staticTypes,
           { ...external_types },
-          ext_path
+          process.env.VUE_APP_RELATIVE_CONFIG_PATH
         );
       } catch (error) {
         console.log(error);
-        // console.log("Folder not found: ", `${ext_path}/views`);
       }
-      // staticTypes = this.build_comp(staticTypes, internal_types, int_path);
+      // staticTypes = this.build_comp(
+      //   staticTypes,
+      //   internal_types,
+      //   "../src/configs"
+      // );
+
+      console.log("staticTypes:", staticTypes);
 
       return [...new Set(staticTypes)];
     },

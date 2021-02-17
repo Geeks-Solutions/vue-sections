@@ -16,17 +16,17 @@ export default {
   props: {
     title: {
       type: String,
-      default: "",
+    },
+    path: {
+      type: String,
     },
   },
   computed: {
     getIcon() {
-      // return () =>
-      //   import(
-      //     `${
-      //       process.env.VUE_APP_RELATIVE_CONFIG_PATH
-      //     }/type-icons/${this.title.replace(/ /g, "_")}`
-      //   );
+      // const path =
+      //   this.path + "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+
+      return () => import(`${this.path}`);
     },
   },
 };

@@ -4,7 +4,7 @@
       <h3>{{ props.name }}</h3>
       <form>
         <div>
-          <subType :name="props.name" @addStatic="addStatic">
+          <subType :path="props.path" :name="props.name" @addStatic="addStatic">
             <slot />
           </subType>
         </div>
@@ -40,10 +40,9 @@ export default {
   },
   computed: {
     component() {
-      // return () =>
-      //   import(
-      //     `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views/${this.props.name}`
-      //   );
+      console.log("Static.vue: ", this.props);
+      const path = this.props.path + "/views/" + this.props.name + ".vue";
+      return import(path);
     },
     id() {
       if (this.savedView.id) {

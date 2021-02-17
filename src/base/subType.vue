@@ -22,6 +22,10 @@ export default {
       type: String,
       default: "",
     },
+    path: {
+      type: String,
+      default: "",
+    },
   },
   methods: {
     sendJsonData() {
@@ -31,10 +35,8 @@ export default {
   },
   computed: {
     getComponentForm() {
-      // return () =>
-      //   import(
-      //     `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/forms/${this.name}`
-      //   );
+      const ax = this.path + "/forms/" + this.name;
+      return () => import(`@/${ax}`);
     },
   },
 };

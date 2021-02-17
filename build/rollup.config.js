@@ -9,7 +9,6 @@ import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
-// import requireContext from 'rollup-plugin-require-context';
 
 // Get browserslist config and remove ie from es build targets
 const esbrowserslist = fs.readFileSync('./.browserslistrc')
@@ -40,7 +39,7 @@ const baseConfig = {
     replace: {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.VUE_APP_SERVER_URL': JSON.stringify('https://sections-saas.k8s-dev.geeks.solutions'),
-      'process.env.VUE_APP_RELATIVE_CONFIG_PATH': JSON.stringify('@/src/configs'),
+      'process.env.VUE_APP_RELATIVE_CONFIG_PATH': JSON.stringify('@/../src/configs'),
     },
     vue: {
       css: true,
