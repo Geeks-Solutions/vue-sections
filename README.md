@@ -35,6 +35,17 @@ src
 
 ## For Developers
 
+---
+
+# vue-sections
+
+1. Please fork the project
+2. `npm install` to install node modules
+3. `npm run build` to build the library using rollup
+4. If you want to test your changes locally you can run: `npm run serve`
+
+# Setting up a new project
+
 To test the library you should create a new vue project and set it up:
 
 1. `vue.config.js:`
@@ -57,6 +68,7 @@ To test the library you should create a new vue project and set it up:
        "vue-sections": "file:{path_of_your_vue_section_project}"
    }
    ```
+   Note: Make sure to run the following command after this adjustment `npm install vue-sections`
 4. `App.vue`
 
    ```
@@ -82,4 +94,4 @@ To test the library you should create a new vue project and set it up:
     </script>
    ```
 
-5. `config` this folder should is found on gitlab please download it or create your own views.
+5. `config` this folder is found on gitlab wiki page please download it or create your own components.
