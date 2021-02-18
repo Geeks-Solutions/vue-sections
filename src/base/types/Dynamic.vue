@@ -5,21 +5,20 @@
 </template>
 
 <script>
-// import { renderSection } from '../graphql'
 export default {
   props: {
     props: {
       type: Object,
-      default: {}
+      default: {},
     },
     savedView: {
       type: Object,
-      default: {}
+      default: {},
     },
     headers: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   computed: {
     id() {
@@ -33,39 +32,7 @@ export default {
         return this.savedView.weight;
       }
       return null;
-    }
+    },
   },
-  mounted() {
-    // this.renderSection(this.props.name)
-  },
-  methods: {
-    // renderSection(name) {
-    //   this.$apollo
-    //     .mutate({
-    //       mutation: renderSection,
-    //       variables: {
-    //         settings: {
-    //           name,
-    //           weight: 1
-    //         }
-    //       },
-    //       context: {
-    //         headers: this.headers
-    //       }
-    //     })
-    //     .then(res => {
-    //       this.$emit('addSectionType', {
-    //         name: this.props.name,
-    //         type: 'dynamic',
-    //         id: this.id,
-    //         weight: this.weight,
-    //         renderData: res.data.renderSection.renderData
-    //       })
-    //     })
-    //     .catch(err => {
-    //       console.log(err)
-    //     })
-    // }
-  }
 };
 </script>

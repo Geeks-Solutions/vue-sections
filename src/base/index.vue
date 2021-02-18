@@ -385,7 +385,7 @@ export default {
           staticTypes.push({
             name,
             type: "static",
-            path: `@/../src/configs/type-icons/wysiwyg.vue`,
+            path,
           });
           names.push(name);
         }
@@ -416,43 +416,9 @@ export default {
       //   "../src/configs"
       // );
 
-      console.log("staticTypes:", staticTypes);
-
       return [...new Set(staticTypes)];
     },
     openEditMode() {
-      // CALL QUERIES and fill display variables
-      // const allVars = this.variations.slice(0)
-      // allVars.push({
-      //   name: 'default',
-      //   pageName: this.pageName
-      // })
-      // allVars.map(variation => {
-      //   this.$apollo.queries.getSections.fetchMore({
-      //     // New variables
-      //     variables: {
-      //       page: variation.pageName
-      //     },
-      //     // Transform the previous result with new data
-      //     updateQuery: (previousResult, { fetchMoreResult }) => {
-      //       const sections = fetchMoreResult.getSections.sections
-      //       const views = {}
-      //       sections.map(section => {
-      //         if (section.id) {
-      //           views[section.id] = section
-      //         }
-      //       })
-      //       Vue.set(this.displayVariations, variation.pageName, {
-      //         name: variation.name,
-      //         views: { ...views }
-      //       })
-      //       Vue.set(this.originalVariations, variation.pageName, {
-      //         name: variation.name,
-      //         views: JSON.parse(JSON.stringify(views))
-      //       })
-      //     }
-      //   })
-      // })
       this.originalVariations = this.displayVariations;
       this.editMode = !this.editMode;
     },

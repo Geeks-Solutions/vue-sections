@@ -23,10 +23,13 @@ export default {
   },
   computed: {
     getIcon() {
-      // const path =
-      //   this.path + "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+      // This is not working
+      const path =
+        this.path + "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
 
-      return () => import(`${this.path}`);
+      // When we change this.path to process.env.VUE_APP_RELATIVE... it's working
+
+      return () => import(`${path}`);
     },
   },
 };
