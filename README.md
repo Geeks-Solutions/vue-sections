@@ -91,4 +91,4 @@ src
 
 ## For Contributors
 
-If you wish to contribute to this project, head to this [wiki](https://gl.eweev.com/oss/vue-sections/-/wikis/home) and follow the instructions there.
+If you wish to contribute to this project, head to this [wiki](https://github.com/Geeks-Solutions/vue-sections/wiki) and follow the instructions there.
