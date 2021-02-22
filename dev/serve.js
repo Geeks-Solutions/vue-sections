@@ -10,7 +10,6 @@ import VueSections from '@/entry.esm';
 Vue.use(VueSections);
 
 // Vue.config.productionTip = false
-// require('dotenv').config()
 
 const requireComponent = require.context(
   // The relative path of the components folder

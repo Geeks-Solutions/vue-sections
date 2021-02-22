@@ -17,19 +17,23 @@ export default {
     title: {
       type: String,
     },
-    path: {
+    type: {
       type: String,
     },
   },
   computed: {
     getIcon() {
       // This is not working
-      const path =
-        this.path + "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
-
-      // When we change this.path to process.env.VUE_APP_RELATIVE... it's working
-
-      return () => import(`${path}`);
+      const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+      if (this.type == "internal") {
+        return () => import(`../src/configs${path}`);
+      } else {
+        if (process.env.VUE_APP_SECTIONS_CONF) {
+          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
+        } else {
+          return () => import(`@/sections_config${path}`);
+        }
+      }
     },
   },
 };

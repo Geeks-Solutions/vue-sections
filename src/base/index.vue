@@ -109,7 +109,7 @@
               class="bg-light-blue "
               :title="formatName(type.name)"
               :icon="type.name"
-              :path="type.path"
+              :type="type.type"
             />
           </div>
         </div>
@@ -370,8 +370,10 @@ export default {
     });
   },
   methods: {
-    build_comp(staticTypes, types, path) {
-      let names = [];
+    build_comp(staticTypes, types, type) {
+      let names = staticTypes.map((obj) => {
+        return obj.name;
+      });
       types.keys().forEach((fileName) => {
         const name = camelCase(
           // Gets the file name regardless of folder depth
@@ -385,7 +387,7 @@ export default {
           staticTypes.push({
             name,
             type: "static",
-            path,
+            type,
           });
           names.push(name);
         }
@@ -395,26 +397,33 @@ export default {
     getStaticTypes() {
       let staticTypes = [];
       const internal_types = require.context("../src/configs/views", false);
-      // const internal_types = {};
       let external_types = {};
-      try {
-        external_types = require.context(
-          `${process.env.VUE_APP_RELATIVE_CONFIG_PATH}/views`,
-          false
-        );
-        staticTypes = this.build_comp(
-          staticTypes,
-          { ...external_types },
-          process.env.VUE_APP_RELATIVE_CONFIG_PATH
-        );
-      } catch (error) {
-        console.log(error);
+      // const internal_types = {};
+      if (process.env.VUE_APP_SECTIONS_CONF) {
+        try {
+          external_types = require.context(
+            `${process.env.VUE_APP_SECTIONS_CONF}/views`,
+            false
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        try {
+          external_types = require.context(`@/sections_config/views`, false);
+        } catch (error) {
+          console.log(error);
+          throw new Error(
+            "vue-sections: There is no sections_config folder in src"
+          );
+        }
       }
-      // staticTypes = this.build_comp(
-      //   staticTypes,
-      //   internal_types,
-      //   "../src/configs"
-      // );
+      staticTypes = this.build_comp(
+        staticTypes,
+        { ...external_types },
+        "external"
+      );
+      staticTypes = this.build_comp(staticTypes, internal_types, "internal");
 
       return [...new Set(staticTypes)];
     },

@@ -19,7 +19,6 @@ const esbrowserslist = fs.readFileSync('./.browserslistrc')
 const argv = minimist(process.argv.slice(2));
 
 const projectRoot = path.resolve(__dirname, '..');
-
 const baseConfig = {
   input: 'src/entry.js',
   plugins: {
@@ -39,7 +38,6 @@ const baseConfig = {
     replace: {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.VUE_APP_SERVER_URL': JSON.stringify('https://sections-saas.k8s-dev.geeks.solutions'),
-      'process.env.VUE_APP_RELATIVE_CONFIG_PATH': JSON.stringify('@/../src/configs'),
     },
     vue: {
       css: true,

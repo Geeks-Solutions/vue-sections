@@ -1,6 +1,6 @@
 module.exports = {
-    devServer: {
+  devServer: {
     host: 'pigrofelice.k8s-dev.geeks.solution',
     https: true
-  },
+  }
 };

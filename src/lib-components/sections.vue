@@ -24,17 +24,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    project_id: {
-      type: String,
-      default: "",
-    },
-    configsPath: {
-      type: String,
-      default: "",
-    },
   },
   components: {
     SectionsMain,
+  },
+  data() {
+    return {
+      projectId: this.$sections.projectId,
+    };
   },
   computed: {
     variations() {

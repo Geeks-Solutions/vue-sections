@@ -35,8 +35,17 @@ export default {
   },
   computed: {
     getComponentForm() {
-      const ax = this.path + "/forms/" + this.name;
-      return () => import(`@/${ax}`);
+      const path = "/forms/" + this.name;
+
+      if (this.type == "internal") {
+        return () => import(`../src/configs${path}`);
+      } else {
+        if (process.env.VUE_APP_SECTIONS_CONF) {
+          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
+        } else {
+          return () => import(`@/sections_config${path}`);
+        }
+      }
     },
   },
 };

@@ -40,9 +40,16 @@ export default {
   },
   computed: {
     component() {
-      console.log("Static.vue: ", this.props);
-      const path = this.props.path + "/views/" + this.props.name + ".vue";
-      return import(path);
+      const path = "/views/" + this.props.name + ".vue";
+      if (this.props.type == "internal") {
+        return () => import(`../src/configs${path}`);
+      } else {
+        if (process.env.VUE_APP_SECTIONS_CONF) {
+          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
+        } else {
+          return () => import(`@/sections_config${path}`);
+        }
+      }
     },
     id() {
       if (this.savedView.id) {
