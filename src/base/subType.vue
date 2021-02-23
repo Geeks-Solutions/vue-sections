@@ -16,13 +16,15 @@
 </template>
 
 <script>
+import { importComp } from "../base/helpers";
+
 export default {
   props: {
     name: {
       type: String,
       default: "",
     },
-    path: {
+    compType: {
       type: String,
       default: "",
     },
@@ -36,16 +38,7 @@ export default {
   computed: {
     getComponentForm() {
       const path = "/forms/" + this.name;
-
-      if (this.type == "internal") {
-        return () => import(`../src/configs${path}`);
-      } else {
-        if (process.env.VUE_APP_SECTIONS_CONF) {
-          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
-        } else {
-          return () => import(`@/sections_config${path}`);
-        }
-      }
+      return importComp(path, this.compType);
     },
   },
 };

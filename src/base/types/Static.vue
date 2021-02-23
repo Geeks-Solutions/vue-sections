@@ -4,7 +4,11 @@
       <h3>{{ props.name }}</h3>
       <form>
         <div>
-          <subType :path="props.path" :name="props.name" @addStatic="addStatic">
+          <subType
+            :compType="props.compType"
+            :name="props.name"
+            @addStatic="addStatic"
+          >
             <slot />
           </subType>
         </div>
@@ -17,6 +21,8 @@
 
 <script>
 import subType from "../subType.vue";
+import { importComp } from "../helpers";
+
 export default {
   components: {
     subType,
@@ -41,15 +47,7 @@ export default {
   computed: {
     component() {
       const path = "/views/" + this.props.name + ".vue";
-      if (this.props.type == "internal") {
-        return () => import(`../src/configs${path}`);
-      } else {
-        if (process.env.VUE_APP_SECTIONS_CONF) {
-          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
-        } else {
-          return () => import(`@/sections_config${path}`);
-        }
-      }
+      importComp(path);
     },
     id() {
       if (this.savedView.id) {

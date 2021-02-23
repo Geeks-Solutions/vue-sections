@@ -12,12 +12,13 @@
 </template>
 
 <script>
+import { importComp } from "../base/helpers.js";
 export default {
   props: {
     title: {
       type: String,
     },
-    type: {
+    compType: {
       type: String,
     },
   },
@@ -25,15 +26,7 @@ export default {
     getIcon() {
       // This is not working
       const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
-      if (this.type == "internal") {
-        return () => import(`../src/configs${path}`);
-      } else {
-        if (process.env.VUE_APP_SECTIONS_CONF) {
-          return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
-        } else {
-          return () => import(`@/sections_config${path}`);
-        }
-      }
+      return importComp(path, this.compType);
     },
   },
 };

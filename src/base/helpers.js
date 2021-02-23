@@ -15,3 +15,20 @@ export const base64Img = file => {
     reader.readAsDataURL(file);
   });
 };
+
+export const importComp = (path,type) => {
+  try {
+    if (type == "internal") {
+      return () => import(`../src/configs${path}`);
+    } else {
+      if (process.env.VUE_APP_SECTIONS_CONF) {
+        return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
+      } else {
+        return () => import(`@/sections_config${path}`);
+      }
+    }
+  } catch (error) {
+    console.log(error)
+    return
+  }
+}

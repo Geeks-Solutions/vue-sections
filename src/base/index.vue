@@ -109,7 +109,7 @@
               class="bg-light-blue "
               :title="formatName(type.name)"
               :icon="type.name"
-              :type="type.type"
+              :compType="type.compType"
             />
           </div>
         </div>
@@ -370,7 +370,7 @@ export default {
     });
   },
   methods: {
-    build_comp(staticTypes, types, type) {
+    build_comp(staticTypes, types, compType) {
       let names = staticTypes.map((obj) => {
         return obj.name;
       });
@@ -387,7 +387,7 @@ export default {
           staticTypes.push({
             name,
             type: "static",
-            type,
+            compType,
           });
           names.push(name);
         }
