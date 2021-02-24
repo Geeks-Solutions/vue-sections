@@ -32,3 +32,25 @@ export const importComp = (path,type) => {
     return
   }
 }
+
+export const sectionHeader = (header) => {
+  const timestamp = new Date().getTime();
+  const random = Math.floor(Math.random() * 1000000 + 1);
+  const header_key = `project-id-${timestamp}-${random}`;
+  header[header_key] = "a3b2cd1";
+  return header
+}
+
+export const getComp = () => {
+      const widgets = ["Wysiwyg"];
+      const path =`/views/wysiwyg.vue`
+      return widgets.reduce(
+        (current, widget) => ({
+          ...current,
+          [widget]: () => import(
+              `${process.env.VUE_APP_SECTIONS_CONF}${path}`
+            )
+        }),
+        {}
+      );
+    }

@@ -2,7 +2,12 @@
   "name": "vue-sections",
   "version": "1.0.0",
   "author": "Geeks Solutions info@geeks.solutions (https://www.geeks.solutions)",
-  "keywords": ["page speed", "page building", "A/B testing", "Content authoring"],
+  "keywords": [
+    "page speed",
+    "page building",
+    "A/B testing",
+    "Content authoring"
+  ],
   "description": "A VueJS client to interface with Sections Serverless Page Building and rendering engine",
   "license": "ISC",
   "main": "dist/vue-sections.ssr.js",

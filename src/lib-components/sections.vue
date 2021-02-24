@@ -4,7 +4,6 @@
       :admin="admin"
       :pageName="pageName"
       :variations="variations"
-      :project_id="project_id"
     />
   </div>
 </template>
@@ -27,11 +26,6 @@ export default {
   },
   components: {
     SectionsMain,
-  },
-  data() {
-    return {
-      projectId: this.$sections.projectId,
-    };
   },
   computed: {
     variations() {

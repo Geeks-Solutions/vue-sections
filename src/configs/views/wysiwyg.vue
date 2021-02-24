@@ -7,8 +7,8 @@ export default {
   props: {
     section: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   computed: {
     html() {
@@ -16,9 +16,7 @@ export default {
         return this.section.settings;
       }
       return "not found";
-    }
-  }
+    },
+  },
 };
 </script>
-
-<style></style>

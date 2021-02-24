@@ -1,3 +1,4 @@
+// import {importComp} from "./helpers"
 // name for the section time when you choose one in the popup
 export function formatName(name) {
   switch (name) {
@@ -11,6 +12,8 @@ export function formatName(name) {
 
 // name of the component to match the view comp name in views folder
 export function getSectionViewCompName(viewName) {
+  const path = "/views/" + viewName + ".vue";
+  // return importComp(path, "external");
   switch (viewName) {
     case "wysiwyg":
       return "Wysiwyg";

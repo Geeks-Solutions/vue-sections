@@ -47,7 +47,7 @@ export default {
   computed: {
     component() {
       const path = "/views/" + this.props.name + ".vue";
-      importComp(path);
+      return importComp(path, "external");
     },
     id() {
       if (this.savedView.id) {
