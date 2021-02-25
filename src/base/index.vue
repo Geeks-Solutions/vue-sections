@@ -1,227 +1,254 @@
 <template>
-  <div class="sections-config justify-content-center">
-    <!-- page buttons part 1-->
-    <button
-      @click="openEditMode()"
-      v-if="admin"
-      class="bg-blue control-button hide-mobile"
-    >
-      {{ !editMode ? "Edit page" : "View page" }}
-    </button>
-    <div class="bg-light-grey-hp hide-mobile">
-      <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
-        MESSAGE?
-      </div>
-
-      <div
-        class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
-        v-if="admin && editMode"
+  <div class="sections-config justify-content-center" v-if="showSections">
+    <div v-if="!pageNotFound">
+      <!-- page buttons part 1-->
+      <button
+        @click="openEditMode()"
+        v-if="admin"
+        class="bg-blue control-button hide-mobile"
       >
-        <button
-          class="hp-button"
-          @click="
-            (currentSection = null), (isModalOpen = true), (savedView = {})
-          "
+        {{ !editMode ? "Edit page" : "View page" }}
+      </button>
+      <div class="bg-light-grey-hp hide-mobile">
+        <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
+          MESSAGE?
+        </div>
+
+        <div
+          class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
+          v-if="admin && editMode"
         >
-          <div class="btn-icon plus-icon"><PlusIcon /></div>
-          <div class="btn-text">Add</div>
-        </button>
-        <button class="hp-button" @click="saveVariation">
-          <div class="btn-icon check-icon"><CheckIcon /></div>
-          <div class="btn-text">Save</div>
-        </button>
-        <button class="hp-button grey" @click="restoreVariations">
-          <div class="btn-icon back-icon"><BackIcon /></div>
-          <div class="btn-text">Restore</div>
-        </button>
-        <button
-          @click="$cookies.remove('sections-auth-token'), (admin = false)"
-          v-if="admin"
-          class="bg-blue control-button"
-          style="    right: 0px;
+          <button
+            class="hp-button"
+            @click="
+              (currentSection = null), (isModalOpen = true), (savedView = {})
+            "
+          >
+            <div class="btn-icon plus-icon"><PlusIcon /></div>
+            <div class="btn-text">Add</div>
+          </button>
+          <button class="hp-button" @click="saveVariation">
+            <div class="btn-icon check-icon"><CheckIcon /></div>
+            <div class="btn-text">Save</div>
+          </button>
+          <button class="hp-button grey" @click="restoreVariations">
+            <div class="btn-icon back-icon"><BackIcon /></div>
+            <div class="btn-text">Restore</div>
+          </button>
+          <button
+            @click="$cookies.remove('sections-auth-token'), (admin = false)"
+            v-if="admin"
+            class="bg-blue control-button"
+            style="    right: 0px;
     left: auto;
     background: black;
     font-size: 13px;
     border-radius: 5px;
     padding: 3px 6px;"
-        >
-          Logout
-        </button>
+          >
+            Logout
+          </button>
+        </div>
       </div>
-    </div>
-    <!-- page buttons part 2-->
-    <div
-      class="bg-light-grey-hp p-3 d-flex justify-content-center part2 hide-mobile"
-      v-if="admin && editMode"
-    >
-      <b-alert
-        :show="dismissCountDown"
-        variant="warning"
-        @dismissed="dismissCountDown = 0"
-        @dismiss-count-down="
-          (countDownChanged) => {
-            dismissCountDown = countDownChanged;
-          }
-        "
+      <!-- page buttons part 2-->
+      <div
+        class="bg-light-grey-hp p-3 d-flex justify-content-center part2 hide-mobile"
+        v-if="admin && editMode"
       >
-        <p>Save the main section before editing a variation</p>
-        <b-progress
+        <b-alert
+          :show="dismissCountDown"
           variant="warning"
-          max="4"
-          :value="dismissCountDown"
-          height="4px"
-        ></b-progress>
-      </b-alert>
-      <button
-        class="hp-button "
-        :class="selectedVariation === pageName ? 'danger' : 'grey'"
-        @click="selectedVariation = pageName"
-      >
-        <div class="btn-text">{{ pageName + " " + "Main" }}</div>
-      </button>
-      <div v-for="(v, idx) in variations" :key="idx">
-        <button
-          class="hp-button"
-          :class="selectedVariation === v.pageName ? 'danger' : 'grey'"
-          @click="
-            if (displayVariations[pageName].altered) dismissCountDown = 4;
-            else selectedVariation = v.pageName;
+          @dismissed="dismissCountDown = 0"
+          @dismiss-count-down="
+            (countDownChanged) => {
+              dismissCountDown = countDownChanged;
+            }
           "
         >
-          <div class="btn-text">{{ v.name }}</div>
+          <p>Save the main section before editing a variation</p>
+          <b-progress
+            variant="warning"
+            max="4"
+            :value="dismissCountDown"
+            height="4px"
+          ></b-progress>
+        </b-alert>
+        <button
+          class="hp-button "
+          :class="selectedVariation === pageName ? 'danger' : 'grey'"
+          @click="selectedVariation = pageName"
+        >
+          <div class="btn-text">{{ pageName + " " + "Main" }}</div>
         </button>
-        <div
-          class="sync d-flex p4  justify-content-center"
-          v-if="selectedVariation === v.pageName"
-          @click="synch()"
-        >
-          <div class="icon" :class="{ synched }"><SyncIcon /></div>
-          <span>Synchronise</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ------------------------------------------------------------------------------------------- -->
-
-    <!-- page section types popup 'edit' -->
-    <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
-      <div class="section-modal-content">
-        <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
-          Add
-        </div>
-        <div class="closeIcon" @click="isModalOpen = false"><CloseIcon /></div>
-        <div
-          class="step-back"
-          v-if="currentSection"
-          @click="currentSection = null"
-        >
-          <BackIcon />
-        </div>
-
-        <div v-if="!currentSection" class="m-1 p-1 type-items">
+        <div v-for="(v, idx) in variations" :key="idx">
+          <button
+            class="hp-button"
+            :class="selectedVariation === v.pageName ? 'danger' : 'grey'"
+            @click="
+              if (displayVariations[pageName].altered) dismissCountDown = 4;
+              else selectedVariation = v.pageName;
+            "
+          >
+            <div class="btn-text">{{ v.name }}</div>
+          </button>
           <div
-            class="section-item"
-            v-for="type in types"
-            :key="type.name"
-            @click="currentSection = type"
+            class="sync d-flex p4  justify-content-center"
+            v-if="selectedVariation === v.pageName"
+            @click="synch()"
           >
-            <SectionItem
-              v-if="type.name && !type.name.includes('local')"
-              class="bg-light-blue "
-              :title="formatName(type.name)"
-              :icon="type.name"
-            />
-          </div>
-        </div>
-        <div v-else class="d-flex">
-          <div class="component-view">
-            <!-- we can use this short hand too -->
-            <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
-            <Static
-              v-if="currentSection.type === 'static'"
-              :props="currentSection"
-              @addSectionType="addSectionType"
-              :savedView="savedView"
-            />
-            <Dynamic
-              v-if="currentSection.type === 'dynamic'"
-              :props="currentSection"
-              @addSectionType="addSectionType"
-              :savedView="savedView"
-              :headers="headers"
-            />
-            <Configurable
-              v-if="currentSection.type === 'configurable'"
-              @addSectionType="addSectionType"
-              :props="currentSection"
-              :variation="variation"
-              :savedView="savedView"
-              :headers="headers"
-              @loading="loading = !loading"
-            />
-            <Local
-              v-if="currentSection.type === 'local'"
-              :props="currentSection"
-              @addSectionType="addSectionType"
-              :savedView="savedView"
-            />
+            <div class="icon" :class="{ synched }"><SyncIcon /></div>
+            <span>Synchronise</span>
           </div>
         </div>
       </div>
-    </b-modal>
 
-    <!-- ------------------------------------------------------------------------------------------- -->
+      <!-- ------------------------------------------------------------------------------------------- -->
 
-    <!-- views rendered in homepage -->
-    <div class="views">
-      <draggable
-        v-model="currentViews"
-        group="people"
-        @start="drag = true"
-        @end="drag = false"
-        handle=".handle"
-      >
-        <transition-group>
-          <section
-            v-for="(view, index) in currentViews"
-            :key="index"
-            :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
+      <!-- page section types popup 'edit' -->
+      <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
+            Add
+          </div>
+          <div class="closeIcon" @click="isModalOpen = false">
+            <CloseIcon />
+          </div>
+          <div
+            class="step-back"
+            v-if="currentSection"
+            @click="currentSection = null"
           >
-            <div class="section-view">
-              <div
-                class="controls d-flex justify-content-center hide-mobile"
-                v-if="admin && editMode"
-              >
-                <LinkIcon v-if="view.linkedTo" />
-                <div @click="edit(view)" v-if="editable(view.type)">
-                  <EditIcon class="edit-icon" />
+            <BackIcon />
+          </div>
+
+          <div v-if="!currentSection" class="m-1 p-1 type-items">
+            <div
+              class="section-item"
+              v-for="type in types"
+              :key="type.name"
+              @click="currentSection = type"
+            >
+              <SectionItem
+                v-if="type.name && !type.name.includes('local')"
+                class="bg-light-blue "
+                :title="formatName(type.name)"
+                :icon="type.name"
+              />
+            </div>
+          </div>
+          <div v-else class="d-flex">
+            <div class="component-view">
+              <!-- we can use this short hand too -->
+              <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
+              <Static
+                v-if="currentSection.type === 'static'"
+                :props="currentSection"
+                @addSectionType="addSectionType"
+                :savedView="savedView"
+              />
+              <Dynamic
+                v-if="currentSection.type === 'dynamic'"
+                :props="currentSection"
+                @addSectionType="addSectionType"
+                :savedView="savedView"
+                :headers="headers"
+              />
+              <Configurable
+                v-if="currentSection.type === 'configurable'"
+                @addSectionType="addSectionType"
+                :props="currentSection"
+                :variation="variation"
+                :savedView="savedView"
+                :headers="headers"
+                @loading="loading = !loading"
+              />
+              <Local
+                v-if="currentSection.type === 'local'"
+                :props="currentSection"
+                @addSectionType="addSectionType"
+                :savedView="savedView"
+              />
+            </div>
+          </div>
+        </div>
+      </b-modal>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- views rendered in homepage -->
+      <div class="views">
+        <draggable
+          v-model="currentViews"
+          group="people"
+          @start="drag = true"
+          @end="drag = false"
+          handle=".handle"
+        >
+          <transition-group>
+            <section
+              v-for="(view, index) in currentViews"
+              :key="index"
+              :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
+            >
+              <div class="section-view">
+                <div
+                  class="controls d-flex justify-content-center hide-mobile"
+                  v-if="admin && editMode"
+                >
+                  <LinkIcon v-if="view.linkedTo" />
+                  <div @click="edit(view)" v-if="editable(view.type)">
+                    <EditIcon class="edit-icon" />
+                  </div>
+                  <DragIcon class="drag-icon handle" />
+                  <div @click="deleteView(view.id)">
+                    <TrashIcon class="trash-icon" />
+                  </div>
                 </div>
-                <DragIcon class="drag-icon handle" />
-                <div @click="deleteView(view.id)">
-                  <TrashIcon class="trash-icon" />
-                </div>
-              </div>
-              <div class="view-component" :style="{ background: viewsBgColor }">
-                <component
-                  v-if="view.settings"
-                  :is="getSectionViewCompName(view.name)"
-                  :section="view"
-                  :lang="lang"
-                />
-                <div v-else>
-                  <div v-if="admin" class="error-section-loaded">
-                    Some sections could not be loaded correctly, saving the page
-                    will delete these sections from your page, unless you are
-                    happy with the page you see now, do not save it
+                <div
+                  class="view-component"
+                  :style="{ background: viewsBgColor }"
+                >
+                  <component
+                    v-if="view.settings"
+                    :is="getSectionViewCompName(view.name)"
+                    :section="view"
+                    :lang="lang"
+                  />
+                  <div v-else>
+                    <div v-if="admin" class="error-section-loaded">
+                      Some sections could not be loaded correctly, saving the
+                      page will delete these sections from your page, unless you
+                      are happy with the page you see now, do not save it
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-        </transition-group>
-      </draggable>
+            </section>
+          </transition-group>
+        </draggable>
+      </div>
+      <Loading :loading="loading" />
     </div>
-    <Loading :loading="loading" />
+    <div v-else>
+      <button class="hp-button" @click="createNewPage">
+        Create New Page
+      </button>
+      <b-toast title="" solid variant="success" :visible="successCreatePage">
+        Congratulations on successfully creating a new page on sections. Start
+        adding some content to it.
+      </b-toast>
+      <b-modal
+        class="modal"
+        header-bg-variant="danger"
+        header-text-variant="light"
+        title="Unable to Create New Page for Sections"
+        :visible="errorCreatePage"
+        ok-title="Try Again"
+        centered
+      >
+        We are unable to create a new page for sections for {{ pageName }}
+      </b-modal>
+    </div>
   </div>
 </template>
 
@@ -251,6 +278,8 @@ import LinkIcon from "./icons/link.vue";
 import { formatName, getSectionViewCompName } from "./functions";
 import Vue from "vue";
 import Loading from "./components/Loading.vue";
+
+import { sectionHeader } from "./helpers";
 
 import axios from "axios";
 export default {
@@ -315,6 +344,10 @@ export default {
 
   data() {
     return {
+      showSections: false,
+      pageNotFound: false,
+      successCreatePage: false,
+      errorCreatePage: false,
       dismissCountDown: 0,
       editMode: false,
       selectedVariation: this.pageName,
@@ -388,11 +421,15 @@ export default {
       this.toast(type, type, message);
     });
     this.loading = true;
+    this.checkToken();
+    const config = {
+      headers: sectionHeader({}),
+    };
     const URL =
       process.env.VUE_APP_SERVER_URL +
       `/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
     axios
-      .post(URL)
+      .post(URL, {}, config)
       .then((res) => {
         const sections = res.data.sections;
         const views = {};
@@ -411,6 +448,7 @@ export default {
         this.selectedVariation = this.activeVariation.pageName;
         this.$store.commit("setFetched");
         this.loading = false;
+        this.showSections = true;
       })
       .catch(() => {
         // this.toast(
@@ -419,19 +457,79 @@ export default {
         //   "Couldn't load the page.Check logs for more info please"
         // );
         this.loading = false;
+        this.showSections = true;
+        this.pageNotFound = true;
         this.$store.commit("setFetched");
       });
   },
   methods: {
+    createNewPage() {
+      // pageName
+      const token = Vue.$cookies.get("sections-auth-token");
+      const header = {
+        token,
+      };
+      const config = {
+        headers: sectionHeader(header),
+      };
+      const URL = `${this.server_url}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+      axios
+        .put(
+          URL,
+          {
+            variations: [],
+            sections: [],
+          },
+          config
+        )
+        .then((res) => {
+          this.successCreatePage = true;
+          setTimeout(() => {
+            this.successCreatePage = false;
+          }, 1000);
+        })
+        .catch((err) => {
+          this.errorCreatePage = true;
+        });
+    },
+    checkToken() {
+      const root_path = window.location.href.split("?")[0];
+      const auth_code = window.location.href.split("auth_code=")[1];
+      if (auth_code) {
+        const config = {
+          headers: sectionHeader({}),
+        };
+        const URL =
+          process.env.VUE_APP_SERVER_URL +
+          `/api/v1/project/${this.$sections.projectId}/token/${auth_code}`;
+        axios
+          .get(URL, config)
+          .then((res) => {
+            const token = res.data.token;
+            this.$cookies.set("sections-auth-token", token);
+            window.location.replace(root_path);
+            this.loading = false;
+          })
+          .catch((err) => {
+            this.loading = false;
+          });
+      }
+    },
     getSectionTypes() {
       if (this.types && this.types.length) {
         return;
       }
+      const token = this.$cookies.get("sections-auth-token");
+      const config = {
+        headers: sectionHeader({
+          token,
+        }),
+      };
       const url =
         process.env.VUE_APP_SERVER_URL +
         `/api/v1/project/${this.$sections.projectId}/section-types`;
       axios
-        .get(url)
+        .get(url, config)
         .then((res) => {
           res.data.data.map((d) => {
             this.types.push({

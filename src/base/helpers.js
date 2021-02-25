@@ -28,8 +28,8 @@ export const importComp = (path,type) => {
       }
     }
   } catch (error) {
-    console.log(error)
-    return
+    throw new Error(`vue-sections: can't find the file in your filesystem: ${path}`)
+    // return
   }
 }
 

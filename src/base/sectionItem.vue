@@ -30,6 +30,7 @@ export default {
   },
   computed: {
     getIcon() {
+      console.log("title: ", this.title);
       const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
       return importComp(path, "external");
     },
