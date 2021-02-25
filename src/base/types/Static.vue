@@ -1,14 +1,10 @@
 <template>
   <div class="text-center">
     <div class="element-type">
-      <h3>{{ props.name }}</h3>
+      <h3 class="pb-4">{{ $formatText(props.name, " / ") }}</h3>
       <form>
         <div>
-          <subType
-            :compType="props.compType"
-            :name="props.name"
-            @addStatic="addStatic"
-          >
+          <subType :name="props.name" @addStatic="addStatic" ref="viewSaved">
             <slot />
           </subType>
         </div>
@@ -56,16 +52,20 @@ export default {
       return "id-" + Date.now();
     },
     weight() {
-      if (this.savedView.weight) {
+      if (this.savedView.weight === 0 || this.savedView.weight) {
         return this.savedView.weight;
       }
-      return null;
+      return "null";
     },
   },
 
   mounted() {
-    if (this.savedView.settings) {
-      this.settings.data = this.savedView.settings.data;
+    if (this.savedView && this.savedView.settings) {
+      setTimeout(() => {
+        this.$refs.viewSaved.$refs[
+          this.props.name
+        ].settings = this.savedView.settings;
+      }, 500);
     }
     setTimeout(() => {
       this.elements = this.$refs.importedComponent.fields;

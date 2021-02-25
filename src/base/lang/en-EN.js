@@ -4,6 +4,6 @@ export default {
   Save: "Save",
   Restore: "Restore",
   Variation: "Variation",
-  Main: "main",
+  Main: "Main",
   Synchronise: "Synchronise"
 };

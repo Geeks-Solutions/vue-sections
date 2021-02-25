@@ -34,5 +34,37 @@ export default {
       return null;
     },
   },
+  mounted() {
+    // this.renderSection(this.props.name)
+  },
+  methods: {
+    // renderSection(name) {
+    //   this.$apollo
+    //     .mutate({
+    //       mutation: renderSection,
+    //       variables: {
+    //         settings: {
+    //           name,
+    //           weight: 1
+    //         }
+    //       },
+    //       context: {
+    //         headers: this.headers
+    //       }
+    //     })
+    //     .then(res => {
+    //       this.$emit('addSectionType', {
+    //         name: this.props.name,
+    //         type: 'dynamic',
+    //         id: this.id,
+    //         weight: this.weight,
+    //         renderData: res.data.renderSection.renderData
+    //       })
+    //     })
+    //     .catch(err => {
+    //       console.log(err)
+    //     })
+    // }
+  },
 };
 </script>

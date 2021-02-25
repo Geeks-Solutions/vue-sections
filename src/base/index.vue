@@ -1,16 +1,20 @@
 <template>
-  <div class="sections-config justify-content-center" v-if="showSections">
-    <div v-if="!pageNotFound">
-      <!-- page buttons part 1-->
-      <button
-        @click="openEditMode()"
-        v-if="admin"
-        class="bg-purple control-button"
-      >
-        {{ !editMode ? "Edit Page" : "View page" }}
-      </button>
+  <div class="sections-config justify-content-center">
+    <!-- page buttons part 1-->
+    <button
+      @click="openEditMode()"
+      v-if="admin"
+      class="bg-blue control-button hide-mobile"
+    >
+      {{ !editMode ? "Edit page" : "View page" }}
+    </button>
+    <div class="bg-light-grey-hp hide-mobile">
+      <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
+        MESSAGE?
+      </div>
+
       <div
-        class="bg-light-grey p-3 d-flex justify-content-center part1"
+        class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
         v-if="admin && editMode"
       >
         <button
@@ -19,158 +23,173 @@
             (currentSection = null), (isModalOpen = true), (savedView = {})
           "
         >
-          <div class="btn-icon"><PlusIcon /></div>
-          <div class="btn-text">{{ "Add" }}</div>
+          <div class="btn-icon plus-icon"><PlusIcon /></div>
+          <div class="btn-text">Add</div>
         </button>
         <button class="hp-button" @click="saveVariation">
-          <div class="btn-icon"><CheckIcon /></div>
-          <div class="btn-text">{{ "Save" }}</div>
+          <div class="btn-icon check-icon"><CheckIcon /></div>
+          <div class="btn-text">Save</div>
         </button>
         <button class="hp-button grey" @click="restoreVariations">
-          <div class="btn-icon"><BackIcon /></div>
-          <div class="btn-text">{{ "Restore" }}</div>
+          <div class="btn-icon back-icon"><BackIcon /></div>
+          <div class="btn-text">Restore</div>
+        </button>
+        <button
+          @click="$cookies.remove('sections-auth-token'), (admin = false)"
+          v-if="admin"
+          class="bg-blue control-button"
+          style="    right: 0px;
+    left: auto;
+    background: black;
+    font-size: 13px;
+    border-radius: 5px;
+    padding: 3px 6px;"
+        >
+          Logout
         </button>
       </div>
-      <!-- page buttons part 2-->
-      <div
-        class="bg-light-grey p-3 d-flex justify-content-center part2"
-        v-if="admin && editMode"
+    </div>
+    <!-- page buttons part 2-->
+    <div
+      class="bg-light-grey-hp p-3 d-flex justify-content-center part2 hide-mobile"
+      v-if="admin && editMode"
+    >
+      <b-alert
+        :show="dismissCountDown"
+        variant="warning"
+        @dismissed="dismissCountDown = 0"
+        @dismiss-count-down="
+          (countDownChanged) => {
+            dismissCountDown = countDownChanged;
+          }
+        "
       >
-        <b-alert
-          :show="dismissCountDown"
+        <p>Save the main section before editing a variation</p>
+        <b-progress
           variant="warning"
-          @dismissed="dismissCountDown = 0"
-          @dismiss-count-down="
-            (countDownChanged) => {
-              dismissCountDown = countDownChanged;
-            }
+          max="4"
+          :value="dismissCountDown"
+          height="4px"
+        ></b-progress>
+      </b-alert>
+      <button
+        class="hp-button "
+        :class="selectedVariation === pageName ? 'danger' : 'grey'"
+        @click="selectedVariation = pageName"
+      >
+        <div class="btn-text">{{ pageName + " " + "Main" }}</div>
+      </button>
+      <div v-for="(v, idx) in variations" :key="idx">
+        <button
+          class="hp-button"
+          :class="selectedVariation === v.pageName ? 'danger' : 'grey'"
+          @click="
+            if (displayVariations[pageName].altered) dismissCountDown = 4;
+            else selectedVariation = v.pageName;
           "
         >
-          <p>Save the main section before editing a variation</p>
-          <b-progress
-            variant="warning"
-            max="4"
-            :value="dismissCountDown"
-            height="4px"
-          ></b-progress>
-        </b-alert>
-        <button
-          class="hp-button "
-          :class="selectedVariation === pageName ? 'danger' : 'grey'"
-          @click="selectedVariation = pageName"
-        >
-          <div class="btn-text">{{ pageName + " " + "Main" }}</div>
+          <div class="btn-text">{{ v.name }}</div>
         </button>
-        <div v-for="(v, idx) in variations" :key="idx">
-          <button
-            class="hp-button"
-            :class="selectedVariation === v.pageName ? 'danger' : 'grey'"
-            @click="
-              if (displayVariations[pageName].altered) dismissCountDown = 4;
-              else selectedVariation = v.pageName;
-            "
-          >
-            <div class="btn-text">{{ v.name }}</div>
-          </button>
+        <div
+          class="sync d-flex p4  justify-content-center"
+          v-if="selectedVariation === v.pageName"
+          @click="synch()"
+        >
+          <div class="icon" :class="{ synched }"><SyncIcon /></div>
+          <span>Synchronise</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------------------------- -->
+
+    <!-- page section types popup 'edit' -->
+    <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
+      <div class="section-modal-content">
+        <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
+          Add
+        </div>
+        <div class="closeIcon" @click="isModalOpen = false"><CloseIcon /></div>
+        <div
+          class="step-back"
+          v-if="currentSection"
+          @click="currentSection = null"
+        >
+          <BackIcon />
+        </div>
+
+        <div v-if="!currentSection" class="m-1 p-1 type-items">
           <div
-            class="sync d-flex p4  justify-content-center"
-            v-if="selectedVariation === v.pageName"
-            @click="synch()"
+            class="section-item"
+            v-for="type in types"
+            :key="type.name"
+            @click="currentSection = type"
           >
-            <div class="icon" :class="{ synched }"><SyncIcon /></div>
-            <span>{{ "Synchronise" }}</span>
+            <SectionItem
+              v-if="type.name && !type.name.includes('local')"
+              class="bg-light-blue "
+              :title="formatName(type.name)"
+              :icon="type.name"
+            />
+          </div>
+        </div>
+        <div v-else class="d-flex">
+          <div class="component-view">
+            <!-- we can use this short hand too -->
+            <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
+            <Static
+              v-if="currentSection.type === 'static'"
+              :props="currentSection"
+              @addSectionType="addSectionType"
+              :savedView="savedView"
+            />
+            <Dynamic
+              v-if="currentSection.type === 'dynamic'"
+              :props="currentSection"
+              @addSectionType="addSectionType"
+              :savedView="savedView"
+              :headers="headers"
+            />
+            <Configurable
+              v-if="currentSection.type === 'configurable'"
+              @addSectionType="addSectionType"
+              :props="currentSection"
+              :variation="variation"
+              :savedView="savedView"
+              :headers="headers"
+              @loading="loading = !loading"
+            />
+            <Local
+              v-if="currentSection.type === 'local'"
+              :props="currentSection"
+              @addSectionType="addSectionType"
+              :savedView="savedView"
+            />
           </div>
         </div>
       </div>
+    </b-modal>
 
-      <!-- ------------------------------------------------------------------------------------------- -->
+    <!-- ------------------------------------------------------------------------------------------- -->
 
-      <!-- page section types popup 'edit' -->
-      <b-modal class="modal" v-model="isModalOpen" centered>
-        <div class="section-modal-content">
-          <div class="text-center h8 my-3  pb-3" v-if="!currentSection">
-            {{ "Add" }}
-          </div>
-          <div class="closeIcon" @click="isModalOpen = false">
-            <CloseIcon />
-          </div>
-          <div
-            class="step-back"
-            v-if="currentSection"
-            @click="currentSection = null"
+    <!-- views rendered in homepage -->
+    <div class="views">
+      <draggable
+        v-model="currentViews"
+        group="people"
+        @start="drag = true"
+        @end="drag = false"
+        handle=".handle"
+      >
+        <transition-group>
+          <section
+            v-for="(view, index) in currentViews"
+            :key="index"
+            :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
           >
-            <BackIcon />
-          </div>
-
-          <div v-if="!currentSection" class="m-1 p-1 type-items">
-            <div
-              class="section-item"
-              v-for="type in types"
-              :key="type.name"
-              @click="currentSection = type"
-            >
-              <SectionItem
-                v-if="type.name && !type.name.includes('local')"
-                class="bg-light-blue "
-                :title="formatName(type.name)"
-                :icon="type.name"
-                :compType="type.compType"
-              />
-            </div>
-          </div>
-          <div v-else class="d-flex">
-            <div class="component-view">
-              <!-- we can use this short hand too -->
-              <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
-              <Static
-                v-if="currentSection.type === 'static'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                :savedView="savedView"
-              />
-              <Dynamic
-                v-if="currentSection.type === 'dynamic'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                :savedView="savedView"
-                :headers="headers"
-              />
-              <Configurable
-                v-if="currentSection.type === 'configurable'"
-                @addSectionType="addSectionType"
-                :props="currentSection"
-                :variation="variation"
-                :savedView="savedView"
-                :headers="headers"
-                @loading="loading = !loading"
-              />
-              <Local
-                v-if="currentSection.type === 'local'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                :savedView="savedView"
-              />
-            </div>
-          </div>
-        </div>
-      </b-modal>
-
-      <!-- ------------------------------------------------------------------------------------------- -->
-
-      <!-- views rendered in homepage -->
-      <div class="views">
-        <draggable
-          v-model="currentViews"
-          group="people"
-          @start="drag = true"
-          @end="drag = false"
-          handle=".handle"
-        >
-          <!-- <transition-group> -->
-          <section v-for="(view, index) in currentViews" :key="index">
             <div class="section-view">
               <div
-                class="controls d-flex justify-content-center"
+                class="controls d-flex justify-content-center hide-mobile"
                 v-if="admin && editMode"
               >
                 <LinkIcon v-if="view.linkedTo" />
@@ -182,55 +201,37 @@
                   <TrashIcon class="trash-icon" />
                 </div>
               </div>
-              <div class="view-component">
-                {{ view }}
+              <div class="view-component" :style="{ background: viewsBgColor }">
                 <component
+                  v-if="view.settings"
                   :is="getSectionViewCompName(view.name)"
                   :section="view"
+                  :lang="lang"
                 />
+                <div v-else>
+                  <div v-if="admin" class="error-section-loaded">
+                    Some sections could not be loaded correctly, saving the page
+                    will delete these sections from your page, unless you are
+                    happy with the page you see now, do not save it
+                  </div>
+                </div>
               </div>
             </div>
           </section>
-          <!-- </transition-group> -->
-        </draggable>
-      </div>
-      <Loading :loading="loading" />
+        </transition-group>
+      </draggable>
     </div>
-    <div v-else>
-      <button class="hp-button" @click="createNewPage">
-        Create New Page
-      </button>
-      <b-toast title="" solid variant="success" :visible="successCreatePage">
-        Congratulations on successfully creating a new page on sections. Start
-        adding some content to it.
-      </b-toast>
-      <b-modal
-        class="modal"
-        header-bg-variant="danger"
-        header-text-variant="light"
-        title="Unable to Create New Page for Sections"
-        :visible="errorCreatePage"
-        ok-title="Try Again"
-        centered
-      >
-        We are unable to create a new page for sections for {{ pageName }}
-      </b-modal>
-    </div>
+    <Loading :loading="loading" />
   </div>
 </template>
 
 <script>
-import Vue from "vue";
 // import sections types
 import Static from "./types/Static.vue";
 import Dynamic from "./types/Dynamic.vue";
 import Configurable from "./types/Configurable.vue";
 import Local from "./types/Local.vue";
 import { BAlert, BModal, VBModal, BToast } from "bootstrap-vue";
-import VueCookies from "vue-cookies";
-Vue.use(VueCookies);
-
-import { getComp, sectionHeader } from "./helpers";
 
 // import other comps
 import SectionItem from "./sectionItem.vue";
@@ -245,12 +246,13 @@ import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
 
-import camelCase from "lodash/camelCase";
+// import camelCase from "lodash/camelCase";
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
+import Vue from "vue";
 import Loading from "./components/Loading.vue";
-import axios from "axios";
 
+import axios from "axios";
 export default {
   layout: "dashboard",
   components: {
@@ -273,13 +275,13 @@ export default {
     "b-alert": BAlert,
     "b-modal": BModal,
     "b-toast": BToast,
-    ...getComp(),
-  },
-  directives: {
-    "b-modal": VBModal,
   },
   props: {
     pageName: {
+      type: String,
+      default: "",
+    },
+    projectId: {
       type: String,
       default: "",
     },
@@ -301,18 +303,22 @@ export default {
       type: String,
       default: "",
     },
+    lang: {
+      type: String,
+      default: "",
+    },
+    viewsBgColor: {
+      type: String,
+      default: "transparent",
+    },
   },
 
   data() {
     return {
-      showSections: false,
-      successCreatePage: false,
-      errorCreatePage: false,
-      server_url: process.env.VUE_APP_SERVER_URL,
       dismissCountDown: 0,
       editMode: false,
       selectedVariation: this.pageName,
-      types: [...this.getStaticTypes()],
+      types: [],
       sectionTypes: [],
       originalVariations: {},
       // current visible views
@@ -324,7 +330,6 @@ export default {
       isModalOpen: false,
       synched: false,
       savedView: {},
-      pageNotFound: false,
       // all saved variations
       displayVariations: {
         [this.pageName]: {
@@ -371,20 +376,28 @@ export default {
       },
     },
   },
+  created() {
+    axios.defaults.headers.common["token"] = this.$cookies.get(
+      "sections-auth-token"
+    ); // for all requests
+    // axios.defaults.headers.common["origin"] = "http://localhost:3330"; // for all requests
+    // axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*"; // for all requests
+  },
   mounted() {
-    // this.loading = true
-    this.checkToken();
-    const config = {
-      headers: sectionHeader({}),
-    };
-    const URL = `${this.server_url}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+    this.$root.$on("toast", ({ type, message }) => {
+      this.toast(type, type, message);
+    });
+    this.loading = true;
+    const URL =
+      process.env.VUE_APP_SERVER_URL +
+      `/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
     axios
-      .post(URL, {}, config)
+      .post(URL)
       .then((res) => {
         const sections = res.data.sections;
         const views = {};
-        if (sections) console.log(sections);
         sections.map((section) => {
+          section.settings = JSON.parse(section.settings);
           if (section.id) {
             views[section.id] = section;
           } else {
@@ -396,131 +409,47 @@ export default {
           views: { ...views },
         });
         this.selectedVariation = this.activeVariation.pageName;
+        this.$store.commit("setFetched");
         this.loading = false;
-        this.showSections = true;
       })
       .catch(() => {
-        this.pageNotFound = true;
-        this.showSections = true;
+        // this.toast(
+        //   "Error",
+        //   "Error",
+        //   "Couldn't load the page.Check logs for more info please"
+        // );
+        this.loading = false;
+        this.$store.commit("setFetched");
       });
   },
   methods: {
-    createNewPage() {
-      // pageName
-      const token = Vue.$cookies.get("sections-auth-token");
-      const header = {
-        token,
-      };
-      const config = {
-        headers: sectionHeader(header),
-      };
-      const URL = `${this.server_url}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+    getSectionTypes() {
+      if (this.types && this.types.length) {
+        return;
+      }
+      const url =
+        process.env.VUE_APP_SERVER_URL +
+        `/api/v1/project/${this.$sections.projectId}/section-types`;
       axios
-        .put(
-          URL,
-          {
-            variations: [],
-            sections: [],
-          },
-          config
-        )
+        .get(url)
         .then((res) => {
-          this.successCreatePage = true;
-          setTimeout(() => {
-            this.successCreatePage = false;
-          }, 1000);
+          res.data.data.map((d) => {
+            this.types.push({
+              name: d.name,
+              type: d.type,
+            });
+          });
         })
-        .catch((err) => {
-          this.errorCreatePage = true;
-        });
-    },
-    checkToken() {
-      const root_path = window.location.href.split("?")[0];
-      const auth_code = window.location.href.split("auth_code=")[1];
-      if (auth_code) {
-        const URL = `${this.server_url}/api/v1/project/${this.$sections.projectId}/token/${auth_code}`;
-        axios
-          .get(URL)
-          .then((res) => {
-            const token = res.data.token;
-            Vue.$cookies.set("sections-auth-token", token);
-            window.location.replace(root_path);
-            this.loading = false;
-          })
-          .catch((err) => {
-            this.loading = false;
-          });
-      }
-    },
-    build_comp(staticTypes, types, compType) {
-      let names = staticTypes.map((obj) => {
-        return obj.name;
-      });
-      types.keys().forEach((fileName) => {
-        // const splitName = fileName.split("-");
-        // const type = splitName[1];
-        // const mainName = splitName[0]
-        // if (type) {
-        const name = camelCase(
-          // Gets the file name regardless of folder depth
-          fileName
-            .split("/")
-            .pop()
-            .replace(/\.\w+$/, "")
-        );
-
-        if (!names.includes(name)) {
-          staticTypes.push({
-            name,
-            type: "static",
-            compType,
-          });
-
-          names.push(name);
-        }
-        // } else {
-        //   throw new Error(
-        //     `vue-sections: ${fileName} can't be registered! You should follow the naming convention of any registered component`
-        //   );
-        // }
-      });
-      return staticTypes;
-    },
-    getStaticTypes() {
-      let staticTypes = [];
-      const internal_types = require.context("../src/configs/views", false);
-      let external_types = {};
-      // const internal_types = {};
-      if (process.env.VUE_APP_SECTIONS_CONF) {
-        try {
-          external_types = require.context(
-            `${process.env.VUE_APP_SECTIONS_CONF}/views`,
-            false
-          );
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        try {
-          external_types = require.context(`@/sections_config/views`, false);
-        } catch (error) {
-          console.log(error);
-          throw new Error(
-            "vue-sections: There is no sections_config folder in src"
-          );
-        }
-      }
-      staticTypes = this.build_comp(
-        staticTypes,
-        { ...external_types },
-        "external"
-      );
-      staticTypes = this.build_comp(staticTypes, internal_types, "internal");
-      console.log("staticTypes: ", staticTypes);
-      return [...new Set(staticTypes)];
+        .catch(() => {});
     },
     openEditMode() {
-      this.originalVariations = this.displayVariations;
+      this.getSectionTypes();
+      if (!this.originalVariations[this.selectedVariation]) {
+        this.originalVariations = JSON.parse(
+          JSON.stringify(this.displayVariations)
+        );
+      }
+
       this.editMode = !this.editMode;
     },
     formatName,
@@ -578,38 +507,59 @@ export default {
       }, 1000);
     },
     addSectionType(section) {
-      section.weight = Object.keys(
-        this.displayVariations[this.selectedVariation].views
-      ).length;
-      section.linkedTo = "";
-      Vue.set(
-        this.displayVariations[this.selectedVariation].views,
-        section.id,
-        section
-      );
+      try {
+        if (this.savedView.linkedTo) {
+          const confirmed = window.confirm(
+            "This section is linked to a main section, editing it will break the link, are you sure you want to proceed ?"
+          );
+          if (!confirmed) {
+            return;
+          }
+        }
+        if (section.weight === "null") {
+          section.weight = Object.keys(
+            this.displayVariations[this.selectedVariation].views
+          ).length;
+        }
 
-      if (this.selectedVariation === this.pageName) {
-        // We check if there are variations that contains a section linked to the one we just edited
-        // If there are, we edit them too so they stay in sync
-        this.variations.map((variation) => {
-          const newViews = Object.values(
-            this.displayVariations[variation.pageName].views
-          ).map((sectionVariation) => {
-            if (sectionVariation.linkedTo === section.id)
-              sectionVariation.settings = section.settings;
-            return sectionVariation;
+        section.linkedTo = "";
+        Vue.set(
+          this.displayVariations[this.selectedVariation].views,
+          section.id,
+          section
+        );
+
+        if (this.selectedVariation === this.pageName) {
+          // We check if there are variations that contains a section linked to the one we just edited
+          // If there are, we edit them too so they stay in sync
+          this.variations.map((variation) => {
+            const newViews = Object.values(
+              this.displayVariations[variation.pageName].views
+            ).map((sectionVariation) => {
+              if (sectionVariation.linkedTo === section.id)
+                sectionVariation.settings = section.settings;
+              return sectionVariation;
+            });
+            Vue.set(this.displayVariations[variation.pageName], "views", {
+              ...newViews,
+            });
           });
-          Vue.set(this.displayVariations[variation.pageName], "views", {
-            ...newViews,
-          });
-        });
+        }
+
+        this.currentViews = this.displayVariations[
+          this.selectedVariation
+        ].views;
+        this.displayVariations[this.selectedVariation].altered = true;
+        this.isModalOpen = false;
+        this.savedView = {};
+        this.loading = false;
+      } catch (e) {
+        // this.toast(
+        //   "error",
+        //   "Error",
+        //   "We are unable to preview your section, try again later or contact your support"
+        // );
       }
-
-      this.currentViews = this.displayVariations[this.selectedVariation].views;
-      this.displayVariations[this.selectedVariation].altered = true;
-      this.isModalOpen = false;
-      this.savedView = {};
-      this.loading = false;
     },
     mutateVariation(variationName) {
       const sections = [];
@@ -649,15 +599,37 @@ export default {
         `/api/v1/project/${this.$sections.projectId}/page/${variationName}`;
       axios
         .put(URL, variables)
-        .then(() => {
+        .then((res) => {
+          if (res.data && res.data.error) {
+            this.toast("error", "Error", res.data.error);
+            return;
+          }
           this.displayVariations[variationName].altered = false;
           this.loading = false;
+          // this.toast(
+          //   "Success",
+          //   "Success",
+          //   "You have successfully saved your changes and they are now visible to your visitors"
+          // );
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          // this.toast(
+          //   "error",
+          //   "Error",
+          //   "We couldn't save your changes, try again later or contact your support"
+          // );
+
           this.loading = false;
         });
     },
+    // toast(title, type, message) {
+    //   this.$bvToast.toast(message, {
+    //     title,
+    //     variant: type === "Error" ? "danger" : "success",
+    //     solid: true,
+    //     toaster: "b-toaster-top-center",
+    //   });
+    // },
     saveVariation() {
       this.loading = true;
       // intialise the new views
@@ -684,6 +656,11 @@ export default {
       this.displayVariations = JSON.parse(
         JSON.stringify(this.originalVariations)
       );
+      // this.toast(
+      //   "info",
+      //   "info",
+      //   "You have successfully reverted your page to how it is currently showing to your visitors"
+      // );
     },
     deleteView(id) {
       if (this.selectedVariation === this.pageName) {
@@ -703,12 +680,18 @@ export default {
       }
       // Then we remove the variation we want to delete
       Vue.delete(this.displayVariations[this.selectedVariation].views, id);
+      this.toast(
+        "deleted",
+        "success",
+        "Your section has been removed, save your page to display this change to your visitors"
+      );
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+$sectionsBlue: #31a9db;
 // .media-mobile(@rules) {
 //   @media only screen and (max-width: 1025px) {
 //     @rules();
@@ -734,16 +717,18 @@ button {
   max-height: 64px;
   width: auto;
   min-width: auto;
-  border-radius: 20px;
+  border-radius: 16px;
   height: auto;
-  padding: 10px 10px;
+  padding: 6px 8px;
   min-height: auto;
   margin: 10px;
 }
 
 // modal styles
 .view-component {
+  position: relative;
   // max-width: 1560px;
+  overflow-x: hidden;
   margin: 0 auto;
   // .media-mobile({width: 100%;});
 }
@@ -765,7 +750,7 @@ button {
       cursor: pointer;
       width: 40px;
       height: 40px;
-      color: #39aad9;
+      color: $sectionsBlue;
       margin: 3px;
       // .media-mobile({width: 6vmin; height: 6vmin;});
     }
@@ -779,26 +764,44 @@ button {
 }
 
 .hp-button {
+  outline: none;
   max-width: 1000px;
   display: flex;
-  background: #39aad9;
+  background: #31a9db;
+  border: none;
   color: white;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background: #298cb6;
+    transition: 0.1s;
+  }
   div {
     display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .btn-icon {
     margin-right: 8px;
     svg {
       color: white;
-      width: 40px;
-      height: 40px;
+      width: 24px;
+      height: 24px;
     }
   }
   &.danger {
     background: red;
+    &:hover {
+      background: rgb(214, 1, 1);
+      transition: 0.1s;
+    }
   }
   &.grey {
-    background: darkgray;
+    background: #8b8b8b;
+    &:hover {
+      background: rgb(143, 142, 142);
+      transition: 0.1s;
+    }
   }
 }
 .part2 {
@@ -820,14 +823,29 @@ button {
       height: 3vw;
       // .media-wide({width: 50px; height: 50px;});
 
-      color: #9032a1;
+      transition: 0.2s;
+      &:hover {
+        transition: 0.2s;
+      }
     }
   }
   .step-back {
     left: 10px;
+    svg {
+      color: #8b8b8b;
+      &:hover {
+        color: darken(#8b8b8b, 10%);
+      }
+    }
   }
   .closeIcon {
     right: 10px;
+    svg {
+      color: $sectionsBlue;
+      &:hover {
+        color: darken($sectionsBlue, 10%);
+      }
+    }
   }
 }
 
@@ -904,7 +922,7 @@ button {
 //   }
 // }
 .section-modal-content {
-  padding: 1rem;
+  padding-bottom: 1rem;
 }
 
 .modal-header,
@@ -943,10 +961,39 @@ button {
     height: 20px;
   }
 }
-.bg-light-grey {
-  background: lightgrey;
+.bg-light-grey-hp {
+  background: #f5f5f5;
+}
+.bg-blue {
+  background: #31a9db;
+  color: white;
+  border: none;
+  outline: none !important;
+  transition: 0.2s;
+
+  &:hover {
+    background: #0881b3;
+    transition: 0.2s;
+  }
 }
 .danger {
   color: white;
+}
+
+.error-section-loaded {
+  text-align: center;
+  color: rgb(216, 42, 42);
+  font-size: 17px;
+  width: 50%;
+  margin: 0 auto;
+  padding: 15px;
+  font-weight: 500;
+}
+
+// .hide-mobile {
+//   .media-mobile({display: none;}) !important;
+// }
+.mainmsg {
+  color: #686868;
 }
 </style>

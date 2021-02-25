@@ -1,6 +1,9 @@
 
 // Import vue components
 import * as components from '@/lib-components/index';
+import VueCookies from "vue-cookies";
+// import i18n from "./i18n"
+// Vue.use(i18n)
 
 // install function executed by Vue.use()
 const install = function installVueSections(Vue,options) {
@@ -14,6 +17,8 @@ const install = function installVueSections(Vue,options) {
   Object.entries(components).forEach(([componentName, component]) => {
     Vue.component(componentName, component);
   });
+
+  Vue.use(VueCookies);
   
   Vue.prototype.$sections =  {
     projectId: options.projectId
