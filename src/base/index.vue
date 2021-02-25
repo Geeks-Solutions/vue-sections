@@ -273,7 +273,9 @@ import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
 
-// import camelCase from "lodash/camelCase";
+import camelCase from "lodash/camelCase";
+import upperFirst from "lodash/upperFirst";
+
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
 import Vue from "vue";
@@ -446,9 +448,9 @@ export default {
           views: { ...views },
         });
         this.selectedVariation = this.activeVariation.pageName;
-        this.$store.commit("setFetched");
-        this.loading = false;
         this.showSections = true;
+        // this.$store.commit("setFetched");
+        this.loading = false;
       })
       .catch(() => {
         // this.toast(
@@ -537,8 +539,77 @@ export default {
               type: d.type,
             });
           });
+          this.types = [...this.types,...this.addSystemTypes()]
         })
         .catch(() => {});
+    },
+    addSystemTypes() {
+      let staticTypes = [];
+      const internal_types = require.context("../src/configs/views", false);
+      let external_types = {};
+      // const internal_types = {};
+      if (process.env.VUE_APP_SECTIONS_CONF) {
+        try {
+          external_types = require.context(
+            `${process.env.VUE_APP_SECTIONS_CONF}/views`,
+            false
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        try {
+          external_types = require.context(`@/sections_config/views`, false);
+        } catch (error) {
+          console.log(error);
+          throw new Error(
+            "vue-sections: There is no sections_config folder in src"
+          );
+        }
+      }
+      staticTypes = this.build_comp(
+        staticTypes,
+        { ...external_types },
+        "external"
+      );
+      staticTypes = this.build_comp(staticTypes, internal_types, "internal");
+      console.log("staticTypes: ", staticTypes);
+      return [...new Set(staticTypes)];
+    },
+    build_comp(staticTypes, types, compType) {
+      let names = staticTypes.map((obj) => {
+        return obj.name;
+      });
+      types.keys().forEach((fileName) => {
+        // const splitName = fileName.split("-");
+        // const type = splitName[1];
+        // const mainName = splitName[0]
+        // if (type) {
+        const name = camelCase(
+          // Gets the file name regardless of folder depth
+          fileName
+            .split("/")
+            .pop()
+            .replace(/\.\w+$/, "")
+        );
+
+        if (!names.includes(name)) {
+          staticTypes.push({
+            name,
+            type: "static",
+            compType,
+          });
+
+          names.push(name);
+        }
+        // } else {
+        //   throw new Error(
+        //     `vue-sections: ${fileName} can't be registered! You should follow the naming convention of any registered component`
+        //   );
+        // }
+      });
+      Vue.component("Wysiwyg")
+      return staticTypes;
     },
     openEditMode() {
       this.getSectionTypes();
