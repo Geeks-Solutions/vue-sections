@@ -34,6 +34,7 @@ export default {
   computed: {
     getComponentForm() {
       const path = "/forms/" + this.name + ".vue";
+      // @TODO managment of external and internal
       return importComp(path, "external");
     },
   },

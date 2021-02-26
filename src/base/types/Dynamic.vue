@@ -38,6 +38,7 @@ export default {
     // this.renderSection(this.props.name)
   },
   methods: {
+    // @TODO this should change from apollo to axios
     // renderSection(name) {
     //   this.$apollo
     //     .mutate({

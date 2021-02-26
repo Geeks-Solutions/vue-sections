@@ -281,7 +281,7 @@ import { formatName, getSectionViewCompName } from "./functions";
 import Vue from "vue";
 import Loading from "./components/Loading.vue";
 
-import { sectionHeader } from "./helpers";
+import { sectionHeader, getComp } from "./helpers";
 
 import axios from "axios";
 export default {
@@ -306,6 +306,7 @@ export default {
     "b-alert": BAlert,
     "b-modal": BModal,
     "b-toast": BToast,
+    ...getComp(),
   },
   props: {
     pageName: {
@@ -419,6 +420,10 @@ export default {
     // axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*"; // for all requests
   },
   mounted() {
+    // @TODO check if the user is admin or not
+    // Everything in the page should be loaded
+    // But if he is admin when he choose from the list of components
+    // we load the componet using Vue.component
     this.$root.$on("toast", ({ type, message }) => {
       this.toast(type, type, message);
     });
@@ -467,7 +472,7 @@ export default {
   methods: {
     createNewPage() {
       // pageName
-      const token = Vue.$cookies.get("sections-auth-token");
+      const token = this.$cookies.get("sections-auth-token");
       const header = {
         token,
       };
@@ -537,6 +542,11 @@ export default {
             this.types.push({
               name: d.name,
               type: d.type,
+              access: d.access,
+              application: d.application,
+              dynamic_options: d.dynamic_options,
+              fields: d.fields,
+              multiple: d.multiple,
             });
           });
           this.types = [...this.types, ...this.addSystemTypes()];
@@ -766,6 +776,14 @@ export default {
         sections.push({ ...refactorView });
       });
 
+      const token = this.$cookies.get("sections-auth-token");
+      const header = {
+        token,
+      };
+      const config = {
+        headers: sectionHeader(header),
+      };
+
       const variables = {
         page: variationName,
         variations: [],
@@ -775,7 +793,7 @@ export default {
         process.env.VUE_APP_SERVER_URL +
         `/api/v1/project/${this.$sections.projectId}/page/${variationName}`;
       axios
-        .put(URL, variables)
+        .put(URL, variables, config)
         .then((res) => {
           if (res.data && res.data.error) {
             this.toast("error", "Error", res.data.error);

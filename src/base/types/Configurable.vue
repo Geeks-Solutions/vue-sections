@@ -104,6 +104,7 @@ export default {
     },
   },
   apollo: {
+      // @TODO On mount we should call get section options
     // getSectionOptions: {
     //   query: getSectionOptions,
     //   variables() {
@@ -227,6 +228,8 @@ export default {
     formatName,
     getTag(type, name) {
       switch (type) {
+        case "integer":
+          return "input";
         case "file":
           return "b-form-file";
         case "string":
@@ -244,6 +247,8 @@ export default {
         case "file":
           return "file";
         case "string":
+          return "text";
+        case "integer":
           return "text";
       }
     },

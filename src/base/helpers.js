@@ -39,3 +39,15 @@ export const sectionHeader = (header) => {
   header[header_key] = "a3b2cd1";
   return header
 }
+
+export const getComp = () => {
+  const widgets = ["Wysiwyg"];
+  const path =`/views/wysiwyg_static.vue`
+  return widgets.reduce(
+    (current, widget) => ({
+      ...current,
+      [widget]: () => import(`@/sections_config${path}`)
+    }),
+    {}
+  );
+}
