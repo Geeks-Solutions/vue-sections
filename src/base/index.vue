@@ -258,7 +258,7 @@ import Static from "./types/Static.vue";
 import Dynamic from "./types/Dynamic.vue";
 import Configurable from "./types/Configurable.vue";
 import Local from "./types/Local.vue";
-import { BAlert, BModal, VBModal, BToast } from "bootstrap-vue";
+import { BAlert, BModal, BToast } from "bootstrap-vue";
 
 // import other comps
 import SectionItem from "./sectionItem.vue";
@@ -274,7 +274,7 @@ import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
 
 import camelCase from "lodash/camelCase";
-import upperFirst from "lodash/upperFirst";
+// import upperFirst from "lodash/upperFirst";
 
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
@@ -539,7 +539,7 @@ export default {
               type: d.type,
             });
           });
-          this.types = [...this.types,...this.addSystemTypes()]
+          this.types = [...this.types, ...this.addSystemTypes()];
         })
         .catch(() => {});
     },
@@ -547,21 +547,22 @@ export default {
       let staticTypes = [];
       const internal_types = require.context("../src/configs/views", false);
       let external_types = {};
-      // const internal_types = {};
+      let external_path = "";
       if (process.env.VUE_APP_SECTIONS_CONF) {
         try {
           external_types = require.context(
             `${process.env.VUE_APP_SECTIONS_CONF}/views`,
             false
           );
+          external_path = `${process.env.VUE_APP_SECTIONS_CONF}/views`;
         } catch (error) {
           console.log(error);
         }
       } else {
         try {
           external_types = require.context(`@/sections_config/views`, false);
+          external_path = `@/sections_config/views`;
         } catch (error) {
-          console.log(error);
           throw new Error(
             "vue-sections: There is no sections_config folder in src"
           );
@@ -570,45 +571,52 @@ export default {
       staticTypes = this.build_comp(
         staticTypes,
         { ...external_types },
-        "external"
+        "external",
+        external_path
       );
-      staticTypes = this.build_comp(staticTypes, internal_types, "internal");
+      staticTypes = this.build_comp(
+        staticTypes,
+        internal_types,
+        "internal",
+        "internal:path"
+      );
       console.log("staticTypes: ", staticTypes);
       return [...new Set(staticTypes)];
     },
-    build_comp(staticTypes, types, compType) {
+    build_comp(staticTypes, types, compType, path) {
       let names = staticTypes.map((obj) => {
         return obj.name;
       });
       types.keys().forEach((fileName) => {
-        // const splitName = fileName.split("-");
-        // const type = splitName[1];
-        // const mainName = splitName[0]
-        // if (type) {
-        const name = camelCase(
-          // Gets the file name regardless of folder depth
-          fileName
-            .split("/")
-            .pop()
-            .replace(/\.\w+$/, "")
-        );
-
-        if (!names.includes(name)) {
-          staticTypes.push({
-            name,
-            type: "static",
-            compType,
-          });
-
-          names.push(name);
+        const splitName = fileName.split("_");
+        const type = splitName[1];
+        const mainName = splitName[0];
+        if (type) {
+          if (type == "local") {
+            const name = camelCase(
+              // Gets the file name regardless of folder depth
+              mainName
+                .split("/")
+                .pop()
+                .replace(/\.\w+$/, "")
+            );
+            if (!names.includes(name)) {
+              staticTypes.push({
+                name,
+                type,
+                compType,
+              });
+              names.push(name);
+            }
+          }
+        } else {
+          if (fileName.includes(".vue")) {
+            console.error(
+              `vue-sections: ${fileName} in ${path} can't be registered! You should follow the naming convention of any registered component '{Section Name}_{Section Type}.vue'`
+            );
+          }
         }
-        // } else {
-        //   throw new Error(
-        //     `vue-sections: ${fileName} can't be registered! You should follow the naming convention of any registered component`
-        //   );
-        // }
       });
-      Vue.component("Wysiwyg")
       return staticTypes;
     },
     openEditMode() {

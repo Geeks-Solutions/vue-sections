@@ -22,14 +22,13 @@ export const importComp = (path,type) => {
       return () => import(`../src/configs${path}`);
     } else {
       if (process.env.VUE_APP_SECTIONS_CONF) {
-        return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`);
+        return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
       } else {
-        return () => import(`@/sections_config${path}`);
+        return () => import(`@/sections_config${path}`)
       }
     }
   } catch (error) {
     throw new Error(`vue-sections: can't find the file in your filesystem: ${path}`)
-    // return
   }
 }
 
