@@ -65,6 +65,7 @@ export default {
         .then((res) => {
           if (res.data && res.data.error) {
             this.$emit('errorAddingSection', {
+              closeModal: true,
               title: "Error adding "+ this.props.name,
               message: res.data.error
             })
@@ -82,6 +83,7 @@ export default {
         })
         .catch(() => {
           this.$emit('errorAddingSection', {
+              closeModal: true,
               title: "Error adding "+ this.props.name,
               message: "We couldn't save your changes, try again later"
             })

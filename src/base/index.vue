@@ -157,6 +157,7 @@
               <Configurable
                 v-if="currentSection.type === 'configurable'"
                 @addSectionType="addSectionType"
+                @errorAddingSection="errorAddingSection"
                 :props="currentSection"
                 :variation="variation"
                 :savedView="savedView"
@@ -833,7 +834,7 @@ export default {
       this.showToast("Deletet", "info", "Your section has been removed, save your page to display this change to your visitors")
     },
     errorAddingSection(error){
-      this.isModalOpen = false;
+      this.isModalOpen = !error.closeModal;
       this.showToast(error.title, "danger", error.message)      
     },
   },
