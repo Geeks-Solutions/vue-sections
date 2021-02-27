@@ -2,7 +2,8 @@
 // Import vue components
 import * as components from '@/lib-components/index';
 import VueCookies from "vue-cookies";
-import "./i18n"
+// This is the way to have the toaster
+import { ToastPlugin } from 'bootstrap-vue';
 
 
 // install function executed by Vue.use()
@@ -13,12 +14,12 @@ const install = function installVueSections(Vue,options) {
   if(!options.hasOwnProperty('projectId'))
     throw new Error("vue-sections: You should define your projectId")
 
-
   Object.entries(components).forEach(([componentName, component]) => {
     Vue.component(componentName, component);
   });
 
   Vue.use(VueCookies);
+  Vue.use(ToastPlugin);
 
   Vue.prototype.$formatText = (text, sep = " ") => {
     const result = text.replace(/([A-Z])/g, `${sep}$1`);

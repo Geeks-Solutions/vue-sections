@@ -1,7 +1,7 @@
 // rollup.config.js
 import fs from 'fs';
 import path from 'path';
-import vue from 'rollup-plugin-vue';
+import vuePlugin from 'rollup-plugin-vue';
 import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -29,7 +29,7 @@ const baseConfig = {
           {
             find: '@',
             replacement: `${path.resolve(projectRoot, 'src')}`,
-          },
+          }
         ],
         customResolver: resolve({
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -40,7 +40,7 @@ const baseConfig = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.VUE_APP_SERVER_URL': JSON.stringify('https://sections-saas.k8s-dev.geeks.solutions'),
     },
-    vue: {
+    vuePlugin: {
       css: true,
       template: {
         isProduction: true,
@@ -61,6 +61,7 @@ const baseConfig = {
 const external = [
   // list external dependencies, exactly the way it is written in the import statement.
   // eg. 'jquery'
+  // path.resolve('node_modules/vue/dist/vue.runtime.esm.js'),
   'vue',
 ];
 
@@ -88,7 +89,7 @@ if (!argv.format || argv.format === 'es') {
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
       scss(),
-      vue(baseConfig.plugins.vue),
+      vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
       babel({
         ...baseConfig.plugins.babel,
@@ -123,10 +124,10 @@ if (!argv.format || argv.format === 'cjs') {
       scss(),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      vue({
-        ...baseConfig.plugins.vue,
+      vuePlugin({
+        ...baseConfig.plugins.vuePlugin,
         template: {
-          ...baseConfig.plugins.vue.template,
+          ...baseConfig.plugins.vuePlugin.template,
           optimizeSSR: true,
         },
       }),
@@ -154,7 +155,7 @@ if (!argv.format || argv.format === 'iife') {
       scss(),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
+      vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
       babel(baseConfig.plugins.babel),
       commonjs(),

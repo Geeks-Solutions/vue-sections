@@ -11,7 +11,7 @@
       </button>
       <div class="bg-light-grey-hp hide-mobile">
         <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
-          MESSAGE?
+          Your changes will be published when the page is saved.
         </div>
 
         <div
@@ -150,6 +150,7 @@
                 v-if="currentSection.type === 'dynamic'"
                 :props="currentSection"
                 @addSectionType="addSectionType"
+                @errorAddingSection="errorAddingSection"
                 :savedView="savedView"
                 :headers="headers"
               />
@@ -233,21 +234,6 @@
       <button class="hp-button" @click="createNewPage">
         Create New Page
       </button>
-      <b-toast title="" solid variant="success" :visible="successCreatePage">
-        Congratulations on successfully creating a new page on sections. Start
-        adding some content to it.
-      </b-toast>
-      <b-modal
-        class="modal"
-        header-bg-variant="danger"
-        header-text-variant="light"
-        title="Unable to Create New Page for Sections"
-        :visible="errorCreatePage"
-        ok-title="Try Again"
-        centered
-      >
-        We are unable to create a new page for sections for {{ pageName }}
-      </b-modal>
     </div>
   </div>
 </template>
@@ -258,7 +244,7 @@ import Static from "./types/Static.vue";
 import Dynamic from "./types/Dynamic.vue";
 import Configurable from "./types/Configurable.vue";
 import Local from "./types/Local.vue";
-import { BAlert, BModal, BToast } from "bootstrap-vue";
+import { BAlert, BModal } from "bootstrap-vue";
 
 // import other comps
 import SectionItem from "./sectionItem.vue";
@@ -278,7 +264,6 @@ import camelCase from "lodash/camelCase";
 
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
-import Vue from "vue";
 import Loading from "./components/Loading.vue";
 
 import { sectionHeader, getComp } from "./helpers";
@@ -305,15 +290,10 @@ export default {
     LinkIcon,
     "b-alert": BAlert,
     "b-modal": BModal,
-    "b-toast": BToast,
     ...getComp(),
   },
   props: {
     pageName: {
-      type: String,
-      default: "",
-    },
-    projectId: {
       type: String,
       default: "",
     },
@@ -349,8 +329,6 @@ export default {
     return {
       showSections: false,
       pageNotFound: false,
-      successCreatePage: false,
-      errorCreatePage: false,
       dismissCountDown: 0,
       editMode: false,
       selectedVariation: this.pageName,
@@ -403,7 +381,7 @@ export default {
         for (let index = 0; index < newValue.length; index++) {
           const replacement = newValue[index];
           replacement.weight = index;
-          Vue.set(
+          this.$set(
             this.displayVariations[this.selectedVariation].views,
             newValue[index].id,
             replacement
@@ -416,8 +394,6 @@ export default {
     axios.defaults.headers.common["token"] = this.$cookies.get(
       "sections-auth-token"
     ); // for all requests
-    // axios.defaults.headers.common["origin"] = "http://localhost:3330"; // for all requests
-    // axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*"; // for all requests
   },
   mounted() {
     // @TODO check if the user is admin or not
@@ -425,7 +401,7 @@ export default {
     // But if he is admin when he choose from the list of components
     // we load the componet using Vue.component
     this.$root.$on("toast", ({ type, message }) => {
-      this.toast(type, type, message);
+      this.showToast(type, type, message);
     });
     this.loading = true;
     this.checkToken();
@@ -448,7 +424,7 @@ export default {
             views["test"] = section;
           }
         });
-        Vue.set(this.displayVariations, this.activeVariation.pageName, {
+        this.$set(this.displayVariations, this.activeVariation.pageName, {
           name: this.activeVariation.pageName,
           views: { ...views },
         });
@@ -457,16 +433,12 @@ export default {
         // this.$store.commit("setFetched");
         this.loading = false;
       })
-      .catch(() => {
-        // this.toast(
-        //   "Error",
-        //   "Error",
-        //   "Couldn't load the page.Check logs for more info please"
-        // );
+      .catch((error) => {
+        this.showToast("Error", "danger", "Couldn't load the page: "+ error)
         this.loading = false;
         this.showSections = true;
         this.pageNotFound = true;
-        this.$store.commit("setFetched");
+        // this.$store.commit("setFetched");
       });
   },
   methods: {
@@ -479,7 +451,7 @@ export default {
       const config = {
         headers: sectionHeader(header),
       };
-      const URL = `${this.server_url}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+      const URL = `${process.env.VUE_APP_SERVER_URL}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
       axios
         .put(
           URL,
@@ -490,14 +462,19 @@ export default {
           config
         )
         .then((res) => {
-          this.successCreatePage = true;
-          setTimeout(() => {
-            this.successCreatePage = false;
-          }, 1000);
+          this.showToast("Success", "success", "Congratulations on successfully creating a new page on sections. Start adding some content to it.")
         })
         .catch((err) => {
-          this.errorCreatePage = true;
+          this.showToast("Error creating page", "danger", "We are unable to create a new sections page for " + pageName)
         });
+    },
+    showToast(title, variant, message) {
+        this.$bvToast.toast(message, {
+        title,
+        variant,
+        solid: true,
+        toaster: "b-toaster-top-center",
+      });
     },
     checkToken() {
       const root_path = window.location.href.split("?")[0];
@@ -551,7 +528,9 @@ export default {
           });
           this.types = [...this.types, ...this.addSystemTypes()];
         })
-        .catch(() => {});
+        .catch((error) => {
+          this.showToast("Error", "danger", error)
+        });
     },
     addSystemTypes() {
       let staticTypes = [];
@@ -683,7 +662,7 @@ export default {
       finalSections.map((section) => {
         finalViews[section.id] = section;
       });
-      Vue.set(
+      this.$set(
         this.displayVariations[this.selectedVariation],
         "views",
         finalViews
@@ -710,7 +689,7 @@ export default {
         }
 
         section.linkedTo = "";
-        Vue.set(
+        this.$set(
           this.displayVariations[this.selectedVariation].views,
           section.id,
           section
@@ -727,7 +706,7 @@ export default {
                 sectionVariation.settings = section.settings;
               return sectionVariation;
             });
-            Vue.set(this.displayVariations[variation.pageName], "views", {
+            this.$set(this.displayVariations[variation.pageName], "views", {
               ...newViews,
             });
           });
@@ -740,12 +719,9 @@ export default {
         this.isModalOpen = false;
         this.savedView = {};
         this.loading = false;
+        this.showToast("Success", "info", "This sections was successfully added to your page but is now only visible to you.")
       } catch (e) {
-        // this.toast(
-        //   "error",
-        //   "Error",
-        //   "We are unable to preview your section, try again later or contact your support"
-        // );
+        this.showToast("Error", "danger", "We are unable to preview your section, try again later")
       }
     },
     mutateVariation(variationName) {
@@ -796,35 +772,18 @@ export default {
         .put(URL, variables, config)
         .then((res) => {
           if (res.data && res.data.error) {
-            this.toast("error", "Error", res.data.error);
+            this.showToast("error", "danger", res.data.error);
             return;
           }
           this.displayVariations[variationName].altered = false;
           this.loading = false;
-          // this.toast(
-          //   "Success",
-          //   "Success",
-          //   "You have successfully saved your changes and they are now visible to your visitors"
-          // );
+          this.showToast("Success", "success", "You have successfully saved your changes and they are now visible to your visitors");
         })
         .catch(() => {
-          // this.toast(
-          //   "error",
-          //   "Error",
-          //   "We couldn't save your changes, try again later or contact your support"
-          // );
-
+          this.showToast("Error", "danger", "We couldn't save your changes, try again later");
           this.loading = false;
         });
     },
-    // toast(title, type, message) {
-    //   this.$bvToast.toast(message, {
-    //     title,
-    //     variant: type === "Error" ? "danger" : "success",
-    //     solid: true,
-    //     toaster: "b-toaster-top-center",
-    //   });
-    // },
     saveVariation() {
       this.loading = true;
       // intialise the new views
@@ -851,11 +810,7 @@ export default {
       this.displayVariations = JSON.parse(
         JSON.stringify(this.originalVariations)
       );
-      // this.toast(
-      //   "info",
-      //   "info",
-      //   "You have successfully reverted your page to how it is currently showing to your visitors"
-      // );
+      this.showToast("Revert Successful", "info", "You have successfully reverted your page to how it is currently showing to your visitors")
     },
     deleteView(id) {
       if (this.selectedVariation === this.pageName) {
@@ -868,18 +823,18 @@ export default {
             if (section.linkedTo === id) section.linkedTo = "";
             return section;
           });
-          Vue.set(this.displayVariations[variation.pageName], "views", {
+          this.$set(this.displayVariations[variation.pageName], "views", {
             ...newViews,
           });
         });
       }
       // Then we remove the variation we want to delete
-      Vue.delete(this.displayVariations[this.selectedVariation].views, id);
-      this.toast(
-        "deleted",
-        "success",
-        "Your section has been removed, save your page to display this change to your visitors"
-      );
+      this.$delete(this.displayVariations[this.selectedVariation].views, id);
+      this.showToast("Deletet", "info", "Your section has been removed, save your page to display this change to your visitors")
+    },
+    errorAddingSection(error){
+      this.isModalOpen = false;
+      this.showToast(error.title, "danger", error.message)      
     },
   },
 };

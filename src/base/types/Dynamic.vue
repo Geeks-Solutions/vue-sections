@@ -5,6 +5,9 @@
 </template>
 
 <script>
+import axios from "axios";
+import { sectionHeader } from "../helpers";
+
 export default {
   props: {
     props: {
@@ -35,37 +38,57 @@ export default {
     },
   },
   mounted() {
-    // this.renderSection(this.props.name)
+    this.renderSection(this.props.name)
   },
   methods: {
-    // @TODO this should change from apollo to axios
-    // renderSection(name) {
-    //   this.$apollo
-    //     .mutate({
-    //       mutation: renderSection,
-    //       variables: {
-    //         settings: {
-    //           name,
-    //           weight: 1
-    //         }
-    //       },
-    //       context: {
-    //         headers: this.headers
-    //       }
-    //     })
-    //     .then(res => {
-    //       this.$emit('addSectionType', {
-    //         name: this.props.name,
-    //         type: 'dynamic',
-    //         id: this.id,
-    //         weight: this.weight,
-    //         renderData: res.data.renderSection.renderData
-    //       })
-    //     })
-    //     .catch(err => {
-    //       console.log(err)
-    //     })
-    // }
+    renderSection(name) {
+      
+      const token = this.$cookies.get("sections-auth-token");
+      const header = {
+        token,
+      };
+      const config = {
+        headers: sectionHeader(header),
+      };
+
+      const variables = {
+        section: {
+              name,
+              weight: 1
+            }
+      };
+      const URL =
+        process.env.VUE_APP_SERVER_URL +
+        `/api/v1/project/${this.$sections.projectId}/section/render`;
+      axios
+        .post(URL, variables, config)
+        .then((res) => {
+          if (res.data && res.data.error) {
+            this.$emit('errorAddingSection', {
+              title: "Error adding "+ this.props.name,
+              message: res.data.error
+            })
+            this.loading = false;
+            return;
+          }
+          this.$emit('addSectionType', {
+            name: this.props.name,
+            type: 'dynamic',
+            id: this.id,
+            weight: this.weight,
+            renderData: res.data.renderSection.renderData
+          })
+          this.loading = false;
+        })
+        .catch(() => {
+          this.$emit('errorAddingSection', {
+              title: "Error adding "+ this.props.name,
+              message: "We couldn't save your changes, try again later"
+            })
+
+          this.loading = false;
+        });
+    }
   },
 };
 </script>
