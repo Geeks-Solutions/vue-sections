@@ -31,13 +31,11 @@ export default {
   computed: {
     getIcon() {
       const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
-      return importComp(path, "external");
+      return importComp(path);
     },
     getIconBase() {
-      // this is commented for now for testing purposes
-      // return () => import(`./base/icons/${this.title.replace(/ /g, "_")}`);
       const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
-      return importComp(path, "external");
+      return importComp(path);
     },
   },
 };

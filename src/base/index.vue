@@ -25,28 +25,28 @@
             "
           >
             <div class="btn-icon plus-icon"><PlusIcon /></div>
-            <div class="btn-text">Add</div>
+            <div class="btn-text">{{ $t("Add") }}</div>
           </button>
           <button class="hp-button" @click="saveVariation">
             <div class="btn-icon check-icon"><CheckIcon /></div>
-            <div class="btn-text">Save</div>
+            <div class="btn-text">{{ $t("Save") }}</div>
           </button>
           <button class="hp-button grey" @click="restoreVariations">
             <div class="btn-icon back-icon"><BackIcon /></div>
-            <div class="btn-text">Restore</div>
+            <div class="btn-text">{{ $t("Restore") }}</div>
           </button>
           <button
             @click="$cookies.remove('sections-auth-token'), (admin = false)"
             v-if="admin"
             class="bg-blue control-button"
-            style="    right: 0px;
-    left: auto;
-    background: black;
-    font-size: 13px;
-    border-radius: 5px;
-    padding: 3px 6px;"
+            style="right: 0px;
+                  left: auto;
+                  background: black;
+                  font-size: 13px;
+                  border-radius: 5px;
+                  padding: 3px 6px;"
           >
-            Logout
+            {{ $t("Logout") }}
           </button>
         </div>
       </div>
@@ -97,7 +97,7 @@
             @click="synch()"
           >
             <div class="icon" :class="{ synched }"><SyncIcon /></div>
-            <span>Synchronise</span>
+            <span>{{ $t("Synchronise") }}</span>
           </div>
         </div>
       </div>
@@ -186,47 +186,44 @@
           @end="drag = false"
           handle=".handle"
         >
-          <transition-group>
-            <section
-              v-for="(view, index) in currentViews"
-              :key="index"
-              :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
-            >
-              <div class="section-view">
-                <div
-                  class="controls d-flex justify-content-center hide-mobile"
-                  v-if="admin && editMode"
-                >
-                  <LinkIcon v-if="view.linkedTo" />
-                  <div @click="edit(view)" v-if="editable(view.type)">
-                    <EditIcon class="edit-icon" />
-                  </div>
-                  <DragIcon class="drag-icon handle" />
-                  <div @click="deleteView(view.id)">
-                    <TrashIcon class="trash-icon" />
-                  </div>
+          <!-- <transition-group> -->
+          <section
+            v-for="(view, index) in currentViews"
+            :key="index"
+            :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
+          >
+            <div class="section-view">
+              <div
+                class="controls d-flex justify-content-center hide-mobile"
+                v-if="admin && editMode"
+              >
+                <LinkIcon v-if="view.linkedTo" />
+                <div @click="edit(view)" v-if="editable(view.type)">
+                  <EditIcon class="edit-icon" />
                 </div>
-                <div
-                  class="view-component"
-                  :style="{ background: viewsBgColor }"
-                >
-                  <component
-                    v-if="view.settings"
-                    :is="getSectionViewCompName(view.name)"
-                    :section="view"
-                    :lang="lang"
-                  />
-                  <div v-else>
-                    <div v-if="admin" class="error-section-loaded">
-                      Some sections could not be loaded correctly, saving the
-                      page will delete these sections from your page, unless you
-                      are happy with the page you see now, do not save it
-                    </div>
+                <DragIcon class="drag-icon handle" />
+                <div @click="deleteView(view.id)">
+                  <TrashIcon class="trash-icon" />
+                </div>
+              </div>
+              <div class="view-component" :style="{ background: viewsBgColor }">
+                <component
+                  v-if="view.settings || view.type == 'local'"
+                  :is="getSectionViewCompName(view.name)"
+                  :section="view"
+                  :lang="lang"
+                />
+                <div v-else>
+                  <div v-if="admin" class="error-section-loaded">
+                    Some sections could not be loaded correctly, saving the page
+                    will delete these sections from your page, unless you are
+                    happy with the page you see now, do not save it
                   </div>
                 </div>
               </div>
-            </section>
-          </transition-group>
+            </div>
+          </section>
+          <!-- </transition-group> -->
         </draggable>
       </div>
       <Loading :loading="loading" />
@@ -240,6 +237,7 @@
 </template>
 
 <script>
+import initI18n from "@/i18n";
 // import sections types
 import Static from "./types/Static.vue";
 import Dynamic from "./types/Dynamic.vue";
@@ -261,16 +259,16 @@ import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
 
 import camelCase from "lodash/camelCase";
-// import upperFirst from "lodash/upperFirst";
+import upperFirst from "lodash/upperFirst";
 
 // import functions
 import { formatName, getSectionViewCompName } from "./functions";
 import Loading from "./components/Loading.vue";
 
-import { sectionHeader, getComp } from "./helpers";
-
+import { sectionHeader, importComp } from "./helpers";
 import axios from "axios";
 export default {
+  i18n: initI18n,
   layout: "dashboard",
   components: {
     Loading,
@@ -291,7 +289,6 @@ export default {
     LinkIcon,
     "b-alert": BAlert,
     "b-modal": BModal,
-    ...getComp(),
   },
   props: {
     pageName: {
@@ -328,6 +325,7 @@ export default {
 
   data() {
     return {
+      sectionInPage: [],
       showSections: false,
       pageNotFound: false,
       dismissCountDown: 0,
@@ -395,8 +393,6 @@ export default {
     axios.defaults.headers.common["token"] = this.$cookies.get(
       "sections-auth-token"
     ); // for all requests
-  },
-  mounted() {
     // @TODO check if the user is admin or not
     // Everything in the page should be loaded
     // But if he is admin when he choose from the list of components
@@ -418,7 +414,9 @@ export default {
         const sections = res.data.sections;
         const views = {};
         sections.map((section) => {
-          section.settings = JSON.parse(section.settings);
+          this.trackSectionComp(section.name, section.type);
+          if(section.settings)
+            section.settings = JSON.parse(section.settings);
           if (section.id) {
             views[section.id] = section;
           } else {
@@ -435,7 +433,7 @@ export default {
         this.loading = false;
       })
       .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: "+ error)
+        this.showToast("Error", "danger", "Couldn't load the page: " + error);
         this.loading = false;
         this.showSections = true;
         this.pageNotFound = true;
@@ -443,6 +441,22 @@ export default {
       });
   },
   methods: {
+    trackSectionComp(sectionName, sectionType) {
+      if (!this.sectionInPage.includes(sectionName)) {
+        this.sectionInPage.push(sectionName);
+        const name = upperFirst(
+          camelCase(
+            // Gets the file name regardless of folder depth
+            sectionName
+              .split("/")
+              .pop()
+              .replace(/\.\w+$/, "")
+          )
+        );
+        const path = `/views/${sectionName}_${sectionType}.vue`;
+        this.$options.components[name] = importComp(path);
+      }
+    },
     createNewPage() {
       // pageName
       const token = this.$cookies.get("sections-auth-token");
@@ -463,14 +477,22 @@ export default {
           config
         )
         .then((res) => {
-          this.showToast("Success", "success", "Congratulations on successfully creating a new page on sections. Start adding some content to it.")
+          this.showToast(
+            "Success",
+            "success",
+            "Congratulations on successfully creating a new page on sections. Start adding some content to it."
+          );
         })
         .catch((err) => {
-          this.showToast("Error creating page", "danger", "We are unable to create a new sections page for " + pageName)
+          this.showToast(
+            "Error creating page",
+            "danger",
+            "We are unable to create a new sections page for " + pageName
+          );
         });
     },
     showToast(title, variant, message) {
-        this.$bvToast.toast(message, {
+      this.$bvToast.toast(message, {
         title,
         variant,
         solid: true,
@@ -517,6 +539,7 @@ export default {
         .get(url, config)
         .then((res) => {
           res.data.data.map((d) => {
+            this.trackSectionComp(d.name, d.type);
             this.types.push({
               name: d.name,
               type: d.type,
@@ -530,7 +553,7 @@ export default {
           this.types = [...this.types, ...this.addSystemTypes()];
         })
         .catch((error) => {
-          this.showToast("Error", "danger", error)
+          this.showToast("Error", "danger", error);
         });
     },
     addSystemTypes() {
@@ -591,6 +614,7 @@ export default {
                 .replace(/\.\w+$/, "")
             );
             if (!names.includes(name)) {
+              this.trackSectionComp(name, "local");
               staticTypes.push({
                 name,
                 type,
@@ -720,9 +744,17 @@ export default {
         this.isModalOpen = false;
         this.savedView = {};
         this.loading = false;
-        this.showToast("Success", "info", "This sections was successfully added to your page but is now only visible to you.")
+        this.showToast(
+          "Success",
+          "info",
+          "This sections was successfully added to your page but is now only visible to you."
+        );
       } catch (e) {
-        this.showToast("Error", "danger", "We are unable to preview your section, try again later")
+        this.showToast(
+          "Error",
+          "danger",
+          "We are unable to preview your section, try again later"
+        );
       }
     },
     mutateVariation(variationName) {
@@ -778,10 +810,18 @@ export default {
           }
           this.displayVariations[variationName].altered = false;
           this.loading = false;
-          this.showToast("Success", "success", "You have successfully saved your changes and they are now visible to your visitors");
+          this.showToast(
+            "Success",
+            "success",
+            "You have successfully saved your changes and they are now visible to your visitors"
+          );
         })
         .catch(() => {
-          this.showToast("Error", "danger", "We couldn't save your changes, try again later");
+          this.showToast(
+            "Error",
+            "danger",
+            "We couldn't save your changes, try again later"
+          );
           this.loading = false;
         });
     },
@@ -811,7 +851,11 @@ export default {
       this.displayVariations = JSON.parse(
         JSON.stringify(this.originalVariations)
       );
-      this.showToast("Revert Successful", "info", "You have successfully reverted your page to how it is currently showing to your visitors")
+      this.showToast(
+        "Revert Successful",
+        "info",
+        "You have successfully reverted your page to how it is currently showing to your visitors"
+      );
     },
     deleteView(id) {
       if (this.selectedVariation === this.pageName) {
@@ -831,11 +875,15 @@ export default {
       }
       // Then we remove the variation we want to delete
       this.$delete(this.displayVariations[this.selectedVariation].views, id);
-      this.showToast("Deletet", "info", "Your section has been removed, save your page to display this change to your visitors")
+      this.showToast(
+        "Deletet",
+        "info",
+        "Your section has been removed, save your page to display this change to your visitors"
+      );
     },
-    errorAddingSection(error){
+    errorAddingSection(error) {
       this.isModalOpen = !error.closeModal;
-      this.showToast(error.title, "danger", error.message)      
+      this.showToast(error.title, "danger", error.message);
     },
   },
 };

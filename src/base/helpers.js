@@ -1,3 +1,5 @@
+import { BIconFileEarmarkSlidesFill } from "bootstrap-vue";
+
 export const base64Img = file => {
   const reader = new FileReader();
   return new Promise(resolve => {
@@ -16,19 +18,19 @@ export const base64Img = file => {
   });
 };
 
-export const importComp = (path,type) => {
+export const importComp = (path) => {
   try {
-    if (type == "internal") {
-      return () => import(`../src/configs${path}`);
+    if (process.env.VUE_APP_SECTIONS_CONF) {
+      return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
     } else {
-      if (process.env.VUE_APP_SECTIONS_CONF) {
-        return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
-      } else {
-        return () => import(`@/sections_config${path}`)
-      }
+      return () => import(`@/sections_config${path}`)
     }
   } catch (error) {
-    throw new Error(`vue-sections: can't find the file in your filesystem: ${path}`)
+    try {
+      return () => import(`../src/configs${path}`);
+    } catch (error) {
+      throw new Error(`vue-sections: can't find the file in your filesystem: ${path}`)
+    }
   }
 }
 
@@ -38,16 +40,4 @@ export const sectionHeader = (header) => {
   const header_key = `project-id-${timestamp}-${random}`;
   header[header_key] = "a3b2cd1";
   return header
-}
-
-export const getComp = () => {
-  const widgets = ["Wysiwyg"];
-  const path =`/views/wysiwyg_static.vue`
-  return widgets.reduce(
-    (current, widget) => ({
-      ...current,
-      [widget]: () => import(`@/sections_config${path}`)
-    }),
-    {}
-  );
 }

@@ -44,7 +44,7 @@ export default {
     component() {
       // @TODO managment of external and internal
       const path = "/views/" + this.props.name + ".vue";
-      return importComp(path, "internal");
+      return importComp(path);
     },
     id() {
       if (this.savedView.id) {

@@ -5,7 +5,6 @@ import VueCookies from "vue-cookies";
 // This is the way to have the toaster
 import { ToastPlugin } from 'bootstrap-vue';
 
-
 // install function executed by Vue.use()
 const install = function installVueSections(Vue,options) {
   if(options == undefined)
