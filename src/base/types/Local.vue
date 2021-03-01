@@ -9,12 +9,12 @@ export default {
   props: {
     props: {
       type: Object,
-      default: {}
+      default: {},
     },
     savedView: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   computed: {
     id() {
@@ -27,8 +27,8 @@ export default {
       if (this.savedView.weight) {
         return this.savedView.weight;
       }
-      return null;
-    }
+      return 0;
+    },
   },
   mounted() {
     // add a little time for the user to see the popup and know that the section is adding
@@ -37,10 +37,10 @@ export default {
         name: this.props.name,
         type: "local",
         id: this.id,
-        weight: this.weight
+        weight: this.weight,
       });
     }, 500);
-  }
+  },
 };
 </script>
 

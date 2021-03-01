@@ -42,7 +42,7 @@
             >
               <option value="no-value">Select a value</option>
               <option
-                v-for="option in optionValues.optionValues"
+                v-for="option in optionValues.option_values"
                 :selected="
                   parseInt(option.id) === parseInt(options[idx].effect)
                 "
@@ -85,8 +85,8 @@
 </template>
 
 <script>
-import { formatName } from "../functions";
-import { base64Img } from "../helpers";
+import { formatName, base64Img, sectionHeader } from "../helpers";
+import axios from "axios";
 
 export default {
   props: {
@@ -102,23 +102,6 @@ export default {
       type: Object,
       default: {},
     },
-  },
-  apollo: {
-    // getSectionOptions: {
-    //   query: getSectionOptions,
-    //   variables() {
-    //     return {
-    //       type: this.props.name
-    //     }
-    //   },
-    //   skip() {
-    //     return !this.props.dynamicOptions && !this.savedView.dynamicOptions
-    //   },
-    //   result({ data }) {
-    //     const optionValues = data.getSectionOptions[0]
-    //     this.optionValues = optionValues
-    //   }
-    // }
   },
   data() {
     return {
@@ -172,6 +155,33 @@ export default {
     if (this.props.multiple && !ob) {
       this.props.fields = [this.props.fields];
     }
+
+    if (this.props.dynamic_options || this.savedView.dynamic_options){
+      this.$emit("loading");
+      const token = this.$cookies.get("sections-auth-token");
+      const header = {
+        token,
+      };
+      const config = {
+        headers: sectionHeader(header),
+      };
+
+      const URL =
+        process.env.VUE_APP_SERVER_URL +
+        `/api/v1/project/${this.$sections.projectId}/section/${this.props.name}/options`;
+      
+      axios
+        .get(URL, config)
+        .then((res) => {
+          //TODO this should be updated to iterate over all the elements of the data array 
+          //and key the result by the `field` key in the object
+          this.optionValues = res.data[0]
+          this.$emit("loading");
+        })
+        .catch((err) => {
+          this.$emit("loading");
+        });
+    }
   },
   methods: {
     savedFile(options, field, idx) {
@@ -213,7 +223,7 @@ export default {
         fields.map((field) => {
           if (!opt[field.name] || opt[field.name] === "no-value") {
             errorMessage =
-              "You must fill your current fields before adding new one";
+              "You must fill your current fields before adding a new one";
           }
         });
       });
@@ -227,12 +237,20 @@ export default {
     formatName,
     getTag(type, name) {
       switch (type) {
+        case "integer":
+          if (
+            this.optionValues.field === name &&
+            this.optionValues.option_values
+          ) {
+            return "select";
+          }
+          return "input";
         case "file":
           return "b-form-file";
         case "string":
           if (
             this.optionValues.field === name &&
-            this.optionValues.optionValues
+            this.optionValues.option_values
           ) {
             return "select";
           }
@@ -244,6 +262,8 @@ export default {
         case "file":
           return "file";
         case "string":
+          return "text";
+        case "integer":
           return "text";
       }
     },
@@ -265,36 +285,57 @@ export default {
       }
       this.$emit("loading");
 
-      // const options = JSON.stringify(this.options)
+      const token = this.$cookies.get("sections-auth-token");
+      const header = {
+        token,
+      };
+      const config = {
+        headers: sectionHeader(header),
+      };
 
-      // this.$apollo
-      //   .mutate({
-      //     mutation: renderSection,
-      //     variables: {
-      //       settings: {
-      //         name: this.props.name,
-      //         weight: 0,
-      //         options
-      //       }
-      //     },
-      //     context: {
-      //       headers: this.headers
-      //     }
-      //   })
-      //   .then(res => {
-      //     this.$emit('addSectionType', {
-      //       name: this.props.name,
-      //       type: 'configurable',
-      //       settings: this.options,
-      //       id: this.id,
-      //       weight: this.weight,
-      //       renderData: res.data.renderSection.renderData
-      //     })
+      const options = JSON.stringify(this.options)
 
-      //   }).catch(()=>{
-      //     this.errorMessage = 'Something went wrong, please try again later'
-      //     this.$emit('loading')
-      //   })
+      const variables = {
+        section: {
+              name: this.props.name,
+              weight: 1,
+              options
+            }
+      };
+      const URL =
+        process.env.VUE_APP_SERVER_URL +
+        `/api/v1/project/${this.$sections.projectId}/section/render`;
+
+      axios
+        .post(URL, variables, config)
+        .then((res) => {
+          if (res.data && res.data.error) {
+            this.$emit("loading");
+            this.$emit('errorAddingSection', {
+              closeModal: false,
+              title: "Error adding "+ this.props.name,
+              message: res.data.error
+            })
+            return;
+          }
+          this.$emit("loading");
+          this.$emit('addSectionType', {
+            name: this.props.name,
+            type: 'configurable',
+            settings: this.options,
+            id: this.id,
+            weight: this.weight,
+            renderData: res.data.renderSection.renderData
+          })
+        })
+        .catch(() => {
+          this.$emit("loading");
+          this.$emit('errorAddingSection', {
+              closeModal: false,
+              title: "Error adding "+ this.props.name,
+              message: "We couldn't save your changes, try again later"
+            })
+        });
     },
   },
 };

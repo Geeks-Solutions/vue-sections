@@ -1,11 +1,11 @@
 <template>
-  <div class="item text-center">
+  <div class="item text-center" :class="{ active }">
     <div class="card-content">
       <div class="icon">
-        <component :is="getIcon" />
+        <component :is="!base ? getIcon : getIconBase" />
       </div>
-      <div class="p3 text-capitalize px-3">
-        {{ title }}
+      <div class="p3 text-capitalize px-1">
+        {{ $formatText(title, " ") }}
       </div>
     </div>
   </div>
@@ -17,22 +17,33 @@ export default {
   props: {
     title: {
       type: String,
+      default: "",
     },
-    compType: {
-      type: String,
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    base: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
     getIcon() {
-      // This is not working
       const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
-      return importComp(path, this.compType);
+      return importComp(path);
+    },
+    getIconBase() {
+      const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+      return importComp(path);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+$sectionsBlue: #31a9db;
+$grey: #adadad;
 .item {
   color: white;
   display: flex;
@@ -40,8 +51,16 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: rgb(8, 172, 236);
   cursor: pointer;
+  background: $grey;
+  &.active {
+    background: $sectionsBlue;
+    transition: 0.2s;
+    &:hover {
+      transition: 0.2s;
+      background: darken($sectionsBlue, 10%);
+    }
+  }
 }
 .icon {
   svg {
@@ -56,6 +75,6 @@ export default {
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
-  line-height: 1.3;
+  line-height: 1.85;
 }
 </style>

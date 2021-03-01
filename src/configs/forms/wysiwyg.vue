@@ -19,5 +19,10 @@ export default {
       settings: "",
     };
   },
+  methods: {
+    validate() {
+      return true;
+    }
+  }
 };
 </script>

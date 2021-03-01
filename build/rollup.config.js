@@ -1,7 +1,7 @@
 // rollup.config.js
 import fs from 'fs';
 import path from 'path';
-import vue from 'rollup-plugin-vue';
+import vuePlugin from 'rollup-plugin-vue';
 import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -9,6 +9,7 @@ import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
+import scss from "rollup-plugin-scss"
 
 // Get browserslist config and remove ie from es build targets
 const esbrowserslist = fs.readFileSync('./.browserslistrc')
@@ -28,7 +29,7 @@ const baseConfig = {
           {
             find: '@',
             replacement: `${path.resolve(projectRoot, 'src')}`,
-          },
+          }
         ],
         customResolver: resolve({
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -39,7 +40,7 @@ const baseConfig = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.VUE_APP_SERVER_URL': JSON.stringify('https://sections-saas.k8s-dev.geeks.solutions'),
     },
-    vue: {
+    vuePlugin: {
       css: true,
       template: {
         isProduction: true,
@@ -51,7 +52,7 @@ const baseConfig = {
       exclude: 'node_modules/**',
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       babelHelpers: 'bundled',
-    },
+    }
   },
 };
 
@@ -60,6 +61,7 @@ const baseConfig = {
 const external = [
   // list external dependencies, exactly the way it is written in the import statement.
   // eg. 'jquery'
+  // path.resolve('node_modules/vue/dist/vue.runtime.esm.js'),
   'vue',
 ];
 
@@ -86,7 +88,8 @@ if (!argv.format || argv.format === 'es') {
     plugins: [
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
+      scss(),
+      vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
       babel({
         ...baseConfig.plugins.babel,
@@ -99,7 +102,7 @@ if (!argv.format || argv.format === 'es') {
           ],
         ],
       }),
-      commonjs(),
+      commonjs()
     ],
   };
   buildFormats.push(esConfig);
@@ -118,18 +121,19 @@ if (!argv.format || argv.format === 'cjs') {
       globals,
     },
     plugins: [
+      scss(),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      vue({
-        ...baseConfig.plugins.vue,
+      vuePlugin({
+        ...baseConfig.plugins.vuePlugin,
         template: {
-          ...baseConfig.plugins.vue.template,
+          ...baseConfig.plugins.vuePlugin.template,
           optimizeSSR: true,
         },
       }),
       ...baseConfig.plugins.postVue,
       babel(baseConfig.plugins.babel),
-      commonjs(),
+      commonjs()
     ],
   };
   buildFormats.push(umdConfig);
@@ -148,9 +152,10 @@ if (!argv.format || argv.format === 'iife') {
       globals,
     },
     plugins: [
+      scss(),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
+      vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
       babel(baseConfig.plugins.babel),
       commonjs(),
@@ -158,7 +163,7 @@ if (!argv.format || argv.format === 'iife') {
         output: {
           ecma: 5,
         },
-      }),
+      })
     ],
   };
   buildFormats.push(unpkgConfig);
