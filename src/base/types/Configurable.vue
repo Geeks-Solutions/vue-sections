@@ -85,8 +85,7 @@
 </template>
 
 <script>
-import { formatName } from "../functions";
-import { base64Img, sectionHeader } from "../helpers";
+import { formatName, base64Img, sectionHeader } from "../helpers";
 import axios from "axios";
 
 export default {

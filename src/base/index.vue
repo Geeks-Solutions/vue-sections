@@ -209,7 +209,7 @@
               <div class="view-component" :style="{ background: viewsBgColor }">
                 <component
                   v-if="view.settings || view.type == 'local'"
-                  :is="getSectionViewCompName(view.name)"
+                  :is="view.name"
                   :section="view"
                   :lang="lang"
                 />
@@ -261,11 +261,9 @@ import LinkIcon from "./icons/link.vue";
 import camelCase from "lodash/camelCase";
 import upperFirst from "lodash/upperFirst";
 
-// import functions
-import { formatName, getSectionViewCompName } from "./functions";
 import Loading from "./components/Loading.vue";
 
-import { sectionHeader, importComp } from "./helpers";
+import { formatName, sectionHeader, importComp } from "./helpers";
 import axios from "axios";
 export default {
   i18n: initI18n,
@@ -644,7 +642,6 @@ export default {
       this.editMode = !this.editMode;
     },
     formatName,
-    getSectionViewCompName,
     editable(sectionType) {
       switch (sectionType) {
         case "local":

@@ -1,5 +1,3 @@
-import { BIconFileEarmarkSlidesFill } from "bootstrap-vue";
-
 export const base64Img = file => {
   const reader = new FileReader();
   return new Promise(resolve => {
@@ -18,21 +16,30 @@ export const base64Img = file => {
   });
 };
 
-export const importComp = (path) => {
-  try {
-    if (process.env.VUE_APP_SECTIONS_CONF) {
-      return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
-    } else {
-      return () => import(`@/sections_config${path}`)
-    }
-  } catch (error) {
-    try {
-      return () => import(`../src/configs${path}`);
-    } catch (error) {
-      throw new Error(`vue-sections: can't find the file in your filesystem: ${path}`)
-    }
+// name for the section time when you choose one in the popup
+export function formatName(name) {
+  switch (name) {
+    default:
+      return (
+        name.split(":")[name.split(":").length - 1].replace(/_/g, " ") ||
+        "unlabled"
+      );
   }
 }
+
+export const importComp = (path) => {
+    if (process.env.VUE_APP_SECTIONS_CONF) {
+      return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
+      .catch(err => import(`../src/configs${path}`)
+      .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: ${process.env.VUE_APP_SECTIONS_CONF}${path}`)})
+      )
+    } else {
+      return () => import(`@/sections_config${path}`)
+      .catch(err => import(`../src/configs${path}`)
+      .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: @/sections_config${path}`)})
+      )
+    }
+  }
 
 export const sectionHeader = (header) => {
   const timestamp = new Date().getTime();
