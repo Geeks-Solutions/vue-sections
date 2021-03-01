@@ -13,7 +13,7 @@ Is a vue.js 2 wrapper for sections.
 Make sure to have your projectID, then install the library on your project
 
 ```npm
-npm install vue-sections@1.0.0
+npm install vue-sections@1.0.1
 ```
 
 Configure the library with your ProjectID

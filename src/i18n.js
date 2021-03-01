@@ -5,7 +5,7 @@ Vue.use(VueI18n);
 
 function loadLocaleMessages() {
   const locales = require.context(
-    "../src/lang",
+    "@/lang",
     true,
     /[A-Za-z0-9-_,\s]+\.json$/i
   );
