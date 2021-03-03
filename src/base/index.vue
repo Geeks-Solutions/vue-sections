@@ -7,7 +7,7 @@
         v-if="admin"
         class="bg-blue control-button hide-mobile"
       >
-        {{ !editMode ? "Edit page" : "View page" }}
+        {{ !editMode ? $t("Edit page") : $t("View page") }}
       </button>
       <div class="bg-light-grey-hp hide-mobile">
         <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
@@ -34,6 +34,10 @@
           <button class="hp-button grey" @click="restoreVariations">
             <div class="btn-icon back-icon"><BackIcon /></div>
             <div class="btn-text">{{ $t("Restore") }}</div>
+          </button>
+          <button class="hp-button" @click="openStaticSection">
+            <div class="btn-icon check-icon"><CheckIcon /></div>
+            <div class="btn-text">Create static section</div>
           </button>
           <button
             @click="$cookies.remove('sections-auth-token'), (admin = false)"
@@ -226,6 +230,26 @@
           <!-- </transition-group> -->
         </draggable>
       </div>
+      <b-modal class="modal" v-model="staticModal" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
+            Please enter below name of new static section:
+          </div>
+          <div class="closeIcon" @click="staticModal = false">
+            <CloseIcon />
+          </div>
+          <div class="">
+            <div>Static section name</div>
+            <input type="text" v-model="sectionTypeName" />
+          </div>
+          <div>
+            <button class="hp-button" @click="addNewStaticType">
+              <div class="btn-icon check-icon"></div>
+              <div class="btn-text">Continue</div>
+            </button>
+          </div>
+        </div>
+      </b-modal>
       <Loading :loading="loading" />
     </div>
     <div v-else>
@@ -323,6 +347,8 @@ export default {
 
   data() {
     return {
+      sectionTypeName: "",
+      staticModal: false,
       sectionInPage: [],
       showSections: false,
       pageNotFound: false,
@@ -413,8 +439,7 @@ export default {
         const views = {};
         sections.map((section) => {
           this.trackSectionComp(section.name, section.type);
-          if(section.settings)
-            section.settings = JSON.parse(section.settings);
+          if (section.settings) section.settings = JSON.parse(section.settings);
           if (section.id) {
             views[section.id] = section;
           } else {
@@ -439,6 +464,21 @@ export default {
       });
   },
   methods: {
+    addNewStaticType() {
+      if (this.sectionTypeName != "") {
+        const token = this.$cookies.get("sections-auth-token");
+        const config = {
+          headers: sectionHeader({ token }),
+        };
+        const URL =
+          process.env.VUE_APP_SERVER_URL +
+          `/api/v1/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
+        axios.post(URL, {}, config).then((res) => {});
+      }
+    },
+    openStaticSection() {
+      this.staticModal = true;
+    },
     trackSectionComp(sectionName, sectionType) {
       if (!this.sectionInPage.includes(sectionName)) {
         this.sectionInPage.push(sectionName);
