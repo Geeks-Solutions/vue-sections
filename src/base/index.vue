@@ -23,7 +23,7 @@
             @click="openStaticSection"
           >
             <div class="btn-icon check-icon"><CreateIcon /></div>
-            <div class="btn-text">Create static section</div>
+            <div class="btn-text">{{ $t("Create static section") }}</div>
           </button>
           <button
             class="hp-button"
@@ -115,7 +115,7 @@
       <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
         <div class="section-modal-content">
           <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
-            Add
+            {{ $t("Add") }}
           </div>
           <div class="closeIcon" @click="isModalOpen = false">
             <CloseIcon />
@@ -242,15 +242,15 @@
       >
         <div class="section-modal-wrapper">
           <div class="text-center h4 header" v-if="!currentSection">
-            <div class="title">
-              Please enter below name of new static section:
-            </div>
+            <div class="title">{{ $t("section-title") }}:</div>
             <div class="closeIcon" @click="staticModal = false">
               <CloseIcon />
             </div>
           </div>
           <div class="body">
-            <div style="margin-bottom: 10px;">Static section name</div>
+            <div style="margin-bottom: 10px;">
+              {{ $t("section-input-title") }}
+            </div>
             <input
               class="section-input"
               type="text"
@@ -260,7 +260,9 @@
           <div class="footer">
             <button class="hp-button" @click="addNewStaticType">
               <div class="btn-icon check-icon"></div>
-              <div class="btn-text">Continue</div>
+              <div class="btn-text">
+                {{ $t("Continue") }}
+              </div>
             </button>
           </div>
         </div>
@@ -278,42 +280,37 @@
               <CelebrateIcon />
             </div>
             <div class="title">
-              Congratulations, you just added a new custom static section that
-              is editable by a content administrator
+              {{ $t("success-section-title") }}
             </div>
             <div class="closeIcon" @click="staticSuccess = false">
               <CloseIcon />
             </div>
           </div>
           <div class="body">
-            <div class="subtitle">
-              Now you need to provide three components to make this section
-              alive:
-            </div>
+            <div class="subtitle">{{ $t("success-section-subtitle") }}:</div>
             <div class="section-list">
               <div class="dot"><DotIcon /></div>
               <div>
-                One icon so it displays a nice and clear choice when adding a
-                new section to a page
+                {{ $t("success-section-instruction-1") }}
               </div>
             </div>
             <div class="section-list">
               <div class="dot"><DotIcon /></div>
               <div>
-                One form to let the content administrator edit it
+                {{ $t("success-section-instruction-2") }}
               </div>
             </div>
             <div class="section-list">
               <div class="dot"><DotIcon /></div>
               <div>
-                One view so it can display as you want it for the site visitors
+                {{ $t("success-section-instruction-3") }}
               </div>
             </div>
           </div>
           <div class="footer">
             <button class="hp-button" @click="staticSuccess = false">
               <div class="btn-icon check-icon"></div>
-              <div class="btn-text">Agree</div>
+              <div class="btn-text">{{ $t("Agree") }}</div>
             </button>
           </div>
         </div>
@@ -322,7 +319,7 @@
     </div>
     <div v-else>
       <button class="hp-button" @click="createNewPage">
-        Create New Page
+        {{ $t("Create New Page") }}
       </button>
     </div>
   </div>

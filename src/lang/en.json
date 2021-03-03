@@ -6,5 +6,16 @@
   "Variation": "Variation",
   "Main": "Main",
   "Synchronise": "Synchronise",
-  "Logout": "Logout"
+  "Logout": "Logout",
+  "Create static section": "Create static section",
+  "Create New Page": "Create New Page",
+  "Agree": "Agree",
+  "Continue": "Continue",
+  "section-title": "Please enter below name of new static section",
+  "section-input-title": "Static section name",
+  "success-section-title": "Congratulations, you just added a new custom static section that is editable by a content administrator",
+  "success-section-subtitle": "Now you need to provide three components to make this section alive",
+  "success-section-instruction-1": "One icon so it displays a nice and clear choice when adding a new section to a page",
+  "success-section-instruction-2": "One form to let the content administrator edit it",
+  "success-section-instruction-3": "One view so it can display as you want it for the site visitors"
 }
