@@ -7,9 +7,9 @@
         v-if="admin"
         class="bg-blue control-button hide-mobile"
       >
-        {{ !editMode ? "Edit page" : "View page" }}
+        {{ !editMode ? $t("Edit page") : $t("View page") }}
       </button>
-      <div class="bg-light-grey-hp hide-mobile">
+      <div class="bg-light-grey-hp hide-mobile section-wrapper">
         <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
           Your changes will be published when the page is saved.
         </div>
@@ -18,6 +18,13 @@
           class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
           v-if="admin && editMode"
         >
+          <button
+            class="hp-button create-static-section"
+            @click="openStaticSection"
+          >
+            <div class="btn-icon check-icon"><CreateIcon /></div>
+            <div class="btn-text">{{ $t("Create static section") }}</div>
+          </button>
           <button
             class="hp-button"
             @click="
@@ -108,7 +115,7 @@
       <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
         <div class="section-modal-content">
           <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
-            Add
+            {{ $t("Add") }}
           </div>
           <div class="closeIcon" @click="isModalOpen = false">
             <CloseIcon />
@@ -226,11 +233,93 @@
           <!-- </transition-group> -->
         </draggable>
       </div>
+      <b-modal
+        class="modal"
+        :modal-class="'section-modal-main-wrapper'"
+        v-model="staticModal"
+        centered
+        ref="modal"
+      >
+        <div class="section-modal-wrapper">
+          <div class="text-center h4 header" v-if="!currentSection">
+            <div class="title">{{ $t("section-title") }}:</div>
+            <div class="closeIcon" @click="staticModal = false">
+              <CloseIcon />
+            </div>
+          </div>
+          <div class="body">
+            <div style="margin-bottom: 10px;">
+              {{ $t("section-input-title") }}
+            </div>
+            <input
+              class="section-input"
+              type="text"
+              v-model="sectionTypeName"
+            />
+          </div>
+          <div class="footer">
+            <button class="hp-button" @click="addNewStaticType">
+              <div class="btn-icon check-icon"></div>
+              <div class="btn-text">
+                {{ $t("Continue") }}
+              </div>
+            </button>
+          </div>
+        </div>
+      </b-modal>
+      <b-modal
+        class="modal"
+        :modal-class="'section-modal-main-wrapper'"
+        v-model="staticSuccess"
+        centered
+        ref="modal"
+      >
+        <div class="section-modal-wrapper success-section-type">
+          <div class="text-center h4 header">
+            <div class="icon-head">
+              <CelebrateIcon />
+            </div>
+            <div class="title">
+              {{ $t("success-section-title") }}
+            </div>
+            <div class="closeIcon" @click="staticSuccess = false">
+              <CloseIcon />
+            </div>
+          </div>
+          <div class="body">
+            <div class="subtitle">{{ $t("success-section-subtitle") }}:</div>
+            <div class="section-list">
+              <div class="dot"><DotIcon /></div>
+              <div>
+                {{ $t("success-section-instruction-1") }}
+              </div>
+            </div>
+            <div class="section-list">
+              <div class="dot"><DotIcon /></div>
+              <div>
+                {{ $t("success-section-instruction-2") }}
+              </div>
+            </div>
+            <div class="section-list">
+              <div class="dot"><DotIcon /></div>
+              <div>
+                {{ $t("success-section-instruction-3") }}
+              </div>
+            </div>
+          </div>
+          <div class="footer">
+            <button class="hp-button" @click="staticSuccess = false">
+              <div class="btn-icon check-icon"></div>
+              <div class="btn-text">{{ $t("Agree") }}</div>
+            </button>
+          </div>
+        </div>
+      </b-modal>
       <Loading :loading="loading" />
     </div>
     <div v-else>
       <button class="hp-button" @click="createNewPage">
-        Create New Page
+        {{ $t("Create New Page") }}
       </button>
     </div>
   </div>
@@ -257,6 +346,9 @@ import CloseIcon from "./icons/close.vue";
 import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
+import CreateIcon from "./icons/create.vue";
+import DotIcon from "./icons/dot.vue";
+import CelebrateIcon from "./icons/celebrate.vue";
 
 import camelCase from "lodash/camelCase";
 import upperFirst from "lodash/upperFirst";
@@ -285,6 +377,9 @@ export default {
     CloseIcon,
     draggable,
     LinkIcon,
+    CreateIcon,
+    DotIcon,
+    CelebrateIcon,
     "b-alert": BAlert,
     "b-modal": BModal,
   },
@@ -323,6 +418,9 @@ export default {
 
   data() {
     return {
+      staticSuccess: false,
+      sectionTypeName: "",
+      staticModal: false,
       sectionInPage: [],
       showSections: false,
       pageNotFound: false,
@@ -413,8 +511,7 @@ export default {
         const views = {};
         sections.map((section) => {
           this.trackSectionComp(section.name, section.type);
-          if(section.settings)
-            section.settings = JSON.parse(section.settings);
+          if (section.settings) section.settings = JSON.parse(section.settings);
           if (section.id) {
             views[section.id] = section;
           } else {
@@ -439,6 +536,23 @@ export default {
       });
   },
   methods: {
+    addNewStaticType() {
+      if (this.sectionTypeName != "") {
+        const token = this.$cookies.get("sections-auth-token");
+        const config = {
+          headers: sectionHeader({ token }),
+        };
+        const URL =
+          process.env.VUE_APP_SERVER_URL +
+          `/api/v1/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
+        axios.post(URL, {}, config).then(() => {
+          this.staticSuccess = true;
+        });
+      }
+    },
+    openStaticSection() {
+      this.staticModal = true;
+    },
     trackSectionComp(sectionName, sectionType) {
       if (!this.sectionInPage.includes(sectionName)) {
         this.sectionInPage.push(sectionName);
@@ -511,7 +625,7 @@ export default {
           .get(URL, config)
           .then((res) => {
             const token = res.data.token;
-            this.$cookies.set("sections-auth-token", token);
+            this.$cookies.set("sections-auth-token", token, "7d");
             window.location.replace(root_path);
             this.loading = false;
           })
@@ -886,8 +1000,119 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.section-modal-main-wrapper {
+  .modal-body {
+    position: initial;
+  }
+}
+</style>
 <style lang="scss" scoped>
 $sectionsBlue: #31a9db;
+$sectionsDarkBlue: #257596;
+$scetionGray: #454545;
+$sectionLightGray: #a7a7a7;
+
+.section-modal-wrapper {
+  max-width: 780px;
+  &.success-section-type {
+    .header {
+      flex-direction: column;
+      align-items: center;
+      .icon-head {
+        margin-bottom: 10px;
+      }
+    }
+    .body {
+      width: 60%;
+      margin: 20px auto;
+      .subtitle {
+        font-style: italic;
+        text-align: center;
+        width: 75%;
+        margin: 0 auto 10px auto;
+        color: $scetionGray;
+        font-weight: 400;
+      }
+      .section-list {
+        color: $sectionLightGray;
+        display: flex;
+        margin: 5px 0;
+        .dot {
+          color: $sectionsBlue;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+  .header {
+    margin: 20px 0 40px 0;
+    display: flex;
+    justify-content: center;
+    .title {
+      width: 75%;
+    }
+    .closeIcon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      svg {
+        height: 40px;
+        width: 40px;
+      }
+    }
+  }
+  .body {
+    margin: 20px 0;
+    .section-input {
+      width: 100%;
+      height: 50px;
+    }
+  }
+  .footer {
+    display: flex;
+    justify-content: center;
+    .hp-button {
+      width: 200px;
+    }
+  }
+}
+.section-wrapper {
+  position: relative;
+  .create-static-section {
+    border-color: $sectionsDarkBlue;
+    color: $sectionsDarkBlue;
+    background: white;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    padding: 0;
+    display: flex;
+    border-width: 2px;
+    border: 2px solid #257596;
+    &:hover {
+      background: $sectionsDarkBlue;
+      color: white;
+      .btn-icon {
+        background: white;
+        svg {
+          color: $sectionsDarkBlue;
+        }
+      }
+    }
+    .btn-icon {
+      background: $sectionsDarkBlue;
+      color: white;
+      width: 48px;
+      height: 36px;
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+    }
+    .btn-text {
+      padding-right: 10px;
+    }
+  }
+}
 // .media-mobile(@rules) {
 //   @media only screen and (max-width: 1025px) {
 //     @rules();
@@ -1106,7 +1331,7 @@ button {
     position: absolute;
     z-index: 999;
     left: 0;
-    top: 100px;
+    top: 60px;
   }
 }
 </style>
