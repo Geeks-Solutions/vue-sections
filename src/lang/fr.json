@@ -11,11 +11,11 @@
   "Create New Page": "Create New Page",
   "Agree": "Agree",
   "Continue": "Continue",
-  "section-title": "Please enter below name of new static section",
-  "section-input-title": "Static section name",
-  "success-section-title": "Congratulations, you just added a new custom static section that is editable by a content administrator",
-  "success-section-subtitle": "Now you need to provide three components to make this section alive",
-  "success-section-instruction-1": "One icon so it displays a nice and clear choice when adding a new section to a page",
-  "success-section-instruction-2": "One form to let the content administrator edit it",
-  "success-section-instruction-3": "One view so it can display as you want it for the site visitors"
+  "section-title": "Veuillez saisir le nom de votre nouvelle section static",
+  "section-input-title": "Nom de la section static",
+  "success-section-title": "Félicitations, vous venez de créer une section static modifiable par votre editeur de contenu",
+  "success-section-subtitle": "Vous devez maintenant créer trois composants pour que cette section soit utilisable",
+  "success-section-instruction-1": "Une icon à afficher dans la fenetre d'ajout de section à une page",
+  "success-section-instruction-2": "Un formulaire pour saisir les données à sauvegarder",
+  "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs"
 }
