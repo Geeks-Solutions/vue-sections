@@ -17,7 +17,7 @@ It has also been tested on a nuxtJS project and it's working when used as plugin
 Make sure to have your projectID, then install the library on your project
 
 ```npm
-npm install @geeks-solutions/vue-sections@1.0.0
+npm install @geeks-solutions/vue-sections
 ```
 
 Configure the library with your ProjectID
