@@ -10,12 +10,14 @@ Is a vue.js 2 wrapper for sections. It doesn't work yet on a vue3 project and fo
 You can use vue-i18n on your project as usual, in case you don't need to use vue-i18n, then this library will display its strings in English
 without the need to set a specific configuration for vue-i18n on your project.
 
+It has also been tested on a nuxtJS project and it's working when used as plugin that is installed with NO SSR.
+
 # Get started
 
 Make sure to have your projectID, then install the library on your project
 
 ```npm
-npm install vue-sections@1.0.1
+npm install @geeks-solutions/vue-sections@1.0.0
 ```
 
 Configure the library with your ProjectID
