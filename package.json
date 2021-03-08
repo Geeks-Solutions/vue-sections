@@ -36,7 +36,6 @@
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "vue-cookies": "^1.7.4",
-    "vue-i18n": "^8.23.0",
     "vue-quill-editor": "^3.0.6",
     "vuedraggable": "^2.24.3"
   },
@@ -62,6 +61,9 @@
     "rollup-plugin-vue": "^5.1.9",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.12"
+  },
+  "peerDependencies": {
+    "vue-i18n": "^8.x"
   },
   "engines": {
     "node": ">=12"

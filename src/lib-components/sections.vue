@@ -4,6 +4,7 @@
       :admin="admin"
       :pageName="pageName"
       :variations="variations"
+      :lang="lang"
     />
   </div>
 </template>
@@ -19,6 +20,10 @@ export default {
     pageName: {
       type: String,
       default: "",
+    },
+    lang: {
+      type: String,
+      default: "en",
     },
     admin: {
       type: Boolean,

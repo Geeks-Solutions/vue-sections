@@ -63,6 +63,7 @@ const external = [
   // eg. 'jquery'
   // path.resolve('node_modules/vue/dist/vue.runtime.esm.js'),
   'vue',
+  'vue-i18n',
 ];
 
 // UMD/IIFE shared settings: output.globals
@@ -121,9 +122,9 @@ if (!argv.format || argv.format === 'cjs') {
       globals,
     },
     plugins: [
-      scss(),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
+      scss(),
       vuePlugin({
         ...baseConfig.plugins.vuePlugin,
         template: {

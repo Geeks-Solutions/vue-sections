@@ -408,7 +408,7 @@ export default {
     },
     lang: {
       type: String,
-      default: "",
+      default: "en",
     },
     viewsBgColor: {
       type: String,
@@ -486,6 +486,8 @@ export default {
     },
   },
   created() {
+    initI18n.locale = this.lang;
+    
     axios.defaults.headers.common["token"] = this.$cookies.get(
       "sections-auth-token"
     ); // for all requests
@@ -705,7 +707,6 @@ export default {
         "internal",
         "internal:path"
       );
-      console.log("staticTypes: ", staticTypes);
       return [...new Set(staticTypes)];
     },
     build_comp(staticTypes, types, compType, path) {
