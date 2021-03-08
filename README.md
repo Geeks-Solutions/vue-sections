@@ -6,7 +6,9 @@ In order to benefit from this service you should register for free on the follow
 
 # Vue Sections
 
-Is a vue.js 2 wrapper for sections.
+Is a vue.js 2 wrapper for sections. It doesn't work yet on a vue3 project and for now it requires installation of vue-i18n to properly work.
+You can use vue-i18n on your project as usual, in case you don't need to use vue-i18n, then this library will display its strings in English
+without the need to set a specific configuration for vue-i18n on your project.
 
 # Get started
 
