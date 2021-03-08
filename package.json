@@ -1,6 +1,6 @@
 {
   "name": "@geeks-solutions/vue-sections",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Geeks Solutions info@geeks.solutions (https://www.geeks.solutions)",
   "repository": {
     "type": "git",
@@ -21,7 +21,8 @@
   "unpkg": "dist/vue-sections.min.js",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "src/lang"
   ],
   "sideEffects": false,
   "scripts": {

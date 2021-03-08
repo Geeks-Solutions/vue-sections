@@ -23,7 +23,7 @@ npm install @geeks-solutions/vue-sections@1.0.0
 Configure the library with your ProjectID
 
 ```
-import Sections from 'vue-sections'
+import Sections from '@geeks-solutions/vue-sections'
 
 ...
 
