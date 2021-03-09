@@ -355,7 +355,7 @@ import upperFirst from "lodash/upperFirst";
 
 import Loading from "./components/Loading.vue";
 
-import { formatName, sectionHeader, importComp } from "./helpers";
+import { formatName, sectionHeader, importComp, serverUrl } from "./helpers";
 import axios from "axios";
 export default {
   i18n: initI18n,
@@ -504,8 +504,8 @@ export default {
       headers: sectionHeader({}),
     };
     const URL =
-      process.env.VUE_APP_SERVER_URL +
-      `/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+      serverUrl() +
+      `/project/${this.$sections.projectId}/page/${this.pageName}`;
     axios
       .post(URL, {}, config)
       .then((res) => {
@@ -545,8 +545,8 @@ export default {
           headers: sectionHeader({ token }),
         };
         const URL =
-          process.env.VUE_APP_SERVER_URL +
-          `/api/v1/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
+          serverUrl() +
+          `/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
         axios.post(URL, {}, config).then(() => {
           this.staticSuccess = true;
         });
@@ -580,7 +580,7 @@ export default {
       const config = {
         headers: sectionHeader(header),
       };
-      const URL = `${process.env.VUE_APP_SERVER_URL}/api/v1/project/${this.$sections.projectId}/page/${this.pageName}`;
+      const URL = serverUrl() + `/project/${this.$sections.projectId}/page/${this.pageName}`;
       axios
         .put(
           URL,
@@ -621,8 +621,8 @@ export default {
           headers: sectionHeader({}),
         };
         const URL =
-          process.env.VUE_APP_SERVER_URL +
-          `/api/v1/project/${this.$sections.projectId}/token/${auth_code}`;
+          serverUrl() +
+          `/project/${this.$sections.projectId}/token/${auth_code}`;
         axios
           .get(URL, config)
           .then((res) => {
@@ -647,8 +647,8 @@ export default {
         }),
       };
       const url =
-        process.env.VUE_APP_SERVER_URL +
-        `/api/v1/project/${this.$sections.projectId}/section-types`;
+        serverUrl() +
+        `/project/${this.$sections.projectId}/section-types`;
       axios
         .get(url, config)
         .then((res) => {
@@ -911,8 +911,8 @@ export default {
         sections,
       };
       const URL =
-        process.env.VUE_APP_SERVER_URL +
-        `/api/v1/project/${this.$sections.projectId}/page/${variationName}`;
+        serverUrl() +
+        `/project/${this.$sections.projectId}/page/${variationName}`;
       axios
         .put(URL, variables, config)
         .then((res) => {

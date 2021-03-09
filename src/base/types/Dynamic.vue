@@ -6,7 +6,7 @@
 
 <script>
 import axios from "axios";
-import { sectionHeader } from "../helpers";
+import { sectionHeader, serverUrl } from "../helpers";
 
 export default {
   props: {
@@ -58,8 +58,8 @@ export default {
             }
       };
       const URL =
-        process.env.VUE_APP_SERVER_URL +
-        `/api/v1/project/${this.$sections.projectId}/section/render`;
+        serverUrl() +
+        `/project/${this.$sections.projectId}/section/render`;
       axios
         .post(URL, variables, config)
         .then((res) => {

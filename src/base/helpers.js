@@ -48,3 +48,11 @@ export const sectionHeader = (header) => {
   header[header_key] = "a3b2cd1";
   return header
 }
+
+export const serverUrl = () => {
+  if(process.env.VUE_APP_SECTIONS_ENV === "testing"){
+    return "https://sections-saas.k8s-dev.geeks.solutions/api/v1"
+  } else {
+    return "https://sections.geeks.solutions/api/v1"
+  }
+}

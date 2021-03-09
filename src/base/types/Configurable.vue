@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { formatName, base64Img, sectionHeader } from "../helpers";
+import { formatName, base64Img, sectionHeader, serverUrl } from "../helpers";
 import axios from "axios";
 
 export default {
@@ -167,8 +167,8 @@ export default {
       };
 
       const URL =
-        process.env.VUE_APP_SERVER_URL +
-        `/api/v1/project/${this.$sections.projectId}/section/${this.props.name}/options`;
+        serverUrl() +
+        `/project/${this.$sections.projectId}/section/${this.props.name}/options`;
       
       axios
         .get(URL, config)
@@ -303,8 +303,8 @@ export default {
             }
       };
       const URL =
-        process.env.VUE_APP_SERVER_URL +
-        `/api/v1/project/${this.$sections.projectId}/section/render`;
+        serverUrl() +
+        `/project/${this.$sections.projectId}/section/render`;
 
       axios
         .post(URL, variables, config)

@@ -38,7 +38,6 @@ const baseConfig = {
     ],
     replace: {
       'process.env.NODE_ENV': JSON.stringify('production'),
-      'process.env.VUE_APP_SERVER_URL': JSON.stringify('https://sections.geeks.solutions'),
     },
     vuePlugin: {
       css: true,
