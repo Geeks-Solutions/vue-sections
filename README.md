@@ -88,7 +88,7 @@ src
        |_ {your-component}.vue
 ```
 
-Out of the box, this library will point to `@/sections_config` in case you want to override this path you can do so with the `VUE_APP_SECTIONS_CONF` env. variable.
+Out of the box, this library will point to `@/sections_config` in case you want to override this path you can do so with the `VUE_APP_SECTIONS_CONF` env. variable. (use `NUXT_ENV_SECTIONS_CONF` instead if you are using it in a NuxtJS project, note that if you declare both, the `VUE_APP_` variable will take precedence)
 
 - `views` folder will contain the design of your component that will be displayed on the page to your visitors (and during preview)
 - `type-icons` folder will contain the icons that will illustrate your section in the add a new section box for content editors.

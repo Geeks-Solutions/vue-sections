@@ -1,3 +1,9 @@
+### 1.0.4
+
+#### Additional features
+
+Native support of NUXT*ENV* variables for easy integration in a NuxtJS project
+
 ### 1.0.3
 
 Removing Consoles

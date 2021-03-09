@@ -685,6 +685,16 @@ export default {
         } catch (error) {
           console.log(error);
         }
+      } else if (process.env.NUXT_ENV_SECTIONS_CONF) {
+        try {
+          external_types = require.context(
+            `${process.env.NUXT_ENV_SECTIONS_CONF}/views`,
+            false
+          );
+          external_path = `${process.env.NUXT_ENV_SECTIONS_CONF}/views`;
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         try {
           external_types = require.context(`@/sections_config/views`, false);
