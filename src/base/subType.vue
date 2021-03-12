@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     getComponentForm() {
-      const path = "/forms/" + this.name + ".vue";
+      const path = "/forms/" + this.name;
       return importComp(path);
     },
   },

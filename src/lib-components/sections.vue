@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 import "../assets/scss/variables.scss"
 import SectionsMain from "../base/index.vue";
 export default {
@@ -32,11 +30,6 @@ export default {
   },
   components: {
     SectionsMain,
-  },
-  computed: {
-    variations() {
-      return [];
-    },
   },
 };
 </script>

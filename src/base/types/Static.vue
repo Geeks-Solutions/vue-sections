@@ -42,8 +42,7 @@ export default {
   },
   computed: {
     component() {
-      // @TODO managment of external and internal
-      const path = "/views/" + this.props.name + ".vue";
+      const path = `/views/${this.props.name}_${this.props.type}`;
       return importComp(path);
     },
     id() {

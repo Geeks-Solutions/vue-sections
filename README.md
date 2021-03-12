@@ -20,7 +20,11 @@ Make sure to have your projectID, then install the library on your project
 npm install @geeks-solutions/vue-sections
 ```
 
-Configure the library with your ProjectID
+Configure the library, the possible configurations are as follow:
+
+- `projectId`: The ID of you project, you get it from your project interface after your register to sections
+- `environment`: _to use only for development purposes_ set it to "testing" if you want your requests to be directed to sections test server
+- `projectUrl`: _to use only if you wish to run sections in SSR_ set it to the project url you defined in your project interface on sections back office.
 
 ```
 import Sections from '@geeks-solutions/vue-sections'
@@ -74,21 +78,19 @@ The Wysiwg can be added to any page and will display of the box thanks to intern
 You can also define your own local and static section types and you have the ability to control the way any section will display on your website.
 
 You do this by creating custom VueJS components and placing them in the right configurations folder.
+For now this is not configurable and you should have a `@/sections` folder where to put your components (@ pointing to any folder declaration you have defined in your proejct, i.e @ -> `/src` on a vueJs project. @ -> `/` on a NuxtJs project etc..).
 
 The configurations folder follows the following structure:
 
 ```
-src
-|_ configs
+@/sections
     |_ views
-       |_ {your-component}_{section-type}.vue
+        |_ {your-component}_{section-type}.vue
     |_ type-icons
-       |_ {your-component}.vue
+        |_ {your-component}.vue
     |_ forms
-       |_ {your-component}.vue
+        |_ {your-component}.vue
 ```
-
-Out of the box, this library will point to `@/sections_config` in case you want to override this path you can do so with the `VUE_APP_SECTIONS_CONF` env. variable. (use `NUXT_ENV_SECTIONS_CONF` instead if you are using it in a NuxtJS project, note that if you declare both, the `VUE_APP_` variable will take precedence)
 
 - `views` folder will contain the design of your component that will be displayed on the page to your visitors (and during preview)
 - `type-icons` folder will contain the icons that will illustrate your section in the add a new section box for content editors.

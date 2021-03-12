@@ -5,7 +5,6 @@ import vuePlugin from 'rollup-plugin-vue';
 import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
@@ -21,7 +20,7 @@ const argv = minimist(process.argv.slice(2));
 
 const projectRoot = path.resolve(__dirname, '..');
 const baseConfig = {
-  input: 'src/entry.js',
+  input: 'src/entry.esm.js',
   plugins: {
     preVue: [
       alias({
@@ -36,11 +35,9 @@ const baseConfig = {
         }),
       }),
     ],
-    replace: {
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    },
     vuePlugin: {
       css: true,
+      compileTemplate: true, // Explicitly convert template to render function
       template: {
         isProduction: true,
       },
@@ -86,7 +83,6 @@ if (!argv.format || argv.format === 'es') {
       exports: 'named',
     },
     plugins: [
-      replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
       scss(),
       vuePlugin(baseConfig.plugins.vuePlugin),
@@ -116,12 +112,10 @@ if (!argv.format || argv.format === 'cjs') {
       compact: true,
       file: 'dist/vue-sections.ssr.js',
       format: 'cjs',
-      name: 'VueSections',
-      exports: 'auto',
+      exports: 'named',
       globals,
     },
     plugins: [
-      replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
       scss(),
       vuePlugin({
@@ -147,14 +141,13 @@ if (!argv.format || argv.format === 'iife') {
       compact: true,
       file: 'dist/vue-sections.min.js',
       format: 'iife',
-      name: 'VueSections',
-      exports: 'auto',
+      name: "Sections",
+      exports: 'named',
       globals,
     },
     plugins: [
-      scss(),
-      replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
+      scss(),
       vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
       babel(baseConfig.plugins.babel),
