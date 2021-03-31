@@ -1,3 +1,10 @@
+### 1.0.6
+
+#### Bug fixes
+
+- Fixed an issue when adding or editing an internal wysiwyg section
+- Few typo mistakes on labels
+
 ### 1.0.5
 
 #### Bug fixes

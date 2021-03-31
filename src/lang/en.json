@@ -13,7 +13,7 @@
   "Create New Page": "Create New Page",
   "Agree": "Agree",
   "Continue": "Continue",
-  "section-title": "Please enter below name of new static section",
+  "section-title": "Please enter below the name of a new static section type",
   "section-input-title": "Static section name",
   "success-section-title": "Congratulations, you just added a new custom static section that is editable by a content administrator",
   "success-section-subtitle": "Now you need to provide three components to make this section alive",

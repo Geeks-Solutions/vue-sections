@@ -13,7 +13,7 @@
   "Create New Page": "Créer une nouvelle page",
   "Agree": "Accepter",
   "Continue": "Continuer",
-  "section-title": "Veuillez saisir le nom de votre nouvelle section static",
+  "section-title": "Veuillez saisir le nom de votre nouveau type de section static",
   "section-input-title": "Nom de la section static",
   "success-section-title": "Félicitations, vous venez de créer une section static modifiable par votre editeur de contenu",
   "success-section-subtitle": "Vous devez maintenant créer trois composants pour que cette section soit utilisable",

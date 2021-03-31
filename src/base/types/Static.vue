@@ -11,7 +11,7 @@
       </form>
     </div>
     <!-- get access to the imported static component -->
-    <component :is="component" v-show="false" ref="importedComponent" />
+    <component :is="component" :section="props" v-show="false" ref="importedComponent" />
   </div>
 </template>
 
