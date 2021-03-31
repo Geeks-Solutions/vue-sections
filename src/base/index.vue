@@ -451,6 +451,49 @@ export default {
       api: false,
     };
   },
+  // Server-side only
+  // This will be called by the server renderer automatically
+  serverPrefetch () {
+        const config = {
+      headers: sectionHeader({origin: this.$sections.projectUrl}),
+    };
+    const URL =
+      this.$sections.serverUrl +
+      `/project/${this.$sections.projectId}/page/${this.pageName}`;
+
+    return axios
+      .options(URL, config)
+      .then((res) => {
+        console.log(`Options API Call success`)
+
+        return axios.post(URL, {}, config)
+      })
+      .then((res) => {
+          const sections = res.data.sections;
+          const views = {};
+          sections.map((section) => {
+            this.trackSectionComp(section.name, section.type);
+            if (section.settings) section.settings = JSON.parse(section.settings);
+            if (section.id) {
+              views[section.id] = section;
+            } else {
+              views["test"] = section;
+            }
+          });
+          this.$set(this.displayVariations, this.activeVariation.pageName, {
+            name: this.activeVariation.pageName,
+            views: { ...views },
+          });
+          this.selectedVariation = this.activeVariation.pageName;
+          this.showSections = true;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.showToast("Error", "danger", "Couldn't load the page in server prefetch: " + error.response.data.error);
+          this.loading = false;
+          this.pageNotFound = true;
+        });
+  },
   computed: {
     activeVariation() {
       // If variation true return its page name
@@ -487,71 +530,63 @@ export default {
       },
     },
   },
-  created() {
+  mounted() {
     initI18n.locale = this.lang;
-    if(!this.api){
-      // Create `axios-cache-adapter` instance
-      const cache = setupCache({
-        maxAge: 15 * 60 * 1000,
-        exclude: {
-          // Only exclude PUT, PATCH and DELETE methods from cache
-          methods: ['put', 'patch', 'delete']
-        }
-      })
-      this.api = axios.create({
-        adapter: cache.adapter
-      })
-    } 
+    // if(!this.api){
+    //   // Create `axios-cache-adapter` instance
+    //   const cache = setupCache({
+    //     maxAge: 15 * 60 * 1000,
+    //     exclude: {
+    //       // Only exclude PUT, PATCH and DELETE methods from cache
+    //       methods: ['put', 'patch', 'delete']
+    //     }
+    //   })
+    //   this.api = axios.create({
+    //     adapter: cache.adapter
+    //   })
+    // } 
 
-    this.loading = true;
-    this.checkToken();
-    // We check if this is running in the browser or not
-    // because during SSR no cors preflight request is sent
-    const inBrowser = typeof window !== 'undefined';
-    const config = {
-      headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
-    };
-    const URL =
-      this.$sections.serverUrl +
-      `/project/${this.$sections.projectId}/page/${this.pageName}`;
+    if(!this.showSections){
+      this.loading = true;
+      this.checkToken();
+      // We check if this is running in the browser or not
+      // because during SSR no cors preflight request is sent
+      const inBrowser = typeof window !== 'undefined';
+      const config = {
+        headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
+      };
+      const URL =
+        this.$sections.serverUrl +
+        `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
-    if(!inBrowser){
-      this.api
-      .options(URL, config)
-      .then((res) => {
-        console.log(`Options API Call success: ${res}`)
-      })
-      .catch((error) => {
-        console.warn(`Options API Call error: ${error}`)
-      })
+        axios
+        .post(URL, {}, config)
+        .then((res) => {
+          const sections = res.data.sections;
+          const views = {};
+          sections.map((section) => {
+            this.trackSectionComp(section.name, section.type);
+            if (section.settings) section.settings = JSON.parse(section.settings);
+            if (section.id) {
+              views[section.id] = section;
+            } else {
+              views["test"] = section;
+            }
+          });
+          this.$set(this.displayVariations, this.activeVariation.pageName, {
+            name: this.activeVariation.pageName,
+            views: { ...views },
+          });
+          this.selectedVariation = this.activeVariation.pageName;
+          this.showSections = true;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+          this.loading = false;
+          this.pageNotFound = true;
+        });
     }
-    this.api
-      .post(URL, {}, config)
-      .then((res) => {
-        const sections = res.data.sections;
-        const views = {};
-        sections.map((section) => {
-          this.trackSectionComp(section.name, section.type);
-          if (section.settings) section.settings = JSON.parse(section.settings);
-          if (section.id) {
-            views[section.id] = section;
-          } else {
-            views["test"] = section;
-          }
-        });
-        this.$set(this.displayVariations, this.activeVariation.pageName, {
-          name: this.activeVariation.pageName,
-          views: { ...views },
-        });
-        this.selectedVariation = this.activeVariation.pageName;
-        this.showSections = true;
-        this.loading = false;
-      })
-      .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
-        this.loading = false;
-        this.pageNotFound = true;
-      });
   },
   methods: {
     addNewStaticType() {

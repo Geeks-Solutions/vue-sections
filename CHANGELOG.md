@@ -5,13 +5,13 @@
 - The configuration of the folder to look for sections components isn't flexible enough due to limitations with dynamic import(), we had to remove this feature for now and define the folder. Updated the readme accordingly
 - Fixed SSR compilation errors
 - SSR request to get a page wasn't following the security flow imposed by Sections, this is now fixed
+- SSR compilation is now fixed
 - Toast are not support on SSR side, when running in SSR, replaced toast warning by console.log
 
 #### Additional features
 
-- Fixed the issues with SSR support
-- Added the ability to specify
-- Added Axios caching on requests to optimize performances
+- Added the ability to specify the Server URL through a config.
+- Added the ability to specify the project URL through a config. for SSR security
 
 ### 1.0.4
 

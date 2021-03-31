@@ -1,12 +1,10 @@
 <template>
-  <div id="app">
     <SectionsMain
       :admin="admin"
       :pageName="pageName"
       :variations="variations"
       :lang="lang"
     />
-  </div>
 </template>
 
 <script>

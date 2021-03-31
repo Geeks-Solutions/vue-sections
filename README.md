@@ -24,7 +24,7 @@ Configure the library, the possible configurations are as follow:
 
 - `projectId`: The ID of you project, you get it from your project interface after your register to sections
 - `environment`: _to use only for development purposes_ set it to "testing" if you want your requests to be directed to sections test server
-- `projectUrl`: _to use only if you wish to run sections in SSR_ set it to the project url you defined in your project interface on sections back office.
+- `projectUrl`: _to use only if you intend to run sections in SSR_ set it to the project url you defined in your project interface on sections back office.
 
 ```
 import Sections from '@geeks-solutions/vue-sections'
@@ -78,7 +78,7 @@ The Wysiwg can be added to any page and will display of the box thanks to intern
 You can also define your own local and static section types and you have the ability to control the way any section will display on your website.
 
 You do this by creating custom VueJS components and placing them in the right configurations folder.
-For now this is not configurable and you should have a `@/sections` folder where to put your components (@ pointing to any folder declaration you have defined in your proejct, i.e @ -> `/src` on a vueJs project. @ -> `/` on a NuxtJs project etc..).
+For now this is not configurable and you should have a `@/sections` folder where to put your components (@ pointing to any folder declaration you have defined in your project, i.e @ -> `/src` on a vueJs project. @ -> `/` on a NuxtJs project etc..).
 
 The configurations folder follows the following structure:
 
