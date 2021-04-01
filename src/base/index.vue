@@ -357,7 +357,6 @@ import Loading from "./components/Loading.vue";
 
 import { formatName, sectionHeader, importComp } from "./helpers";
 import axios from "axios";
-import { setupCache } from 'axios-cache-adapter'
 export default {
   i18n: initI18n,
   layout: "dashboard",
