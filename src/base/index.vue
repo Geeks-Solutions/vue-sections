@@ -1,5 +1,5 @@
 <template>
-  <div class="sections-config justify-content-center" v-if="showSections">
+  <div class="sections-config justify-content-center">
     <div v-if="!pageNotFound">
       <!-- page buttons part 1-->
       <button
@@ -318,7 +318,7 @@
       <Loading :loading="loading" />
     </div>
     <div v-else>
-      <button class="hp-button" @click="createNewPage">
+      <button v-if="admin" class="hp-button" @click="createNewPage">
         {{ $t("Create New Page") }}
       </button>
     </div>
@@ -423,7 +423,6 @@ export default {
       sectionTypeName: "",
       staticModal: false,
       sectionInPage: [],
-      showSections: false,
       pageNotFound: false,
       dismissCountDown: 0,
       editMode: false,
@@ -448,7 +447,6 @@ export default {
           altered: false,
         },
       },
-      api: false,
     };
   },
   // Server-side only
@@ -485,7 +483,6 @@ export default {
             views: { ...views },
           });
           this.selectedVariation = this.activeVariation.pageName;
-          this.showSections = true;
           this.loading = false;
         })
         .catch((error) => {
@@ -532,22 +529,8 @@ export default {
   },
   mounted() {
     initI18n.locale = this.lang;
-    // if(!this.api){
-    //   // Create `axios-cache-adapter` instance
-    //   const cache = setupCache({
-    //     maxAge: 15 * 60 * 1000,
-    //     exclude: {
-    //       // Only exclude PUT, PATCH and DELETE methods from cache
-    //       methods: ['put', 'patch', 'delete']
-    //     }
-    //   })
-    //   this.api = axios.create({
-    //     adapter: cache.adapter
-    //   })
-    // } 
-
-    if(!this.showSections){
       this.loading = true;
+
       this.checkToken();
       // We check if this is running in the browser or not
       // because during SSR no cors preflight request is sent
@@ -559,34 +542,32 @@ export default {
         this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
-        axios
-        .post(URL, {}, config)
-        .then((res) => {
-          const sections = res.data.sections;
-          const views = {};
-          sections.map((section) => {
-            this.trackSectionComp(section.name, section.type);
-            if (section.settings) section.settings = JSON.parse(section.settings);
-            if (section.id) {
-              views[section.id] = section;
-            } else {
-              views["test"] = section;
-            }
-          });
-          this.$set(this.displayVariations, this.activeVariation.pageName, {
-            name: this.activeVariation.pageName,
-            views: { ...views },
-          });
-          this.selectedVariation = this.activeVariation.pageName;
-          this.showSections = true;
-          this.loading = false;
-        })
-        .catch((error) => {
-          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
-          this.loading = false;
-          this.pageNotFound = true;
+      axios
+      .post(URL, {}, config)
+      .then((res) => {
+        const sections = res.data.sections;
+        const views = {};
+        sections.map((section) => {
+          this.trackSectionComp(section.name, section.type);
+          if (section.settings) section.settings = JSON.parse(section.settings);
+          if (section.id) {
+            views[section.id] = section;
+          } else {
+            views["test"] = section;
+          }
         });
-    }
+        this.$set(this.displayVariations, this.activeVariation.pageName, {
+          name: this.activeVariation.pageName,
+          views: { ...views },
+        });
+        this.selectedVariation = this.activeVariation.pageName;
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        this.loading = false;
+        this.pageNotFound = true;
+      });
   },
   methods: {
     addNewStaticType() {
@@ -701,6 +682,7 @@ export default {
       if (this.types && this.types.length) {
         return;
       }
+      this.loading = true;
       const token = this.$cookies.get("sections-auth-token");
       const config = {
         headers: sectionHeader({
@@ -726,8 +708,10 @@ export default {
             });
           });
           this.types = [...this.types, ...this.addSystemTypes()];
+          this.loading = false;
         })
         .catch((error) => {
+          this.loading = false;
           this.showToast("Error", "danger", error);
         });
     },
@@ -977,11 +961,11 @@ export default {
             "You have successfully saved your changes and they are now visible to your visitors"
           );
         })
-        .catch(() => {
+        .catch((error) => {
           this.showToast(
-            "Error",
+            "Error saving your changes",
             "danger",
-            "We couldn't save your changes, try again later"
+            error.response.data.error
           );
           this.loading = false;
         });

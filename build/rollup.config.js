@@ -9,6 +9,7 @@ import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
 import scss from "rollup-plugin-scss";
+import image from '@rollup/plugin-image';
 
 // Get browserslist config and remove ie from es build targets
 const esbrowserslist = fs.readFileSync('./.browserslistrc')
@@ -84,6 +85,7 @@ if (!argv.format || argv.format === 'es') {
     },
     plugins: [
       ...baseConfig.plugins.preVue,
+      image(),
       scss(),
       vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,
@@ -117,6 +119,7 @@ if (!argv.format || argv.format === 'cjs') {
     },
     plugins: [
       ...baseConfig.plugins.preVue,
+      image(),
       scss(),
       vuePlugin({
         ...baseConfig.plugins.vuePlugin,
@@ -147,6 +150,7 @@ if (!argv.format || argv.format === 'iife') {
     },
     plugins: [
       ...baseConfig.plugins.preVue,
+      image(),
       scss(),
       vuePlugin(baseConfig.plugins.vuePlugin),
       ...baseConfig.plugins.postVue,

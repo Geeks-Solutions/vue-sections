@@ -1,3 +1,11 @@
+### 1.0.7
+
+#### Bug fixes
+
+- Fixes the loading indicator on page view, page save and edit mode activation
+- Fixes the display of the create new page button for logged in users only
+- Code cleanup to remove axios cache plugin that is not being used now
+
 ### 1.0.6
 
 #### Bug fixes
