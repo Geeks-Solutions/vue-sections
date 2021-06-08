@@ -15,7 +15,7 @@
         </div>
 
         <div
-          class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
+          class="pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
           v-if="admin && editMode"
         >
           <button
@@ -487,7 +487,6 @@ export default {
   },
   created() {
     initI18n.locale = this.lang;
-    
     axios.defaults.headers.common["token"] = this.$cookies.get(
       "sections-auth-token"
     ); // for all requests
@@ -528,12 +527,14 @@ export default {
         this.showSections = true;
         // this.$store.commit("setFetched");
         this.loading = false;
+        this.$emit("load", true);
       })
       .catch((error) => {
         this.showToast("Error", "danger", "Couldn't load the page: " + error);
         this.loading = false;
         this.showSections = true;
         this.pageNotFound = true;
+        this.$emit("load", false);
         // this.$store.commit("setFetched");
       });
   },
@@ -647,8 +648,7 @@ export default {
         }),
       };
       const url =
-        serverUrl() +
-        `/project/${this.$sections.projectId}/section-types`;
+        serverUrl() + `/project/${this.$sections.projectId}/section-types`;
       axios
         .get(url, config)
         .then((res) => {
