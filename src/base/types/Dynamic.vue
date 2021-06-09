@@ -6,7 +6,7 @@
 
 <script>
 import axios from "axios";
-import { sectionHeader, serverUrl } from "../helpers";
+import { sectionHeader } from "../helpers";
 
 export default {
   props: {
@@ -58,7 +58,7 @@ export default {
             }
       };
       const URL =
-        serverUrl() +
+        this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/section/render`;
       axios
         .post(URL, variables, config)

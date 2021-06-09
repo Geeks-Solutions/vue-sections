@@ -28,22 +28,10 @@ export function formatName(name) {
 }
 
 export const importComp = (path) => {
-    if (process.env.VUE_APP_SECTIONS_CONF) {
-      return () => import(`${process.env.VUE_APP_SECTIONS_CONF}${path}`)
-      .catch(err => import(`../src/configs${path}`)
-      .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: ${process.env.VUE_APP_SECTIONS_CONF}${path}`)})
-      )
-    } else if (process.env.NUXT_ENV_SECTIONS_CONF) {
-      return () => import(`${process.env.NUXT_ENV_SECTIONS_CONF}${path}`)
-      .catch(err => import(`../src/configs${path}`)
-      .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: ${process.env.NUXT_ENV_SECTIONS_CONF}${path}`)})
-      )
-    } else {
-      return () => import(`@/sections_config${path}`)
-      .catch(err => import(`../src/configs${path}`)
-      .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: @/sections_config${path}`)})
-      )
-    }
+    return () => import(`@/sections${path}.vue`)
+    .catch(err => import(`../src/configs${path}.vue`)
+    .catch(err => {throw new Error(`vue-sections: can't find the file in your filesystem: @/sections${path}.vue`)})
+    )
   }
 
 export const sectionHeader = (header) => {
@@ -51,13 +39,8 @@ export const sectionHeader = (header) => {
   const random = Math.floor(Math.random() * 1000000 + 1);
   const header_key = `project-id-${timestamp}-${random}`;
   header[header_key] = "a3b2cd1";
-  return header
-}
-
-export const serverUrl = () => {
-  if(process.env.VUE_APP_SECTIONS_ENV === "testing" || process.env.NUXT_ENV_SECTIONS_ENV === "testing"){
-    return "https://sections-saas.k8s-dev.geeks.solutions/api/v1"
-  } else {
-    return "https://sections.geeks.solutions/api/v1"
+  if(header.origin){
+    header['access-control-request-headers'] = header_key;
   }
+  return header
 }

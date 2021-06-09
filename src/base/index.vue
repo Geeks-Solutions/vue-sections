@@ -1,5 +1,5 @@
 <template>
-  <div class="sections-config justify-content-center" v-if="showSections">
+  <div class="sections-config justify-content-center">
     <div v-if="!pageNotFound">
       <!-- page buttons part 1-->
       <button
@@ -318,7 +318,7 @@
       <Loading :loading="loading" />
     </div>
     <div v-else>
-      <button class="hp-button" @click="createNewPage">
+      <button v-if="admin" class="hp-button" @click="createNewPage">
         {{ $t("Create New Page") }}
       </button>
     </div>
@@ -355,7 +355,7 @@ import upperFirst from "lodash/upperFirst";
 
 import Loading from "./components/Loading.vue";
 
-import { formatName, sectionHeader, importComp, serverUrl } from "./helpers";
+import { formatName, sectionHeader, importComp } from "./helpers";
 import axios from "axios";
 export default {
   i18n: initI18n,
@@ -422,7 +422,6 @@ export default {
       sectionTypeName: "",
       staticModal: false,
       sectionInPage: [],
-      showSections: false,
       pageNotFound: false,
       dismissCountDown: 0,
       editMode: false,
@@ -448,6 +447,48 @@ export default {
         },
       },
     };
+  },
+  // Server-side only
+  // This will be called by the server renderer automatically
+  serverPrefetch () {
+        const config = {
+      headers: sectionHeader({origin: this.$sections.projectUrl}),
+    };
+    const URL =
+      this.$sections.serverUrl +
+      `/project/${this.$sections.projectId}/page/${this.pageName}`;
+
+    return axios
+      .options(URL, config)
+      .then((res) => {
+        console.log(`Options API Call success`)
+
+        return axios.post(URL, {}, config)
+      })
+      .then((res) => {
+          const sections = res.data.sections;
+          const views = {};
+          sections.map((section) => {
+            this.trackSectionComp(section.name, section.type);
+            if (section.settings) section.settings = JSON.parse(section.settings);
+            if (section.id) {
+              views[section.id] = section;
+            } else {
+              views["test"] = section;
+            }
+          });
+          this.$set(this.displayVariations, this.activeVariation.pageName, {
+            name: this.activeVariation.pageName,
+            views: { ...views },
+          });
+          this.selectedVariation = this.activeVariation.pageName;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.showToast("Error", "danger", "Couldn't load the page in server prefetch: " + error.response.data.error);
+          this.loading = false;
+          this.pageNotFound = true;
+        });
   },
   computed: {
     activeVariation() {
@@ -485,27 +526,22 @@ export default {
       },
     },
   },
-  created() {
+  mounted() {
     initI18n.locale = this.lang;
-    axios.defaults.headers.common["token"] = this.$cookies.get(
-      "sections-auth-token"
-    ); // for all requests
-    // @TODO check if the user is admin or not
-    // Everything in the page should be loaded
-    // But if he is admin when he choose from the list of components
-    // we load the componet using Vue.component
-    this.$root.$on("toast", ({ type, message }) => {
-      this.showToast(type, type, message);
-    });
-    this.loading = true;
-    this.checkToken();
-    const config = {
-      headers: sectionHeader({}),
-    };
-    const URL =
-      serverUrl() +
-      `/project/${this.$sections.projectId}/page/${this.pageName}`;
-    axios
+      this.loading = true;
+
+      this.checkToken();
+      // We check if this is running in the browser or not
+      // because during SSR no cors preflight request is sent
+      const inBrowser = typeof window !== 'undefined';
+      const config = {
+        headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
+      };
+      const URL =
+        this.$sections.serverUrl +
+        `/project/${this.$sections.projectId}/page/${this.pageName}`;
+
+      axios
       .post(URL, {}, config)
       .then((res) => {
         const sections = res.data.sections;
@@ -524,18 +560,14 @@ export default {
           views: { ...views },
         });
         this.selectedVariation = this.activeVariation.pageName;
-        this.showSections = true;
-        // this.$store.commit("setFetched");
         this.loading = false;
         this.$emit("load", true);
       })
       .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: " + error);
+        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
         this.loading = false;
-        this.showSections = true;
         this.pageNotFound = true;
         this.$emit("load", false);
-        // this.$store.commit("setFetched");
       });
   },
   methods: {
@@ -546,10 +578,16 @@ export default {
           headers: sectionHeader({ token }),
         };
         const URL =
-          serverUrl() +
+          this.$sections.serverUrl +
           `/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
+        this.loading = true;
         axios.post(URL, {}, config).then(() => {
           this.staticSuccess = true;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.error);
+           this.loading = false;
         });
       }
     },
@@ -568,7 +606,7 @@ export default {
               .replace(/\.\w+$/, "")
           )
         );
-        const path = `/views/${sectionName}_${sectionType}.vue`;
+        const path = `/views/${sectionName}_${sectionType}`;
         this.$options.components[name] = importComp(path);
       }
     },
@@ -581,7 +619,7 @@ export default {
       const config = {
         headers: sectionHeader(header),
       };
-      const URL = serverUrl() + `/project/${this.$sections.projectId}/page/${this.pageName}`;
+      const URL = this.$sections.serverUrl + `/project/${this.$sections.projectId}/page/${this.pageName}`;
       axios
         .put(
           URL,
@@ -607,29 +645,33 @@ export default {
         });
     },
     showToast(title, variant, message) {
-      this.$bvToast.toast(message, {
-        title,
-        variant,
-        solid: true,
-        toaster: "b-toaster-top-center",
-      });
+      const inBrowser = typeof window !== 'undefined';
+      if(inBrowser){
+        this.$bvToast.toast(message, {
+          title,
+          variant,
+          solid: true,
+          toaster: "b-toaster-top-center",
+        });
+      } else {
+        console.log(`## ${variant} ## ${title}: ${message}`)
+      }
     },
     checkToken() {
-      const root_path = window.location.href.split("?")[0];
-      const auth_code = window.location.href.split("auth_code=")[1];
+      const auth_code = this.$route.query.auth_code;
       if (auth_code) {
         const config = {
           headers: sectionHeader({}),
         };
         const URL =
-          serverUrl() +
+          this.$sections.serverUrl +
           `/project/${this.$sections.projectId}/token/${auth_code}`;
         axios
           .get(URL, config)
           .then((res) => {
             const token = res.data.token;
             this.$cookies.set("sections-auth-token", token, "7d");
-            window.location.replace(root_path);
+            this.$router.push(this.$route.path)
             this.loading = false;
           })
           .catch((err) => {
@@ -641,6 +683,7 @@ export default {
       if (this.types && this.types.length) {
         return;
       }
+      this.loading = true;
       const token = this.$cookies.get("sections-auth-token");
       const config = {
         headers: sectionHeader({
@@ -648,7 +691,8 @@ export default {
         }),
       };
       const url =
-        serverUrl() + `/project/${this.$sections.projectId}/section-types`;
+        this.$sections.serverUrl +
+        `/project/${this.$sections.projectId}/section-types`;
       axios
         .get(url, config)
         .then((res) => {
@@ -665,8 +709,10 @@ export default {
             });
           });
           this.types = [...this.types, ...this.addSystemTypes()];
+          this.loading = false;
         })
         .catch((error) => {
+          this.loading = false;
           this.showToast("Error", "danger", error);
         });
     },
@@ -675,35 +721,13 @@ export default {
       const internal_types = require.context("../src/configs/views", false);
       let external_types = {};
       let external_path = "";
-      if (process.env.VUE_APP_SECTIONS_CONF) {
-        try {
-          external_types = require.context(
-            `${process.env.VUE_APP_SECTIONS_CONF}/views`,
-            false
-          );
-          external_path = `${process.env.VUE_APP_SECTIONS_CONF}/views`;
-        } catch (error) {
-          console.log(error);
-        }
-      } else if (process.env.NUXT_ENV_SECTIONS_CONF) {
-        try {
-          external_types = require.context(
-            `${process.env.NUXT_ENV_SECTIONS_CONF}/views`,
-            false
-          );
-          external_path = `${process.env.NUXT_ENV_SECTIONS_CONF}/views`;
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        try {
-          external_types = require.context(`@/sections_config/views`, false);
-          external_path = `@/sections_config/views`;
-        } catch (error) {
-          throw new Error(
-            "vue-sections: There is no sections_config folder in src"
-          );
-        }
+      try {
+        external_types = require.context(`@/sections/views`, false);
+        external_path = `@/sections/views`;
+      } catch (error) {
+        throw new Error(
+          "vue-sections: Your project contains no @/sections folder"
+        );
       }
       staticTypes = this.build_comp(
         staticTypes,
@@ -921,7 +945,7 @@ export default {
         sections,
       };
       const URL =
-        serverUrl() +
+        this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/page/${variationName}`;
       axios
         .put(URL, variables, config)
@@ -938,11 +962,11 @@ export default {
             "You have successfully saved your changes and they are now visible to your visitors"
           );
         })
-        .catch(() => {
+        .catch((error) => {
           this.showToast(
-            "Error",
+            "Error saving your changes",
             "danger",
-            "We couldn't save your changes, try again later"
+            error.response.data.error
           );
           this.loading = false;
         });

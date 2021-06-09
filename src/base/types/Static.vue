@@ -11,7 +11,7 @@
       </form>
     </div>
     <!-- get access to the imported static component -->
-    <component :is="component" v-show="false" ref="importedComponent" />
+    <component :is="component" :section="props" v-show="false" ref="importedComponent" />
   </div>
 </template>
 
@@ -42,8 +42,7 @@ export default {
   },
   computed: {
     component() {
-      // @TODO managment of external and internal
-      const path = "/views/" + this.props.name + ".vue";
+      const path = `/views/${this.props.name}_${this.props.type}`;
       return importComp(path);
     },
     id() {

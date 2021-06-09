@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { formatName, base64Img, sectionHeader, serverUrl } from "../helpers";
+import { formatName, base64Img, sectionHeader } from "../helpers";
 import axios from "axios";
 
 export default {
@@ -167,7 +167,7 @@ export default {
       };
 
       const URL =
-        serverUrl() +
+        this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/section/${this.props.name}/options`;
       
       axios
@@ -303,7 +303,7 @@ export default {
             }
       };
       const URL =
-        serverUrl() +
+        this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/section/render`;
 
       axios

@@ -30,11 +30,11 @@ export default {
   },
   computed: {
     getIcon() {
-      const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+      const path = "/type-icons/" + this.title.replace(/ /g, "_");
       return importComp(path);
     },
     getIconBase() {
-      const path = "/type-icons/" + this.title.replace(/ /g, "_") + ".vue";
+      const path = "/type-icons/" + this.title.replace(/ /g, "_");
       return importComp(path);
     },
   },
