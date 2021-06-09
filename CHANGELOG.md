@@ -1,3 +1,9 @@
+### 1.0.8
+
+#### Additional features
+
+- Emit a load event when the sections are loaded
+
 ### 1.0.7
 
 #### Bug fixes
