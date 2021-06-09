@@ -15,7 +15,7 @@
         </div>
 
         <div
-          class=" pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
+          class="pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
           v-if="admin && editMode"
         >
           <button
@@ -561,11 +561,13 @@ export default {
         });
         this.selectedVariation = this.activeVariation.pageName;
         this.loading = false;
+        this.$emit("load", true);
       })
       .catch((error) => {
         this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
         this.loading = false;
         this.pageNotFound = true;
+        this.$emit("load", false);
       });
   },
   methods: {

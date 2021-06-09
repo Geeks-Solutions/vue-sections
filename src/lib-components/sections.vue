@@ -4,6 +4,7 @@
       :pageName="pageName"
       :variations="variations"
       :lang="lang"
+      @load="loaded"
     />
 </template>
 
@@ -29,5 +30,10 @@ export default {
   components: {
     SectionsMain,
   },
-};
+  methods: {
+    loaded(e) {
+      this.$emit('finishLoad', e)
+    },
+  },
+}
 </script>
