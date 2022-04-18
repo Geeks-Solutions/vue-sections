@@ -9,7 +9,7 @@ import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
 
 import { quillEditor } from "vue-quill-editor";
-import axios from "axios";
+import {globalFileUpload} from "vue-sections";
 
 export default {
   components: {
@@ -39,24 +39,7 @@ export default {
       // Listen upload local image and save to server
       input.onchange = async () => {
         const file = input.files[0];
-        const data = new FormData()
-        data.append('files[1][file]', file)
-        data.append('type', "image")
-        data.append('author', "Author")
-        data.append('private_status', "public")
-        data.append('files[1][platform_id]', '1')
-        const token = this.$cookies.get("sections-auth-token")
-          const config = {
-            headers: this.sectionHeader({token}),
-          };
-          await axios.post(
-              this.$sections.serverUrl +
-              `/project/${this.$sections.projectId}/media`,
-              // Uncomment the below line to overpass CORS
-              '/media/',
-              data,
-              config
-          ).then((result) => {
+          await globalFileUpload(file).then((result) => {
             imageURL = result.data.files[0].url
             const range = this.$refs.myQuillEditor.quill.getSelection();
             this.$refs.myQuillEditor.quill.insertEmbed(range.index, 'image', imageURL);
