@@ -1,4 +1,4 @@
-### 1.0.10 
+### 1.0.11 
 #### Additional features
 
 - Update the library to have it use media in the wysiwyg and the static components
