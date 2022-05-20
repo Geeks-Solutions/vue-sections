@@ -106,9 +106,14 @@ In case you are trying to use a section that you haven't properly declared on yo
 - `globalFileUpload` A function that uses media to upload images replacing the base64 format.
 - The static wysiwyg component uses the globalFileUpload function of media by default.
 - To use the globalFileUpload function of media, you need to call the function and pass the base64 file to it.
+- Import globalFileUpload from "@geeks-solutions/vue-sections"
+
+````
+import {globalFileUpload} from "@geeks-solutions/vue-sections";
+````
 
 It is an async function that returns an object of the function result.
-###Example on how to use the funciton: 
+###Example on how to use the function: 
 
 ````
 async onFileSelected(e) {
