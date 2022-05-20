@@ -127,7 +127,14 @@ await globalFileUpload(this.file).then(
 ## Tailwind Support
 
  - Add "bootstrap-vue": "^2.21.2" to the package json dependencies 
+
  - Add 'bootstrap-vue/nuxt', to nuxt.config.js in modules
+
+````
+modules: [
+  'bootstrap-vue/nuxt',
+]
+````
 
 ## For Contributors
 
