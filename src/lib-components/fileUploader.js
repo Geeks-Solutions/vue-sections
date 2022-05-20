@@ -14,8 +14,8 @@ export async function globalFileUpload(file) {
             headers: sectionHeader({ token }),
         };
         const result = await axios.post(
-            this.$sections.serverUrl +
-            `/project/${this.$sections.projectId}/media`,
+            window.$nuxt.$sections.serverUrl +
+            `/project/${window.$nuxt.$sections.projectId}/media`,
             data,
             config
         )

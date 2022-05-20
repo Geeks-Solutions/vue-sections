@@ -1,3 +1,15 @@
+### 1.0.10 
+#### Additional features
+
+- Update the library to have it use media in the wysiwyg and the static components
+- Update the media to use sections server URL + Update readme to include Tailwind Support
+
+### 1.0.9
+
+#### Bug Fixes
+
+- Properly build update to include it in the esm scripts
+
 ### 1.0.8
 
 #### Additional features
