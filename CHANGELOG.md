@@ -2,7 +2,7 @@
 #### Additional features
 
 - Update the library to have it use media in the wysiwyg and the static components
-- Update the media to use sections server URL + Update readme to include Tailwind Support
+- Update the media to use sections server URL + Update readme to include Tailwind Support 
 
 ### 1.0.9
 
