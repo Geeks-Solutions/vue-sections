@@ -97,8 +97,11 @@ The configurations folder follows the following structure:
 - `type-icons` folder will contain the icons that will illustrate your section in the add a new section box for content editors.
 - `forms` is the folder where you create the form that will help you fill the data while adding or editing `your-component` to your page. This is only for static section types, local and dynamic ones persist no data and configurable ones have their data entry form automatically built by the library as this comes from the third party developer providing this section.
 
+
 In case you are trying to use a section that you haven't properly declared on your project, a warning will display in the console indicating where sections is epxecting the component to be located according to your configuration.
 
+
+- `addNewStaticType(sectionTypeName)` a helper function that takes a string of sectionTypeName that help to declare ready to use section types
 ---
 
 # Media sections
