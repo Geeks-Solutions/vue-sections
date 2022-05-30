@@ -1,4 +1,8 @@
-### 1.0.8
+### 1.0.15
+
+#### Additional features
+
+- Update the UI to be able to delete a newly created static section type
 
 #### Additional features
 

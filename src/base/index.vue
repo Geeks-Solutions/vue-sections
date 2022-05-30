@@ -131,16 +131,24 @@
           <div v-if="!currentSection" class="m-1 p-1 type-items">
             <div
               class="section-item"
-              v-for="type in types"
+              v-for="(type, index) in types"
               :key="type.name"
-              @click="currentSection = type"
             >
-              <SectionItem
-                v-if="type.name && !type.name.includes('local')"
-                class="bg-light-blue "
-                :title="formatName(type.name)"
-                :icon="type.name"
-              />
+              <div class="section-delete">
+                <div class="section-delete-icon" @click="deleteSectionType(type.name, index)">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.89862 4.99959L0.159756 8.73862C0.0569105 8.84154 0.000163078 8.97886 0 9.12528C0 9.27179 0.0567484 9.40927 0.159756 9.51203L0.487399 9.83959C0.590407 9.94276 0.727724 9.99927 0.87431 9.99927C1.02065 9.99927 1.15797 9.94276 1.26098 9.83959L4.99984 6.10081L8.73886 9.83959C8.84171 9.94276 8.97911 9.99927 9.12561 9.99927C9.27195 9.99927 9.40935 9.94276 9.5122 9.83959L9.84 9.51203C10.0533 9.2987 10.0533 8.95171 9.84 8.73862L6.10106 4.99959L9.84 1.26073C9.94293 1.15764 9.99959 1.02032 9.99959 0.8739C9.99959 0.727478 9.94293 0.590161 9.84 0.487153L9.51228 0.159593C9.40943 0.0565033 9.27195 -8.29697e-05 9.12569 -8.29697e-05C8.97919 -8.29697e-05 8.84179 0.0565033 8.73894 0.159593L4.99992 3.89845L1.26106 0.159593C1.15805 0.0565033 1.02073 -8.29697e-05 0.874391 -8.29697e-05H0.874228C0.727805 -8.29697e-05 0.590488 0.0565033 0.48748 0.159593L0.159838 0.487153C0.0569925 0.59008 0.000244141 0.727478 0.000244141 0.8739C0.000244141 1.02032 0.0569925 1.15764 0.159838 1.26065L3.89862 4.99959Z" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="section-item" @click="currentSection = type">
+                <SectionItem
+                    v-if="type.name && !type.name.includes('local')"
+                    class="bg-light-blue"
+                    :title="formatName(type.name)"
+                    :icon="type.name"
+                />
+              </div>
             </div>
           </div>
           <div v-else class="d-flex">
@@ -1031,6 +1039,31 @@ export default {
       this.isModalOpen = !error.closeModal;
       this.showToast(error.title, "danger", error.message);
     },
+    deleteSectionType(sectionTypeName, index) {
+      const token = this.$cookies.get("sections-auth-token");
+      const config = {
+        headers: sectionHeader(({origin: this.$sections.projectUrl, token})),
+      };
+      const URL =
+          this.$sections.serverUrl +
+          `/project/${this.$sections.projectId}/section-types/${sectionTypeName}`;
+
+      axios
+          .delete(URL, config)
+          .then((res) => {
+            this.showToast(
+                "Success",
+                "info",
+                res.data.message
+            );
+            this.types.splice(index, 1)
+            this.$emit("load", true);
+          })
+          .catch((error) => {
+            this.showToast("Error", "danger", "Couldn't delete section type: " + error);
+            this.$emit("load", false);
+          });
+    }
   },
 };
 </script>
@@ -1451,5 +1484,16 @@ button {
 // }
 .mainmsg {
   color: #686868;
+}
+
+.section-delete {
+  background: #31a9db;
+  height: 15px;
+  padding: 5px;
+  text-align: -webkit-right;
+}
+
+.section-delete-icon {
+  cursor: pointer;
 }
 </style>
