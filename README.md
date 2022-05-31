@@ -102,6 +102,21 @@ In case you are trying to use a section that you haven't properly declared on yo
 
 
 - `addNewStaticType(sectionTypeName)` a helper function that takes a string of sectionTypeName that help to declare ready to use section types
+
+###Example on how to use the function:
+
+````
+import {addNewStaticType} from "vue-sections";
+
+async addStaticType(sectionTypeName) { // where sectionTypeName is the name of the sectionType to be added of type String, example: const sectionTypeName = "newSection"
+
+await addNewStaticType(sectionTypeName).then((res) => {
+       // res is {status: 'success'} on successful request
+       // res is {status: 'error', message: errorMessage} on failed request
+      })
+ 
+},
+````
 ---
 
 # Media sections
