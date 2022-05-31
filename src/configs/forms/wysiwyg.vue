@@ -9,7 +9,7 @@ import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
 
 import { quillEditor } from "vue-quill-editor";
-import {globalFileUpload} from "vue-sections";
+import {globalFileUpload} from "@geeks-solutions/vue-sections";
 
 export default {
   components: {
