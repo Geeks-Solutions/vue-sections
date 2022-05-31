@@ -135,7 +135,7 @@
               :key="type.name"
             >
               <div class="section-delete">
-                <div class="section-delete-icon" @click="deleteSectionType(type.name, index)">
+                <div class="section-delete-icon" @click="openDeleteSectionTypeModal(type.name, index)">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3.89862 4.99959L0.159756 8.73862C0.0569105 8.84154 0.000163078 8.97886 0 9.12528C0 9.27179 0.0567484 9.40927 0.159756 9.51203L0.487399 9.83959C0.590407 9.94276 0.727724 9.99927 0.87431 9.99927C1.02065 9.99927 1.15797 9.94276 1.26098 9.83959L4.99984 6.10081L8.73886 9.83959C8.84171 9.94276 8.97911 9.99927 9.12561 9.99927C9.27195 9.99927 9.40935 9.94276 9.5122 9.83959L9.84 9.51203C10.0533 9.2987 10.0533 8.95171 9.84 8.73862L6.10106 4.99959L9.84 1.26073C9.94293 1.15764 9.99959 1.02032 9.99959 0.8739C9.99959 0.727478 9.94293 0.590161 9.84 0.487153L9.51228 0.159593C9.40943 0.0565033 9.27195 -8.29697e-05 9.12569 -8.29697e-05C8.97919 -8.29697e-05 8.84179 0.0565033 8.73894 0.159593L4.99992 3.89845L1.26106 0.159593C1.15805 0.0565033 1.02073 -8.29697e-05 0.874391 -8.29697e-05H0.874228C0.727805 -8.29697e-05 0.590488 0.0565033 0.48748 0.159593L0.159838 0.487153C0.0569925 0.59008 0.000244141 0.727478 0.000244141 0.8739C0.000244141 1.02032 0.0569925 1.15764 0.159838 1.26065L3.89862 4.99959Z" fill="white"/>
                   </svg>
@@ -186,6 +186,35 @@
                 :savedView="savedView"
               />
             </div>
+          </div>
+        </div>
+      </b-modal>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- page section types popup 'delete' -->
+      <b-modal class="modal" v-model="isDeleteModalOpen" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3">
+            {{ $t("delete-section-type") + selectedSectionTypeName}}
+          </div>
+          <div class="flex">
+            <button
+                class="hp-button"
+                @click="deleteSectionType(selectedSectionTypeName, selectedSectionTypeIndex)"
+            >
+              <div class="btn-text">
+                {{ $t("Confirm") }}
+              </div>
+            </button>
+            <button
+                class="hp-button"
+                @click="isDeleteModalOpen = false"
+            >
+              <div class="btn-text">
+                {{ $t("Cancel") }}
+              </div>
+            </button>
           </div>
         </div>
       </b-modal>
@@ -444,6 +473,7 @@ export default {
       dragging: false,
       currentSection: null,
       isModalOpen: false,
+      isDeleteModalOpen: false,
       synched: false,
       savedView: {},
       // all saved variations
@@ -454,6 +484,8 @@ export default {
           altered: false,
         },
       },
+      selectedSectionTypeName: "",
+      selectedSectionTypeIndex: ""
     };
   },
   // Server-side only
@@ -1040,6 +1072,9 @@ export default {
       this.showToast(error.title, "danger", error.message);
     },
     deleteSectionType(sectionTypeName, index) {
+      this.isDeleteModalOpen = false
+      this.loading = true
+      this.$emit("load", true);
       const token = this.$cookies.get("sections-auth-token");
       const config = {
         headers: sectionHeader(({origin: this.$sections.projectUrl, token})),
@@ -1047,7 +1082,6 @@ export default {
       const URL =
           this.$sections.serverUrl +
           `/project/${this.$sections.projectId}/section-types/${sectionTypeName}`;
-
       axios
           .delete(URL, config)
           .then((res) => {
@@ -1057,12 +1091,19 @@ export default {
                 res.data.message
             );
             this.types.splice(index, 1)
-            this.$emit("load", true);
+            this.loading = false
+            this.$emit("load", false);
           })
           .catch((error) => {
             this.showToast("Error", "danger", "Couldn't delete section type: " + error);
+            this.loading = false
             this.$emit("load", false);
           });
+    },
+    openDeleteSectionTypeModal(sectionTypeName, index) {
+      this.selectedSectionTypeName = sectionTypeName
+      this.selectedSectionTypeIndex = index
+      this.isDeleteModalOpen = true
     }
   },
 };
