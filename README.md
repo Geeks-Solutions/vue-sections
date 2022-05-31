@@ -101,6 +101,46 @@ In case you are trying to use a section that you haven't properly declared on yo
 
 ---
 
+# Media sections
+
+- `globalFileUpload` A function that uses media to upload images replacing the base64 format.
+- The static wysiwyg component uses the globalFileUpload function of media by default.
+- To use the globalFileUpload function of media, you need to call the function and pass the base64 file to it.
+- Import globalFileUpload from "@geeks-solutions/vue-sections"
+
+````
+import {globalFileUpload} from "@geeks-solutions/vue-sections";
+````
+
+It is an async function that returns an object of the function result.
+###Example on how to use the function: 
+
+````
+async onFileSelected(e) {
+
+this.file = this.$refs.imagePick.files[0] //your uploaded file
+
+await globalFileUpload(this.file).then(
+   (result) => {
+     this.settings.url = result.data.files[0].url //assign the result url to the settings object to be able to read that value in $section.settings in you static component
+   }
+ )
+ 
+},
+````
+
+## Tailwind Support
+
+ - Add "bootstrap-vue": "^2.21.2" to the package json dependencies 
+
+ - Add 'bootstrap-vue/nuxt', to nuxt.config.js in modules
+
+````
+modules: [
+  'bootstrap-vue/nuxt',
+]
+````
+
 ## For Contributors
 
 If you wish to contribute to this project, head to this [wiki](https://github.com/Geeks-Solutions/vue-sections/wiki) and follow the instructions there.
