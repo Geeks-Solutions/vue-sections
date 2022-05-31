@@ -1,3 +1,9 @@
+### 1.0.14
+#### Additional features
+
+- Update the library to have it export a new helper function that allow adding a new section type
+- Update the UI to be able to delete a newly created static section type 
+
 ### 1.0.13 
 #### Additional features
 
