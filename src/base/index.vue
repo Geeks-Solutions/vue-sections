@@ -590,7 +590,7 @@ export default {
            this.loading = false;
         });
       } else {
-        this.showToast("Error", "danger", "Please enter the name fo the section");
+        this.showToast("Error", "danger", "Please enter the name of the section");
       }
     },
     openStaticSection() {
