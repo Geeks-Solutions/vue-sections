@@ -627,6 +627,8 @@ export default {
           this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.error);
            this.loading = false;
         });
+      } else {
+        this.showToast("Error", "danger", "Please enter the name of the section");
       }
     },
     openStaticSection() {
@@ -678,7 +680,7 @@ export default {
           this.showToast(
             "Error creating page",
             "danger",
-            "We are unable to create a new sections page for " + pageName
+            "We are unable to create a new sections page for " + this.pageName + "\n" + err.response.data.message
           );
         });
     },
