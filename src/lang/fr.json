@@ -19,5 +19,8 @@
   "success-section-subtitle": "Vous devez maintenant créer trois composants pour que cette section soit utilisable",
   "success-section-instruction-1": "Une icon à afficher dans la fenetre d'ajout de section à une page",
   "success-section-instruction-2": "Un formulaire pour saisir les données à sauvegarder",
-  "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs"
+  "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs",
+  "delete-section-type": "Voulez-vous vraiment supprimer ce type de section: ",
+  "Confirm": "Confirmer",
+  "Cancel": "Annuler"
 }
