@@ -106,7 +106,7 @@ In case you are trying to use a section that you haven't properly declared on yo
 ###Example on how to use the function:
 
 ````
-import {addNewStaticType} from "vue-sections";
+import {addNewStaticType} from "@geeks-solutions/vue-sections";
 
 async addStaticType(sectionTypeName) { // where sectionTypeName is the name of the sectionType to be added of type String, example: const sectionTypeName = "newSection"
 
