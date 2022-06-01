@@ -134,7 +134,7 @@
               v-for="(type, index) in types"
               :key="type.name"
             >
-              <div class="section-delete">
+              <div v-if="type.access === 'private'" class="section-delete">
                 <div class="section-delete-icon" @click="openDeleteSectionTypeModal(type.name, index)">
                   <TrashIcon class="trash-icon-style" />
                 </div>
