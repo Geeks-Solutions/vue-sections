@@ -345,7 +345,7 @@
           <div class="footer">
             <button class="hp-button" @click="staticSuccess = false">
               <div class="btn-icon check-icon"></div>
-              <div class="btn-text">{{ $t("Agree") }}</div>
+              <div class="btn-text">{{ $t("Done") }}</div>
             </button>
           </div>
         </div>
@@ -620,11 +620,13 @@ export default {
           `/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
         this.loading = true;
         axios.post(URL, {}, config).then(() => {
+          this.types = [];
+          this.getSectionTypes();
           this.staticSuccess = true;
           this.loading = false;
         })
         .catch((error) => {
-          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.error);
+          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.message);
            this.loading = false;
         });
       } else {
