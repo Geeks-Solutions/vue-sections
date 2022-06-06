@@ -1006,7 +1006,7 @@ export default {
           this.showToast(
             "Error saving your changes",
             "danger",
-            error.response.data.error
+              error.response.data.message
           );
           this.loading = false;
         });
