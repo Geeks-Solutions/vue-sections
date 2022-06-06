@@ -11,7 +11,7 @@
   "Logout": "Logout",
   "Create static section": "Create static section",
   "Create New Page": "Create New Page",
-  "Agree": "Agree",
+  "Done": "Done",
   "Continue": "Continue",
   "section-title": "Please enter below the name of a new static section type",
   "section-input-title": "Static section name",
@@ -19,5 +19,8 @@
   "success-section-subtitle": "Now you need to provide three components to make this section alive",
   "success-section-instruction-1": "One icon so it displays a nice and clear choice when adding a new section to a page",
   "success-section-instruction-2": "One form to let the content administrator edit it",
-  "success-section-instruction-3": "One view so it can display as you want it for the site visitors"
+  "success-section-instruction-3": "One view so it can display as you want it for the site visitors",
+  "delete-section-type": "Are you sure you want to delete this section type: ",
+  "Confirm": "Confirm",
+  "Cancel": "Cancel"
 }

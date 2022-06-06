@@ -4,7 +4,7 @@
     :class="'mtitle' + html.charAt(2)"
     v-view="viewHandler"
   >
-    <div class="title" :class="{ 'slide-up': isVisible }">
+    <div class="ql-editor ql-snow" :class="{ 'slide-up': isVisible }">
       <div v-html="html" />
     </div>
   </div>

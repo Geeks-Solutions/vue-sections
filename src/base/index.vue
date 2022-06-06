@@ -131,16 +131,22 @@
           <div v-if="!currentSection" class="m-1 p-1 type-items">
             <div
               class="section-item"
-              v-for="type in types"
+              v-for="(type, index) in types"
               :key="type.name"
-              @click="currentSection = type"
             >
-              <SectionItem
-                v-if="type.name && !type.name.includes('local')"
-                class="bg-light-blue "
-                :title="formatName(type.name)"
-                :icon="type.name"
-              />
+              <div v-if="type.access === 'private'" class="section-delete">
+                <div class="section-delete-icon" @click="openDeleteSectionTypeModal(type.name, index)">
+                  <TrashIcon class="trash-icon-style" />
+                </div>
+              </div>
+              <div class="section-item" @click="currentSection = type">
+                <SectionItem
+                    v-if="type.name && !type.name.includes('local')"
+                    class="bg-light-blue"
+                    :title="formatName(type.name)"
+                    :icon="type.name"
+                />
+              </div>
             </div>
           </div>
           <div v-else class="d-flex">
@@ -178,6 +184,35 @@
                 :savedView="savedView"
               />
             </div>
+          </div>
+        </div>
+      </b-modal>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- page section types popup 'delete' -->
+      <b-modal class="modal" v-model="isDeleteModalOpen" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3">
+            {{ $t("delete-section-type") + selectedSectionTypeName}}
+          </div>
+          <div class="flex">
+            <button
+                class="hp-button"
+                @click="deleteSectionType(selectedSectionTypeName, selectedSectionTypeIndex)"
+            >
+              <div class="btn-text">
+                {{ $t("Confirm") }}
+              </div>
+            </button>
+            <button
+                class="hp-button"
+                @click="isDeleteModalOpen = false"
+            >
+              <div class="btn-text">
+                {{ $t("Cancel") }}
+              </div>
+            </button>
           </div>
         </div>
       </b-modal>
@@ -310,7 +345,7 @@
           <div class="footer">
             <button class="hp-button" @click="staticSuccess = false">
               <div class="btn-icon check-icon"></div>
-              <div class="btn-text">{{ $t("Agree") }}</div>
+              <div class="btn-text">{{ $t("Done") }}</div>
             </button>
           </div>
         </div>
@@ -436,6 +471,7 @@ export default {
       dragging: false,
       currentSection: null,
       isModalOpen: false,
+      isDeleteModalOpen: false,
       synched: false,
       savedView: {},
       // all saved variations
@@ -446,6 +482,8 @@ export default {
           altered: false,
         },
       },
+      selectedSectionTypeName: "",
+      selectedSectionTypeIndex: ""
     };
   },
   // Server-side only
@@ -582,13 +620,17 @@ export default {
           `/project/${this.$sections.projectId}/section-types/${this.sectionTypeName}`;
         this.loading = true;
         axios.post(URL, {}, config).then(() => {
+          this.types = [];
+          this.getSectionTypes();
           this.staticSuccess = true;
           this.loading = false;
         })
         .catch((error) => {
-          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.error);
+          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.message);
            this.loading = false;
         });
+      } else {
+        this.showToast("Error", "danger", "Please enter the name of the section");
       }
     },
     openStaticSection() {
@@ -640,7 +682,7 @@ export default {
           this.showToast(
             "Error creating page",
             "danger",
-            "We are unable to create a new sections page for " + pageName
+            "We are unable to create a new sections page for " + this.pageName + "\n" + err.response.data.message
           );
         });
     },
@@ -966,7 +1008,7 @@ export default {
           this.showToast(
             "Error saving your changes",
             "danger",
-            error.response.data.error
+              error.response.data.message
           );
           this.loading = false;
         });
@@ -1031,6 +1073,40 @@ export default {
       this.isModalOpen = !error.closeModal;
       this.showToast(error.title, "danger", error.message);
     },
+    deleteSectionType(sectionTypeName, index) {
+      this.isDeleteModalOpen = false
+      this.loading = true
+      this.$emit("load", true);
+      const token = this.$cookies.get("sections-auth-token");
+      const config = {
+        headers: sectionHeader(({origin: this.$sections.projectUrl, token})),
+      };
+      const URL =
+          this.$sections.serverUrl +
+          `/project/${this.$sections.projectId}/section-types/${sectionTypeName}`;
+      axios
+          .delete(URL, config)
+          .then((res) => {
+            this.showToast(
+                "Success",
+                "info",
+                res.data.message
+            );
+            this.types.splice(index, 1)
+            this.loading = false
+            this.$emit("load", false);
+          })
+          .catch((error) => {
+            this.showToast("Error", "danger", "Couldn't delete section type: " + error);
+            this.loading = false
+            this.$emit("load", false);
+          });
+    },
+    openDeleteSectionTypeModal(sectionTypeName, index) {
+      this.selectedSectionTypeName = sectionTypeName
+      this.selectedSectionTypeIndex = index
+      this.isDeleteModalOpen = true
+    }
   },
 };
 </script>
@@ -1451,5 +1527,22 @@ button {
 // }
 .mainmsg {
   color: #686868;
+}
+
+.section-delete {
+  background: #31a9db;
+  height: 25px;
+  padding: 5px;
+  text-align: -webkit-right;
+}
+
+.section-delete-icon {
+  cursor: pointer;
+}
+
+.trash-icon-style {
+  height: 20px;
+  width: 20px;
+  color: white;
 }
 </style>
