@@ -196,7 +196,7 @@
           <div class="text-center h4 my-3  pb-3">
             {{ $t("delete-section-type") + selectedSectionTypeName}}
           </div>
-          <div class="flex">
+          <div class="d-inline-flex">
             <button
                 class="hp-button"
                 @click="deleteSectionType(selectedSectionTypeName, selectedSectionTypeIndex)"
@@ -1097,7 +1097,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", "Couldn't delete section type: " + error);
+            this.showToast("Error", "danger", "Couldn't delete section type: " + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1531,8 +1531,8 @@ button {
 
 .section-delete {
   background: #31a9db;
-  height: 25px;
-  padding: 5px;
+  height: 0px;
+  padding: 0px;
   text-align: -webkit-right;
 }
 
