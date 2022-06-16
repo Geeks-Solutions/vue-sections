@@ -22,7 +22,9 @@
   "module": "dist/vue-sections.esm.js",
   "unpkg": "dist/vue-sections.min.js",
   "files": [
-    "dist/*",
+    "dist/vue-sections.esm.js",
+    "dist/vue-sections.min.js",
+    "dist/vue-sections.ssr.js",
     "src/**/*.vue",
     "src/lang"
   ],
