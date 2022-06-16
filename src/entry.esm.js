@@ -32,7 +32,7 @@ const install = function installVueSections(Vue,options) {
   Vue.prototype.$sections =  {
     projectId: options.projectId,
     projectUrl: options.projectUrl,
-    serverUrl: (options.environment === "testing" ? "https://sections-saas.k8s-dev.geeks.solutions/api/v1" : "https://sections.geeks.solutions/api/v1")
+    serverUrl: (options.environment === "testing" ? "https://api.sections-saas.k8s-dev.geeks.solutions/api/v1" : "https://sections.geeks.solutions/api/v1")
   }
 };
 
