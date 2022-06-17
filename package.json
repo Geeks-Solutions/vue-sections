@@ -22,18 +22,20 @@
   "module": "dist/vue-sections.esm.js",
   "unpkg": "dist/vue-sections.min.js",
   "files": [
-    "dist/*",
+    "dist/vue-sections.esm.js",
+    "dist/vue-sections.min.js",
+    "dist/vue-sections.ssr.js",
     "src/**/*.vue",
     "src/lang"
   ],
   "sideEffects": false,
   "scripts": {
+    "prepare": "npm run build",
     "serve": "vue-cli-service serve dev/serve.js",
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
-    "prepare": "npm run build"
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
   },
   "dependencies": {
     "axios": "^0.21.1",
