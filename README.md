@@ -26,6 +26,7 @@ Configure the library, the possible configurations are as follow:
 - `environment`: _to use only for development purposes_ set it to "testing" if you want your requests to be directed to sections test server
 - `projectUrl`: _to use only if you intend to run sections in SSR_ set it to the project url you defined in your project interface on sections back office.
 
+Vue:
 ```
 import Sections from '@geeks-solutions/vue-sections'
 
@@ -34,35 +35,91 @@ import Sections from '@geeks-solutions/vue-sections'
 Vue.use(Sections, {projectId: "60352afc1ad7f0006327a38"})
 ```
 
+Nuxt SSR:
+
+````
+ > Inside nuxt.config.js:
+
+plugins: [
+    { src: '~/plugins/sections.js', ssr: false}
+  ],
+  
+  ........................
+  
+ > Inside plugins/sections.js:
+
+import Vue from "vue";
+import Sections from "@geeks-solutions/vue-sections";
+
+export default function() {
+  Vue.use(Sections, {
+    projectId: "60352afc1ad7f0006327a38",
+    projectUrl: "http://localhost:3000",
+    environment: "testing"
+  });
+}
+````
+
+ - To use the library with nuxt `cookie-universal-nuxt` & `nuxt-i18n` must be installed on the host project.
+ - For `nuxt-i18n`, add the following configuration inside nuxt.config.js:
+````
+modules: [
+    ... ,
+    [
+      "nuxt-i18n",
+      {
+        lazy: true,
+        locales: [
+          {
+            name: "English",
+            code: "en",
+            iso: "en",
+            file: "en-EN.js"
+          },
+          {
+            name: "French",
+            code: "fr",
+            iso: "fr-FR",
+            file: "fr-FR.js"
+          }
+        ],
+        loadLanguagesAsync: true,
+        langDir: "lang/",
+        defaultLocale: "en"
+      }
+    ],
+  ],
+ ````
+
 Then add the sections component on the page(s) of your choice
 
 ```
-   <template>
-        <div id="app">
-            <Sections
-            :admin="admin"
-            :pageName="page_name"
-            :variations="[]"
-            @finishLoad="method_name"
-            />
-        </div>
-    </template>
+<template>
+  <div id="app">
+    <Sections
+      :admin="admin"
+      :pageName="pageName"
+      :variations="[]"
+      @finishLoad="method_name"
+    />
+  </div>
+</template>
 
-    <script>
-        export default {
-            name: "App",
-            data() {
-                return {
-                    admin: false,
-                    pageName: "home"
-                };
-            },
-            created() {
-                this.admin = this.$cookies.get("sections-auth-token") ? "true" : false;
-            },
-        };
+<script>
+export default {
+  name: "App",
+  data() {
+    return {
+      admin: false,
+      pageName: "home"
+    };
+  },
+  mounted() {
+    this.admin = !!this.$cookies.get("sections-auth-token");
+  },
+};
 
-    </script>
+</script>
 ```
 
 Here we load props from data on the page, the admin prop is used to indicate if the edit interface for the page should display or not. Sections uses a cookie named `sections-auth-token` to store a user token to secure communications for page editing actions, if the cookie is found it assumes the edit button should show. In case you want to know whether the sections are loaded, You can use @finishLoad in your Sections component with a method name. Don't forget to add the method in the methods object.
