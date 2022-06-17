@@ -1,3 +1,11 @@
+### 1.0.15
+#### Bug Fixes
+
+- Fixed display of the delete section type
+- Fixed style of delete popup buttons
+- Fixed error not showing correctly when deleting a used static section type
+- update sections server url to point to the subdomain
+
 ### 1.0.14
 #### Additional features
 
