@@ -602,7 +602,11 @@ export default {
         this.$emit("load", true);
       })
       .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        if(error.response.data.error) {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        } else {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.message);
+        }
         this.loading = false;
         this.pageNotFound = true;
         this.$emit("load", false);
@@ -654,6 +658,7 @@ export default {
     },
     createNewPage() {
       // pageName
+      this.loading = true;
       const token = this.$cookies.get("sections-auth-token");
       const header = {
         token,
@@ -672,6 +677,25 @@ export default {
           config
         )
         .then((res) => {
+          const sections = res.data.sections;
+          const views = {};
+          sections.map((section) => {
+            this.trackSectionComp(section.name, section.type);
+            if (section.settings) section.settings = JSON.parse(section.settings);
+            if (section.id) {
+              views[section.id] = section;
+            } else {
+              views["test"] = section;
+            }
+          });
+          this.$set(this.displayVariations, this.activeVariation.pageName, {
+            name: this.activeVariation.pageName,
+            views: { ...views },
+          });
+          this.selectedVariation = this.activeVariation.pageName;
+          this.loading = false;
+          this.pageNotFound = false;
+          this.$emit("load", true);
           this.showToast(
             "Success",
             "success",
@@ -755,7 +779,7 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          this.showToast("Error", "danger", error);
+          this.showToast("Error", "danger", error.toString());
         });
     },
     addSystemTypes() {

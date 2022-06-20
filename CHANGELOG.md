@@ -1,3 +1,10 @@
+### 1.0.16
+#### Bug Fixes
+
+- Fixed style glitch on the delete section type to fix
+- When edit a page with no sections folder present show the error instead of an undefined error.
+- Padding fixes
+
 ### 1.0.15
 #### Bug Fixes
 
