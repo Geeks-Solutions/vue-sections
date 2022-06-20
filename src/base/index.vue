@@ -130,7 +130,7 @@
 
           <div v-if="!currentSection" class="m-1 p-1 type-items">
             <div
-              class="section-item"
+              class="section-item bg-blue"
               v-for="(type, index) in types"
               :key="type.name"
             >
@@ -1422,6 +1422,7 @@ button {
   .section-item {
     width: 100%;
     height: 130px;
+    margin: 0px;
   }
   padding: 20px;
   .type-items {
