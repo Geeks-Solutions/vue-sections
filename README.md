@@ -100,7 +100,7 @@ Then add the sections component on the page(s) of your choice
       :admin="admin"
       :pageName="pageName"
       :variations="[]"
-      @finishLoad="method_name"
+      @finishLoad="sectionsLoaded"
     />
   </div>
 </template>
@@ -114,9 +114,11 @@ export default {
       pageName: "home"
     };
   },
-  mounted() {
-    this.admin = !!this.$cookies.get("sections-auth-token");
-  },
+  methods: {
+    sectionsLoaded() {
+      this.admin = !!this.$cookies.get("sections-auth-token");
+    }
+  }
 };
 
 </script>
