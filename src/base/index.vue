@@ -714,7 +714,6 @@ export default {
             const token = res.data.token;
             this.$cookies.set("sections-auth-token", token, "7d");
             this.$router.push(this.$route.path)
-            this.$root.$emit('tokenUpdated')
             this.loading = false;
           })
           .catch((err) => {
