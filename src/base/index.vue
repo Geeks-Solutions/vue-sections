@@ -677,6 +677,7 @@ export default {
           config
         )
         .then((res) => {
+          this.loading = false
           this.pageNotFound = false;
           this.showToast(
             "Success",
@@ -685,6 +686,7 @@ export default {
           );
         })
         .catch((err) => {
+          this.loading = false
           this.showToast(
             "Error creating page",
             "danger",
