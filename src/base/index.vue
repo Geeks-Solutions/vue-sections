@@ -130,7 +130,7 @@
 
           <div v-if="!currentSection" class="m-1 p-1 type-items">
             <div
-              class="section-item"
+              class="section-item bg-blue"
               v-for="(type, index) in types"
               :key="type.name"
             >
@@ -602,7 +602,11 @@ export default {
         this.$emit("load", true);
       })
       .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        if(error.response.data.error) {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        } else {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.message);
+        }
         this.loading = false;
         this.pageNotFound = true;
         this.$emit("load", false);
@@ -654,6 +658,7 @@ export default {
     },
     createNewPage() {
       // pageName
+      this.loading = true;
       const token = this.$cookies.get("sections-auth-token");
       const header = {
         token,
@@ -672,6 +677,8 @@ export default {
           config
         )
         .then((res) => {
+          this.loading = false
+          this.pageNotFound = false;
           this.showToast(
             "Success",
             "success",
@@ -679,6 +686,7 @@ export default {
           );
         })
         .catch((err) => {
+          this.loading = false
           this.showToast(
             "Error creating page",
             "danger",
@@ -755,7 +763,7 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          this.showToast("Error", "danger", error);
+          this.showToast("Error", "danger", error.toString());
         });
     },
     addSystemTypes() {
@@ -1421,6 +1429,7 @@ button {
   .section-item {
     width: 100%;
     height: 130px;
+    margin: 0px;
   }
   padding: 20px;
   .type-items {
