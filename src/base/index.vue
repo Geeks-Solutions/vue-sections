@@ -677,26 +677,7 @@ export default {
           config
         )
         .then((res) => {
-          // The following lines of code loads the section views with their settings for the logged in admin and show the Edit Page button
-          const sections = res.data.sections;
-          const views = {};
-          sections.map((section) => {
-            this.trackSectionComp(section.name, section.type);
-            if (section.settings) section.settings = JSON.parse(section.settings);
-            if (section.id) {
-              views[section.id] = section;
-            } else {
-              views["test"] = section;
-            }
-          });
-          this.$set(this.displayVariations, this.activeVariation.pageName, {
-            name: this.activeVariation.pageName,
-            views: { ...views },
-          });
-          this.selectedVariation = this.activeVariation.pageName;
-          this.loading = false;
           this.pageNotFound = false;
-          this.$emit("load", true);
           this.showToast(
             "Success",
             "success",
