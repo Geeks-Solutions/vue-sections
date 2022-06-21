@@ -677,6 +677,7 @@ export default {
           config
         )
         .then((res) => {
+          // The following lines of code loads the section views with their settings for the logged in admin and show the Edit Page button
           const sections = res.data.sections;
           const views = {};
           sections.map((section) => {
