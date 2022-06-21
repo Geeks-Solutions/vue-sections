@@ -602,7 +602,11 @@ export default {
         this.$emit("load", true);
       })
       .catch((error) => {
-        this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        if(error.response.data.error) {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+        } else {
+          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.message);
+        }
         this.loading = false;
         this.pageNotFound = true;
         this.$emit("load", false);
@@ -654,6 +658,7 @@ export default {
     },
     createNewPage() {
       // pageName
+      this.loading = true;
       const token = this.$cookies.get("sections-auth-token");
       const header = {
         token,
@@ -672,6 +677,7 @@ export default {
           config
         )
         .then((res) => {
+          this.pageNotFound = false;
           this.showToast(
             "Success",
             "success",
@@ -755,7 +761,7 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          this.showToast("Error", "danger", error);
+          this.showToast("Error", "danger", error.toString());
         });
     },
     addSystemTypes() {

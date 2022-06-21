@@ -1,7 +1,7 @@
 <template>
   <div class="text-center">
     <div class="element-type">
-      <h3 class="pb-4">{{ $formatText(props.name, " / ") }}</h3>
+      <h3 class="pb-4 mb-4">{{ $formatText(props.name, " / ") }}</h3>
       <form>
         <div>
           <subType :name="props.name" @addStatic="addStatic" ref="viewSaved">
