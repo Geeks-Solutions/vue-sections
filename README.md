@@ -180,9 +180,9 @@ await addNewStaticType(sectionTypeName).then((res) => {
 
 # Media sections
 
-- `globalFileUpload` A function that uses media to upload images replacing the base64 format.
+- `globalFileUpload` A function that uses media to upload images replacing the base64 format and removing old media.
 - The static wysiwyg component uses the globalFileUpload function of media by default.
-- To use the globalFileUpload function of media, you need to call the function and pass the base64 file to it.
+- To use the globalFileUpload function of media, you need to call the function and pass the base64 file to it and the old media ID.
 - Import globalFileUpload from "@geeks-solutions/vue-sections"
 
 ````
@@ -197,13 +197,35 @@ async onFileSelected(e) {
 
 this.file = this.$refs.imagePick.files[0] //your uploaded file
 
-await globalFileUpload(this.file).then(
+await globalFileUpload(this.file, oldMediaID).then(
    (result) => {
      this.settings.url = result.data.files[0].url //assign the result url to the settings object to be able to read that value in $section.settings in you static component
    }
  )
  
 },
+````
+
+- `deleteMedia` A function helper to remove media.
+- To use the deleteMedia function of media, you need to call the function and pass the media ID to it.
+- Import deleteMedia from "@geeks-solutions/vue-sections"
+
+````
+import {deleteMedia} from "@geeks-solutions/vue-sections";
+````
+
+It is an async function that returns an object of the function result.
+###Example on how to use the function:
+
+````
+async removeImage() {
+      const id = this.settings.image.id
+      await deleteMedia(id).then(
+        (result) => {
+          console.log(result)
+        }
+      )
+    },
 ````
 
 ## Tailwind Support
