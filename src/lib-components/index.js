@@ -2,4 +2,5 @@
 // export { default as VueSectionsSample } from './vue-sections-sample.vue';
 export { default as Sections } from './sections.vue';
 export { globalFileUpload } from './fileUploader';
+export { deleteMedia } from './fileUploader';
 export { addNewStaticType } from './addNewSectionType';
