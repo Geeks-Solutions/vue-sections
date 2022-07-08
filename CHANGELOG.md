@@ -1,3 +1,9 @@
+### 1.0.17
+#### Additional features
+
+- Update globalFileUpload media to delete old media when uploading new one
+- Add function to delete media after uploading it
+
 ### 1.0.16
 #### Bug Fixes
 
