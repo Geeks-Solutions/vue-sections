@@ -483,7 +483,8 @@ export default {
         },
       },
       selectedSectionTypeName: "",
-      selectedSectionTypeIndex: ""
+      selectedSectionTypeIndex: "",
+      sectionsPageLastUpdated: null
     };
   },
   // Server-side only
@@ -600,6 +601,7 @@ export default {
         this.selectedVariation = this.activeVariation.pageName;
         this.loading = false;
         this.$emit("load", true);
+        this.sectionsPageLastUpdated = res.data.last_updated;
       })
       .catch((error) => {
         if(error.response.data.error) {
@@ -701,7 +703,7 @@ export default {
           title,
           variant,
           solid: true,
-          toaster: "b-toaster-top-center",
+          toaster: "b-toaster-top-right",
         });
       } else {
         console.log(`## ${variant} ## ${title}: ${message}`)
@@ -839,6 +841,24 @@ export default {
       }
 
       this.editMode = !this.editMode;
+
+      const inBrowser = typeof window !== 'undefined';
+      const config = {
+        headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
+      };
+      const URL =
+          this.$sections.serverUrl +
+          `/project/${this.$sections.projectId}/page/${this.pageName}`;
+
+      axios.post(URL, {}, config).then((res) => {
+        if(res.data.last_updated > this.sectionsPageLastUpdated) {
+          this.showToast(
+              "Warning",
+              "warning",
+              "The version of the page you have is an old one, please refresh your page before doing any modification"
+          );
+        }
+      })
     },
     formatName,
     editable(sectionType) {
