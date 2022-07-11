@@ -483,7 +483,8 @@ export default {
         },
       },
       selectedSectionTypeName: "",
-      selectedSectionTypeIndex: ""
+      selectedSectionTypeIndex: "",
+      sectionsPageLastUpdated: null
     };
   },
   // Server-side only
@@ -600,7 +601,7 @@ export default {
         this.selectedVariation = this.activeVariation.pageName;
         this.loading = false;
         this.$emit("load", true);
-        this.$cookies.set("sections-page-timestamp", res.data.last_updated);
+        this.sectionsPageLastUpdated = res.data.last_updated;
       })
       .catch((error) => {
         if(error.response.data.error) {
@@ -850,7 +851,7 @@ export default {
           `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
       axios.post(URL, {}, config).then((res) => {
-        if(res.data.last_updated > this.$cookies.get('sections-page-timestamp')) {
+        if(res.data.last_updated > this.sectionsPageLastUpdated) {
           this.showToast(
               "Warning",
               "warning",
