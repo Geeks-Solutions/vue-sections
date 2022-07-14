@@ -1,3 +1,8 @@
+### 1.0.18
+#### Bug Fix
+
+- Fix Edit page glitch when user try to edit an old version of the page
+
 ### 1.0.17
 #### Additional features
 

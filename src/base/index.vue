@@ -832,7 +832,7 @@ export default {
       });
       return staticTypes;
     },
-    openEditMode() {
+    async openEditMode() {
       this.getSectionTypes();
       if (!this.originalVariations[this.selectedVariation]) {
         this.originalVariations = JSON.parse(
@@ -842,23 +842,28 @@ export default {
 
       this.editMode = !this.editMode;
 
-      const inBrowser = typeof window !== 'undefined';
-      const config = {
-        headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
-      };
-      const URL =
-          this.$sections.serverUrl +
-          `/project/${this.$sections.projectId}/page/${this.pageName}`;
+      if(this.editMode === true) {
+        this.loading = true;
+        const inBrowser = typeof window !== 'undefined';
+        const config = {
+          headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
+        };
+        const URL =
+            this.$sections.serverUrl +
+            `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
-      axios.post(URL, {}, config).then((res) => {
-        if(res.data.last_updated > this.sectionsPageLastUpdated) {
-          this.showToast(
-              "Warning",
-              "warning",
-              "The version of the page you have is an old one, please refresh your page before doing any modification"
-          );
-        }
-      })
+        await axios.post(URL, {}, config).then((res) => {
+          this.loading = false;
+          if(res.data.last_updated > this.sectionsPageLastUpdated) {
+            this.showToast(
+                "Warning",
+                "warning",
+                "The version of the page you have is an old one, please refresh your page before doing any modification"
+            );
+          }
+        })
+      }
+
     },
     formatName,
     editable(sectionType) {
@@ -1024,6 +1029,7 @@ export default {
             this.showToast("error", "danger", res.data.error);
             return;
           }
+          this.sectionsPageLastUpdated = res.data.last_updated
           this.displayVariations[variationName].altered = false;
           this.loading = false;
           this.showToast(
