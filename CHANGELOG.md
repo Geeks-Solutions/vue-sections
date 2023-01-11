@@ -1,3 +1,8 @@
+### 1.0.19
+#### Query strings
+
+- Handle properly query strings on the library
+
 ### 1.0.18
 #### Bug Fix
 

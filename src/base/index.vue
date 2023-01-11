@@ -573,6 +573,14 @@ export default {
       // We check if this is running in the browser or not
       // because during SSR no cors preflight request is sent
       const inBrowser = typeof window !== 'undefined';
+
+      const queryStringObject = {}
+      if(Object.keys(this.$route.query).length !== 0) {
+        Object.keys(this.$route.query).map((queryKey) => {
+          queryStringObject[queryKey] = this.$route.query[queryKey]
+        })
+      }
+
       const config = {
         headers: sectionHeader(((inBrowser) ? {} : {origin: this.$sections.projectUrl})),
       };
@@ -581,7 +589,9 @@ export default {
         `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
       axios
-      .post(URL, {}, config)
+      .post(URL, {
+        "query_string": queryStringObject
+      }, config)
       .then((res) => {
         const sections = res.data.sections;
         const views = {};
