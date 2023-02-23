@@ -130,7 +130,7 @@
 
           <div v-if="!currentSection" class="m-1 p-1 type-items">
             <div
-              class="section-item bg-blue"
+              class="section-item section-item-box bg-blue"
               v-for="(type, index) in types"
               :key="type.name"
             >
@@ -139,13 +139,23 @@
                   <TrashIcon class="trash-icon-style" />
                 </div>
               </div>
-              <div class="section-item" @click="currentSection = type">
+              <div class="section-item" @click="openCurrentSection(type)">
                 <SectionItem
                     v-if="type.name && !type.name.includes('local')"
                     class="bg-light-blue"
                     :title="formatName(type.name)"
                     :icon="type.name"
                 />
+              </div>
+              <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
+                <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name)">
+                  <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'">
+                    <LockedIcon class="trash-icon-style" />
+                  </div>
+                  <div v-else>
+                    <UnlockedIcon class="trash-icon-style" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -175,7 +185,7 @@
                 :variation="variation"
                 :savedView="savedView"
                 :headers="headers"
-                @loading="loading = !loading"
+                @load="(value) => loading = value"
               />
               <Local
                 v-if="currentSection.type === 'local'"
@@ -213,6 +223,47 @@
                 {{ $t("Cancel") }}
               </div>
             </button>
+          </div>
+        </div>
+      </b-modal>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- page authorize configurable section types popup -->
+      <b-modal class="modal" v-model="isAuthModalOpen" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3">
+            {{ $t("authorize-section-type") + formatName(selectedSectionTypeName)}}
+          </div>
+          <div class="d-flex flex-column gap-3">
+            <div v-for="requiredInput in selectedSectionRequirements">
+              <input
+                  class="form-control"
+                  type="text"
+                  :placeholder="$t(requiredInput)"
+                  v-model="requirementsInputs[requiredInput]"
+              />
+            </div>
+
+            <div class="d-inline-flex">
+              <button
+                  class="hp-button"
+                  @click="authorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
+              >
+                <div class="btn-text">
+                  {{ $t("Confirm") }}
+                </div>
+              </button>
+              <button
+                  class="hp-button"
+                  @click="isAuthModalOpen = false; requirementsInputs = {}"
+              >
+                <div class="btn-text">
+                  {{ $t("Cancel") }}
+                </div>
+              </button>
+            </div>
+
           </div>
         </div>
       </b-modal>
@@ -374,6 +425,8 @@ import SectionItem from "./sectionItem.vue";
 import EditIcon from "./icons/edit.vue";
 import DragIcon from "./icons/drag.vue";
 import TrashIcon from "./icons/trash.vue";
+import LockedIcon from "./icons/locked.vue";
+import UnlockedIcon from "./icons/unlocked.vue";
 import BackIcon from "./icons/back.vue";
 import PlusIcon from "./icons/plus.vue";
 import CheckIcon from "./icons/save.vue";
@@ -392,6 +445,7 @@ import Loading from "./components/Loading.vue";
 
 import { formatName, sectionHeader, importComp } from "./helpers";
 import axios from "axios";
+import Locked from "@/base/icons/locked";
 export default {
   i18n: initI18n,
   layout: "dashboard",
@@ -406,6 +460,8 @@ export default {
     EditIcon,
     DragIcon,
     TrashIcon,
+    LockedIcon,
+    UnlockedIcon,
     BackIcon,
     PlusIcon,
     CheckIcon,
@@ -472,6 +528,7 @@ export default {
       currentSection: null,
       isModalOpen: false,
       isDeleteModalOpen: false,
+      isAuthModalOpen: false,
       synched: false,
       savedView: {},
       // all saved variations
@@ -484,7 +541,10 @@ export default {
       },
       selectedSectionTypeName: "",
       selectedSectionTypeIndex: "",
-      sectionsPageLastUpdated: null
+      selectedSectionTypeAppId: "",
+      selectedSectionRequirements: [],
+      sectionsPageLastUpdated: null,
+      requirementsInputs: {}
     };
   },
   // Server-side only
@@ -597,7 +657,13 @@ export default {
         const views = {};
         sections.map((section) => {
           this.trackSectionComp(section.name, section.type);
-          if (section.settings) section.settings = JSON.parse(section.settings);
+          if (section.type === "configurable") {
+            section.settings = section.render_data[0].settings;
+            section.nameID = section.name;
+            section.name = section.name.split(":")[1];
+          } else if (section.settings) {
+            section.settings = JSON.parse(section.settings);
+          }
           if (section.id) {
             views[section.id] = section;
           } else {
@@ -626,7 +692,7 @@ export default {
   },
   methods: {
     addNewStaticType() {
-      if (this.sectionTypeName != "") {
+      if (this.sectionTypeName !== "") {
         const token = this.$cookies.get("sections-auth-token");
         const config = {
           headers: sectionHeader({ token }),
@@ -664,8 +730,14 @@ export default {
               .replace(/\.\w+$/, "")
           )
         );
-        const path = `/views/${sectionName}_${sectionType}`;
-        this.$options.components[name] = importComp(path);
+        let path = "";
+        if (sectionName.includes(":")) {
+          path = `/views/${sectionName.split(":")[1]}_${sectionType}`;
+          this.$options.components[sectionName.split(":")[1]] = importComp(path);
+        } else {
+          path = `/views/${sectionName}_${sectionType}`;
+          this.$options.components[name] = importComp(path);
+        }
       }
     },
     createNewPage() {
@@ -768,6 +840,9 @@ export default {
               dynamic_options: d.dynamic_options,
               fields: d.fields,
               multiple: d.multiple,
+              application_id: d.application_id,
+              app_status: d.app_status,
+              requirements: d.requirements
             });
           });
           this.types = [...this.types, ...this.addSystemTypes()];
@@ -1000,15 +1075,15 @@ export default {
           type: view.type,
           linkedTo: view.linkedTo,
         };
-        if (view.settings) {
-          refactorView.options = JSON.stringify(view.settings);
-        }
-        if (!view.settings && view.type === "configurable") {
+        if (view.settings && view.type === "configurable") {
+          refactorView.name = view.nameID;
           const options = [];
-          view.renderData.map((rData) => {
+          view.render_data.map((rData) => {
             options.push(rData.settings);
           });
-          refactorView.options = JSON.stringify(options);
+          refactorView.options = options;
+        } else if (view.settings) {
+          refactorView.options = JSON.stringify(view.settings);
         }
         if (refactorView.id.startsWith("id-")) {
           delete refactorView.id;
@@ -1066,12 +1141,24 @@ export default {
       });
     },
     edit(view) {
+      console.log(view);
       this.types.map((type) => {
-        if (type.name === view.name) {
-          view.fields = type.fields;
-          view.multiple = type.multiple;
-          if (type.dynamicOptions) {
-            view.dynamicOptions = true;
+        if(view.type === "configurable") {
+          if (type.name.split(":")[1] === view.name) {
+            view.fields = type.fields;
+            view.multiple = type.multiple;
+            view.application_id = type.application_id;
+            if (type.dynamicOptions) {
+              view.dynamicOptions = true;
+            }
+          }
+        } else {
+          if (type.name === view.name) {
+            view.fields = type.fields;
+            view.multiple = type.multiple;
+            if (type.dynamicOptions) {
+              view.dynamicOptions = true;
+            }
           }
         }
       });
@@ -1146,10 +1233,62 @@ export default {
             this.$emit("load", false);
           });
     },
+    authorizeSectionType(sectionAppId, index) {
+      this.isDeleteModalOpen = false
+      this.loading = true
+      this.$emit("load", true);
+      const token = this.$cookies.get("sections-auth-token");
+      const config = {
+        headers: sectionHeader(({origin: this.$sections.projectUrl, token})),
+      };
+      const URL =
+          this.$sections.serverUrl +
+          `/project/${this.$sections.projectId}/authorization_fields/${sectionAppId}`;
+
+      let authorization_fields = {}
+
+      for(let requiredItem of this.selectedSectionRequirements) {
+        authorization_fields[requiredItem] = this.requirementsInputs[requiredItem]
+      }
+      const data = {
+        authorization_fields
+      };
+      axios
+          .put(URL, data, config)
+          .then((res) => {
+            this.showToast(
+                "Success",
+                "info",
+                this.$t("authorizeSuccess")
+            );
+            this.isAuthModalOpen = false;
+            this.requirementsInputs = {}
+            this.types[index].app_status = "enabled"
+            this.loading = false
+            this.$emit("load", false);
+          })
+          .catch((error) => {
+            this.showToast("Error", "danger", "Couldn't authorize section type: " + error.response.data.message);
+            this.loading = false
+            this.$emit("load", false);
+          });
+    },
     openDeleteSectionTypeModal(sectionTypeName, index) {
       this.selectedSectionTypeName = sectionTypeName
       this.selectedSectionTypeIndex = index
       this.isDeleteModalOpen = true
+    },
+    openAuthConfigurableSectionTypeModal(sectionAppId, index, requirements, sectionTypeName) {
+      this.selectedSectionTypeAppId = sectionAppId
+      this.selectedSectionTypeIndex = index
+      this.selectedSectionRequirements = requirements
+      this.selectedSectionTypeName = sectionTypeName
+      this.isAuthModalOpen = true
+    },
+    openCurrentSection(type) {
+      if(type.app_status === 'disbaled' || type.app_status === 'disabled') {
+        this.showToast("warning", "warning", this.$t("authorizeFirst"));
+      } else this.currentSection = type
     }
   },
 };
@@ -1467,6 +1606,10 @@ button {
     height: 130px;
     margin: 0px;
   }
+  .section-item-box {
+    display: flex;
+    flex-direction: column;
+  }
   padding: 20px;
   .type-items {
     display: grid;
@@ -1575,9 +1718,6 @@ button {
 }
 
 .section-delete {
-  background: #31a9db;
-  height: 0px;
-  padding: 0px;
   text-align: -webkit-right;
 }
 

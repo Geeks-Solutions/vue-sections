@@ -21,6 +21,11 @@
   "success-section-instruction-2": "Un formulaire pour saisir les données à sauvegarder",
   "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs",
   "delete-section-type": "Voulez-vous vraiment supprimer ce type de section: ",
+  "authorize-section-type": "Authorizer ce type de section: ",
   "Confirm": "Confirmer",
-  "Cancel": "Annuler"
+  "Cancel": "Annuler",
+  "pkey": "Clé privée",
+  "project_id": "ID du projet",
+  "authorizeSuccess": "La section configurable <Name of the section> est maintenant debloquée pour être utilisée",
+  "authorizeFirst": "Veuillez autoriser cette section en cliquant sur l'icône du cadenas, pour pouvoir l'utiliser"
 }
