@@ -149,10 +149,14 @@
               </div>
               <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
                 <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name)">
-                  <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'">
+                  <div>
                     <LockedIcon class="trash-icon-style" />
                   </div>
-                  <div v-else>
+                </div>
+              </div>
+              <div v-else-if="type.type === 'configurable'" class="section-delete">
+                <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name)">
+                  <div>
                     <UnlockedIcon class="trash-icon-style" />
                   </div>
                 </div>
@@ -229,13 +233,13 @@
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
-      <!-- page authorize configurable section types popup -->
+      <!-- Authorize configurable section types popup -->
       <b-modal class="modal" v-model="isAuthModalOpen" centered ref="modal">
         <div class="section-modal-content">
           <div class="text-center h4 my-3  pb-3">
             {{ $t("authorize-section-type") + formatName(selectedSectionTypeName)}}
           </div>
-          <div class="d-flex flex-column gap-3">
+          <div class="d-flex flex-column gap-4">
             <div v-for="requiredInput in selectedSectionRequirements">
               <input
                   class="form-control"
@@ -249,6 +253,41 @@
               <button
                   class="hp-button"
                   @click="authorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
+              >
+                <div class="btn-text">
+                  {{ $t("Confirm") }}
+                </div>
+              </button>
+              <button
+                  class="hp-button"
+                  @click="isAuthModalOpen = false; requirementsInputs = {}"
+              >
+                <div class="btn-text">
+                  {{ $t("Cancel") }}
+                </div>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </b-modal>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- UnAuthorize configurable section types popup -->
+      <b-modal class="modal" v-model="isUnAuthModalOpen" centered ref="modal">
+        <div class="section-modal-content">
+          <div class="text-center h4 my-3  pb-3">
+            {{ $t("un-authorize-section-type") }}
+          </div>
+          <div class="d-flex flex-column gap-4">
+
+            <div class="d-inline-flex">
+              <button
+                  class="hp-button"
+                  @click="unAuthorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
               >
                 <div class="btn-text">
                   {{ $t("Confirm") }}
@@ -529,6 +568,7 @@ export default {
       isModalOpen: false,
       isDeleteModalOpen: false,
       isAuthModalOpen: false,
+      isUnAuthModalOpen: false,
       synched: false,
       savedView: {},
       // all saved variations
@@ -1273,6 +1313,45 @@ export default {
             this.$emit("load", false);
           });
     },
+    unAuthorizeSectionType(sectionAppId, index) {
+      this.isDeleteModalOpen = false
+      this.loading = true
+      this.$emit("load", true);
+      const token = this.$cookies.get("sections-auth-token");
+      const config = {
+        headers: sectionHeader(({origin: this.$sections.projectUrl, token})),
+      };
+      const URL =
+          this.$sections.serverUrl +
+          `/project/${this.$sections.projectId}`;
+
+      let data = {
+        configured_fields: {
+          [sectionAppId]: {
+            app_status: "disabled"
+          }
+        }
+      }
+
+      axios
+          .put(URL, data, config)
+          .then((res) => {
+            this.showToast(
+                "Success",
+                "info",
+                this.$t("unAuthorizeSuccess")
+            );
+            this.isUnAuthModalOpen = false;
+            this.types[index].app_status = "disabled"
+            this.loading = false
+            this.$emit("load", false);
+          })
+          .catch((error) => {
+            this.showToast("Error", "danger", "Couldn't un-authorize section type: " + error.response.data.message);
+            this.loading = false
+            this.$emit("load", false);
+          });
+    },
     openDeleteSectionTypeModal(sectionTypeName, index) {
       this.selectedSectionTypeName = sectionTypeName
       this.selectedSectionTypeIndex = index
@@ -1284,6 +1363,12 @@ export default {
       this.selectedSectionRequirements = requirements
       this.selectedSectionTypeName = sectionTypeName
       this.isAuthModalOpen = true
+    },
+    openUnAuthConfigurableSectionTypeModal(sectionAppId, index, sectionTypeName) {
+      this.selectedSectionTypeAppId = sectionAppId
+      this.selectedSectionTypeIndex = index
+      this.selectedSectionTypeName = sectionTypeName
+      this.isUnAuthModalOpen = true
     },
     openCurrentSection(type) {
       if(type.app_status === 'disbaled' || type.app_status === 'disabled') {

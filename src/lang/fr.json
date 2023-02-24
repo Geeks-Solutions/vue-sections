@@ -22,10 +22,12 @@
   "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs",
   "delete-section-type": "Voulez-vous vraiment supprimer ce type de section: ",
   "authorize-section-type": "Authorizer ce type de section: ",
+  "un-authorize-section-type": "Vous aller bloquer la section configurable, êtes vous sur de vouloir continuer ?",
   "Confirm": "Confirmer",
   "Cancel": "Annuler",
   "pkey": "Clé privée",
   "project_id": "ID du projet",
-  "authorizeSuccess": "La section configurable <Name of the section> est maintenant debloquée pour être utilisée",
+  "authorizeSuccess": "La section configurable est maintenant debloquée pour être utilisée",
+  "unAuthorizeSuccess": "La section configurable est maintenant bloquée",
   "authorizeFirst": "Veuillez autoriser cette section en cliquant sur l'icône du cadenas, pour pouvoir l'utiliser"
 }
