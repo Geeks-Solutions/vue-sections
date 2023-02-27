@@ -2,20 +2,18 @@
   <div class="container containerWidth text-center">
 
     <div class="flex d-inline-flex w-full justify-center ml-2 md:ml-0">
-      <div class="bg-info px-2 h-45px flex justify-center items-center rounded-tl-lg" :class="currentTab === 'config' ? 'bg-info' : 'bg-light border border-Blue'" style="border-top-left-radius: 10px 10px;" @click="currentTab = 'config';">
+      <div class="bg-info px-2 h-45px flex justify-center items-center rounded-tl-lg" :class="currentTab === 'config' ? 'bg-info' : 'bg-light border border-Blue'" style="border-top-left-radius: 10px 10px; cursor: pointer;" @click="currentTab = 'config';">
         <div
             class="font-light mt-2 mb-2"
             :class="currentTab === 'config' ? 'text-white' : 'text-info'"
-            style="cursor: pointer"
         >
           <div class="text-capitalize ">{{ formatName(props.name) }}</div>
         </div>
       </div>
-      <div v-if="showCustomFormTab === true" class="bg-info px-2 h-45px flex justify-center items-center rounded-br-lg" :class="currentTab === 'custom' ? 'bg-info' : 'bg-light border border-Blue'" style="border-bottom-right-radius: 10px 10px;" @click="currentTab = 'custom';">
+      <div v-if="showCustomFormTab === true" class="bg-info px-2 h-45px flex justify-center items-center rounded-br-lg" :class="currentTab === 'custom' ? 'bg-info' : 'bg-light border border-Blue'" style="border-bottom-right-radius: 10px 10px; cursor: pointer;" @click="currentTab = 'custom';">
         <div
             class="font-light mt-2 mb-2"
             :class="currentTab === 'custom' ? 'text-white' : 'text-info'"
-            style="cursor: pointer"
         >
           {{ $t('Custom form') }}
         </div>
@@ -63,7 +61,7 @@
                 />
               </div>
               <div v-else>
-                <div v-if="field.type === 'media' && optionsData[field.key] && optionsData[field.key].files">
+                <div v-if="field.type === 'media' && optionsData[field.key] && optionsData[field.key].files" class="py-4">
                   <img
                       v-if="optionsData[field.key].files[0].url"
                       :src="optionsData[field.key].files[0].url"
@@ -71,12 +69,15 @@
                       class="w-95px h-63px object-contain"
                   />
                 </div>
-                <div v-else-if="field.type === 'media' && previewMedia">
+                <div v-else-if="field.type === 'media' && previewMedia" class="py-4">
                   <img
                       :src="previewMedia"
                       alt="image"
                       class="w-95px h-63px object-contain"
                   />
+                </div>
+                <div v-else-if="isInProgress" class="w-70px h-70px pl-4 p-2">
+                  <loadingCircle />
                 </div>
                 <component
                     :value="optionsData[field.key]"
@@ -151,10 +152,11 @@ import {formatName, base64Img, sectionHeader, importComp} from "../helpers";
 import axios from "axios";
 import { quillEditor } from "vue-quill-editor";
 import {globalFileUpload} from "@/lib-components";
+import loadingCircle from "../icons/loadingCircle.vue";
 
 export default {
   components: {
-    quillEditor,
+    quillEditor, loadingCircle
   },
   props: {
     props: {
@@ -183,7 +185,8 @@ export default {
       currentTab: 'config',
       optionsData: {},
       showCustomFormTab: false,
-      previewMedia: ""
+      previewMedia: "",
+      isInProgress: false
     };
   },
   watch: {
@@ -324,6 +327,7 @@ export default {
       }
     },
     async mediaUpload(e, idx, name) {
+      this.isInProgress = true
       const media = {
         id: "",
         files: [
@@ -335,6 +339,7 @@ export default {
       };
       await globalFileUpload(e, this.options[0][name]).then(
           (result) => {
+            this.isInProgress = false
             media.files[0].url = result.data.files[0].url;
             media.files[0].filename = result.data.files[0].filename;
             media.id = result.data.id;

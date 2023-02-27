@@ -295,7 +295,7 @@
               </button>
               <button
                   class="hp-button"
-                  @click="isAuthModalOpen = false; requirementsInputs = {}"
+                  @click="isUnAuthModalOpen = false;"
               >
                 <div class="btn-text">
                   {{ $t("Cancel") }}
@@ -688,10 +688,13 @@ export default {
         this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
+      // TODO: Send Query string payload only when it is requested to be used (Use Sections ENV for it)
+      // {
+      //   "query_string": queryStringObject
+      // }
+
       axios
-      .post(URL, {
-        "query_string": queryStringObject
-      }, config)
+      .post(URL, {}, config)
       .then((res) => {
         const sections = res.data.sections;
         const views = {};
