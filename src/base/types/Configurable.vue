@@ -30,7 +30,7 @@
               class=" d-flex flex-column justify-content-between"
           >
             <div
-                class="element p2 d-inline-block"
+                class="element d-inline-block"
                 :key="idx"
                 v-for="(field, idx) in props.fields"
                 :class="getType(field.type) !== 'file' ? '' : ''"
@@ -43,7 +43,7 @@
               </div> -->
               <div
                   v-if="field.name && field.type !== 'hidden'"
-                  class="text-capitalize text-left p2"
+                  class="text-capitalize text-left"
               >
                 {{ field.name.replace("_", " ") }}
               </div>
@@ -76,7 +76,7 @@
                       class="w-95px h-63px object-contain"
                   />
                 </div>
-                <div v-else-if="isInProgress" class="w-70px h-70px pl-4 p-2">
+                <div v-else-if="field.type === 'media' && isInProgress" class="w-70px h-70px pl-4 p-2">
                   <loadingCircle />
                 </div>
                 <component
@@ -136,7 +136,7 @@
     <div v-show="currentTab === 'custom'" class="sub-types">
       <div>
         <div class="text-video d-flex" v-show="formatName(props.name)">
-          <component :is="getComponentForm" :ref="formatName(props.name)" :section-settings="props" @whitelistIdUpdated="updateWhitelistId" @load="(value) => $emit('load', value)" @customFormLoaded="showCustomFormTab = true" />
+          <component :is="getComponentForm" :ref="formatName(props.name)" :section-settings="props" :section-options="options[0]" @whitelistIdUpdated="updateWhitelistId" @load="(value) => $emit('load', value)" @customFormLoaded="showCustomFormTab = true" />
         </div>
       </div>
     </div>
@@ -478,7 +478,7 @@ export default {
             return;
           }
           this.$emit('addSectionType', {
-            name: this.props.name.split(":")[1],
+            name: this.props.name.includes(":") ? this.props.name.split(":")[1] : this.props.name,
             nameID: this.props.name.includes(":") ? this.props.name : `${this.savedView.application_id}:${this.props.name}`,
             type: 'configurable',
             settings: this.options[0],

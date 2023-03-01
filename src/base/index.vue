@@ -87,6 +87,22 @@
         >
           <div class="btn-text">{{ pageName + " " + "Main" }}</div>
         </button>
+        <button
+          class="hp-button "
+          :class="selectedVariation === pageName ? 'danger' : 'grey'"
+          @click="exportSections"
+        >
+          <div class="btn-text">{{ $t('Export sections of this page') }}</div>
+        </button>
+        <a id="downloadAnchorElem" style="display:none"></a>
+        <button
+          class="hp-button "
+          :class="selectedVariation === pageName ? 'danger' : 'grey'"
+          @click="initImportSections"
+        >
+          <div class="btn-text">{{ $t('Import sections') }}</div>
+        </button>
+        <input ref="jsonFilePick" type="file" @change="e => importSections(e)" style="display:none" />
         <div v-for="(v, idx) in variations" :key="idx">
           <button
             class="hp-button"
@@ -584,7 +600,8 @@ export default {
       selectedSectionTypeAppId: "",
       selectedSectionRequirements: [],
       sectionsPageLastUpdated: null,
-      requirementsInputs: {}
+      requirementsInputs: {},
+      allSections: {}
     };
   },
   // Server-side only
@@ -697,6 +714,7 @@ export default {
       .post(URL, {}, config)
       .then((res) => {
         const sections = res.data.sections;
+        this.allSections = res.data.sections;
         const views = {};
         sections.map((section) => {
           this.trackSectionComp(section.name, section.type);
@@ -734,6 +752,51 @@ export default {
       });
   },
   methods: {
+    exportSections() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.allSections));
+      const dlAnchorElem = document.getElementById('downloadAnchorElem');
+      dlAnchorElem.setAttribute("href",     dataStr     );
+      dlAnchorElem.setAttribute("download", `${this.pageName}.json`);
+      dlAnchorElem.click();
+    },
+    initImportSections() {
+      if (Object.keys(this.allSections).length > 0 || this.currentViews.length > 0) {
+        this.showToast(
+            "Warning",
+            "warning",
+            "Import sections only works for empty pages"
+        );
+      } else {
+        this.$refs.jsonFilePick.click();
+      }
+    },
+    importSections(e) {
+      const jsonFile = e.target.files[0];
+      const reader = new FileReader();
+      reader.readAsText(jsonFile, "UTF-8");
+      reader.onload = (evt) => {
+        const jsonFileResult = evt.target.result;
+        const sections = JSON.parse(jsonFileResult);
+        sections.forEach((section) => {
+          if (section.type === "configurable") {
+            this.showToast(
+                "Warning",
+                "warning",
+                "Make sure to activate configurable sections for your project"
+            );
+          }
+          this.addSectionType(section);
+        })
+      }
+    },
+    isJsonString(str) {
+      try {
+        JSON.parse(str);
+      } catch (e) {
+        return false;
+      }
+      return true;
+    },
     addNewStaticType() {
       if (this.sectionTypeName !== "") {
         const token = this.$cookies.get("sections-auth-token");
@@ -1056,7 +1119,7 @@ export default {
             return;
           }
         }
-        if (section.weight === "null") {
+        if (section.weight === null || section.weight === "null") {
           section.weight = Object.keys(
             this.displayVariations[this.selectedVariation].views
           ).length;
@@ -1184,7 +1247,6 @@ export default {
       });
     },
     edit(view) {
-      console.log(view);
       this.types.map((type) => {
         if(view.type === "configurable") {
           if (type.name.split(":")[1] === view.name) {
