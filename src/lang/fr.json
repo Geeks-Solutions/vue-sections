@@ -21,6 +21,11 @@
   "success-section-instruction-2": "Un formulaire pour saisir les données à sauvegarder",
   "success-section-instruction-3": "Un en rendu qui s'affichera pour tout vos visiteurs",
   "delete-section-type": "Voulez-vous vraiment supprimer ce type de section: ",
+  "authorize-section-type": "Autoriser toutes les sections de ",
+  "un-authorize-section-type": "Vous aller bloquer les sections provenant de ",
   "Confirm": "Confirmer",
-  "Cancel": "Annuler"
+  "Cancel": "Annuler",
+  "authorizeSuccess": "Toutes les section de {appName} sont maintenant disponibles",
+  "unAuthorizeSuccess": "Toutes les sections de {appName} sont maintenant bloquées",
+  "authorizeFirst": "Veuillez autoriser cette section en cliquant sur l'icône du cadenas, pour pouvoir l'utiliser"
 }
