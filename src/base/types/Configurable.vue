@@ -86,7 +86,7 @@
                   <loadingCircle />
                 </div>
                 <component
-                    v-show="field.type !== 'media' || (field.type === 'media' && (previewMedia === '' && optionsData[field.key] && optionsData[field.key].files[0].url === ''))"
+                    v-show="field.type !== 'media' || (field.type === 'media' && previewMedia === '' && ( !optionsData[field.key] || (optionsData[field.key] && optionsData[field.key].files && optionsData[field.key].files[0].url === '')))"
                     :value="optionsData[field.key]"
                     class="d-input form-control"
                     :id="field.key"
@@ -339,10 +339,10 @@ export default {
       if(this.options[0][name]) {
         await deleteMedia(this.options[0][name].id)
       }
+      this.previewMedia = ''
       this.options[0][name].files[0].url = ''
       this.options[0][name].id = null
       this.options[0][name] = null
-      this.perviewMedia = ''
     },
     onEditorChange({ quill, html, text }, idx, fieldname) {
       this.options[0][fieldname] = html;
