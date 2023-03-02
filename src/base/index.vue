@@ -165,16 +165,25 @@
                     :icon="type.name"
                 />
               </div>
+              <div v-if="type.type !== 'configurable'" class="pl-1 pb-1" style="font-size: 10px;">
+                {{ 'By ' + type.application }}
+              </div>
               <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
                 <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name, type.application)">
-                  <div>
+                  <div class="flex justify-between items-end">
+                    <div v-if="type.type === 'configurable'" class="pl-1 pb-1" style="font-size: 8px;">
+                      {{ 'By ' + type.application }}
+                    </div>
                     <LockedIcon class="trash-icon-style p-1" />
                   </div>
                 </div>
               </div>
               <div v-else-if="type.type === 'configurable'" class="section-delete">
                 <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name, type.application)">
-                  <div>
+                  <div class="flex justify-between items-end">
+                    <div class="pl-1 pb-1" style="font-size: 8px;">
+                      {{ 'By ' + type.application }}
+                    </div>
                     <UnlockedIcon class="trash-icon-style p-1" />
                   </div>
                 </div>
