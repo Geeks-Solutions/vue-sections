@@ -21,13 +21,11 @@
   "success-section-instruction-2": "One form to let the content administrator edit it",
   "success-section-instruction-3": "One view so it can display as you want it for the site visitors",
   "delete-section-type": "Are you sure you want to delete this section type: ",
-  "authorize-section-type": "Authorize this section type: ",
-  "un-authorize-section-type": "You will block the configurable section, are you sure you want to continue ?",
+  "authorize-section-type": "Authorise all sections of ",
+  "un-authorize-section-type": "You will block all sections coming from ",
   "Confirm": "Confirm",
   "Cancel": "Cancel",
-  "pkey": "Private key",
-  "project_id": "Project ID",
-  "authorizeSuccess": "The configurable section is now unlocked to use it",
-  "unAuthorizeSuccess": "The configurable section is now locked",
+  "authorizeSuccess": "All sections from {appName} are now available",
+  "unAuthorizeSuccess": "All sections from {appName} are now locked",
   "authorizeFirst": "Please to authorize this section by clicking on the lock icon to be able use it"
 }

@@ -1,7 +1,11 @@
 ### 1.0.19
-#### Query strings
+#### Additional features
 
 - Handle properly query strings on the library
+- Added authorization for the configurable sections on a project
+- Fix the display of configurable sections
+- Support custom form for configurable sections
+- Implemented import/export sections feature for pages
 
 ### 1.0.18
 #### Bug Fix

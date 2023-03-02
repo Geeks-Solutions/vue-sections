@@ -42,19 +42,37 @@
             <div class="btn-icon back-icon"><BackIcon /></div>
             <div class="btn-text">{{ $t("Restore") }}</div>
           </button>
-          <button
-            @click="$cookies.remove('sections-auth-token'), (admin = false)"
-            v-if="admin"
-            class="bg-blue control-button"
-            style="right: 0px;
-                  left: auto;
-                  background: black;
+          <div class="flex control-button" style="right: 0px; left: auto;">
+            <button
+                class="hp-button "
+                :class="selectedVariation === pageName ? 'danger' : 'grey'"
+                data-toggle="tooltip" data-placement="top" title="Export sections"
+                @click="exportSections"
+            >
+              <ExportIcon />
+            </button>
+            <a id="downloadAnchorElem" style="display:none"></a>
+            <button
+                class="hp-button "
+                :class="selectedVariation === pageName ? 'danger' : 'grey'"
+                data-toggle="tooltip" data-placement="top" title="Import sections"
+                @click="initImportSections"
+            >
+              <ImportIcon />
+            </button>
+            <input ref="jsonFilePick" type="file" @change="e => importSections(e)" style="display:none" />
+            <button
+                @click="$cookies.remove('sections-auth-token'), (admin = false)"
+                v-if="admin"
+                class="bg-blue"
+                style="background: black;
                   font-size: 13px;
                   border-radius: 5px;
                   padding: 3px 6px;"
-          >
-            {{ $t("Logout") }}
-          </button>
+            >
+              {{ $t("Logout") }}
+            </button>
+          </div>
         </div>
       </div>
       <!-- page buttons part 2-->
@@ -87,22 +105,6 @@
         >
           <div class="btn-text">{{ pageName + " " + "Main" }}</div>
         </button>
-        <button
-          class="hp-button "
-          :class="selectedVariation === pageName ? 'danger' : 'grey'"
-          @click="exportSections"
-        >
-          <div class="btn-text">{{ $t('Export sections of this page') }}</div>
-        </button>
-        <a id="downloadAnchorElem" style="display:none"></a>
-        <button
-          class="hp-button "
-          :class="selectedVariation === pageName ? 'danger' : 'grey'"
-          @click="initImportSections"
-        >
-          <div class="btn-text">{{ $t('Import sections') }}</div>
-        </button>
-        <input ref="jsonFilePick" type="file" @change="e => importSections(e)" style="display:none" />
         <div v-for="(v, idx) in variations" :key="idx">
           <button
             class="hp-button"
@@ -164,16 +166,16 @@
                 />
               </div>
               <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
-                <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name)">
+                <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name, type.application)">
                   <div>
-                    <LockedIcon class="trash-icon-style" />
+                    <LockedIcon class="trash-icon-style p-1" />
                   </div>
                 </div>
               </div>
               <div v-else-if="type.type === 'configurable'" class="section-delete">
-                <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name)">
+                <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name, type.application)">
                   <div>
-                    <UnlockedIcon class="trash-icon-style" />
+                    <UnlockedIcon class="trash-icon-style p-1" />
                   </div>
                 </div>
               </div>
@@ -253,14 +255,14 @@
       <b-modal class="modal" v-model="isAuthModalOpen" centered ref="modal">
         <div class="section-modal-content">
           <div class="text-center h4 my-3  pb-3">
-            {{ $t("authorize-section-type") + formatName(selectedSectionTypeName)}}
+            {{ $t("authorize-section-type") + selectedAppName}}
           </div>
           <div class="d-flex flex-column gap-4">
             <div v-for="requiredInput in selectedSectionRequirements">
               <input
                   class="form-control"
                   type="text"
-                  :placeholder="$t(requiredInput)"
+                  :placeholder="requiredInput"
                   v-model="requirementsInputs[requiredInput]"
               />
             </div>
@@ -296,7 +298,7 @@
       <b-modal class="modal" v-model="isUnAuthModalOpen" centered ref="modal">
         <div class="section-modal-content">
           <div class="text-center h4 my-3  pb-3">
-            {{ $t("un-authorize-section-type") }}
+            {{ $t("un-authorize-section-type") + selectedAppName }}
           </div>
           <div class="d-flex flex-column gap-4">
 
@@ -482,6 +484,8 @@ import DragIcon from "./icons/drag.vue";
 import TrashIcon from "./icons/trash.vue";
 import LockedIcon from "./icons/locked.vue";
 import UnlockedIcon from "./icons/unlocked.vue";
+import ImportIcon from "./icons/import.vue";
+import ExportIcon from "./icons/export.vue";
 import BackIcon from "./icons/back.vue";
 import PlusIcon from "./icons/plus.vue";
 import CheckIcon from "./icons/save.vue";
@@ -517,6 +521,8 @@ export default {
     TrashIcon,
     LockedIcon,
     UnlockedIcon,
+    ImportIcon,
+    ExportIcon,
     BackIcon,
     PlusIcon,
     CheckIcon,
@@ -596,6 +602,7 @@ export default {
         },
       },
       selectedSectionTypeName: "",
+      selectedAppName: "",
       selectedSectionTypeIndex: "",
       selectedSectionTypeAppId: "",
       selectedSectionRequirements: [],
@@ -705,13 +712,16 @@ export default {
         this.$sections.serverUrl +
         `/project/${this.$sections.projectId}/page/${this.pageName}`;
 
-      // TODO: Send Query string payload only when it is requested to be used (Use Sections ENV for it)
-      // {
-      //   "query_string": queryStringObject
-      // }
+      let payload = {}
+
+      if (this.$sections.queryStringSupport && this.$sections.queryStringSupport === "enabled") {
+        payload = {
+          "query_string": queryStringObject
+        }
+      }
 
       axios
-      .post(URL, {}, config)
+      .post(URL, payload, config)
       .then((res) => {
         const sections = res.data.sections;
         this.allSections = res.data.sections;
@@ -720,6 +730,8 @@ export default {
           this.trackSectionComp(section.name, section.type);
           if (section.type === "configurable") {
             section.settings = section.render_data[0].settings;
+            // Splitting the name of the configurable sections into nameID that has the full name of it including the id,
+            // and name that has only name of the section which is going to be used for importing the section by using only its name on the host project.
             section.nameID = section.name;
             section.name = section.name.split(":")[1];
           } else if (section.settings) {
@@ -760,7 +772,7 @@ export default {
       dlAnchorElem.click();
     },
     initImportSections() {
-      if (Object.keys(this.allSections).length > 0 || this.currentViews.length > 0) {
+      if (Object.keys(this.displayVariations[this.selectedVariation].views).length > 0) {
         this.showToast(
             "Warning",
             "warning",
@@ -777,16 +789,26 @@ export default {
       reader.onload = (evt) => {
         const jsonFileResult = evt.target.result;
         const sections = JSON.parse(jsonFileResult);
+        let sectionsNames = []
         sections.forEach((section) => {
+          sectionsNames.push(section.name);
           if (section.type === "configurable") {
-            this.showToast(
-                "Warning",
-                "warning",
-                "Make sure to activate configurable sections for your project"
-            );
+            const sectionTypeObject = this.types.find(type => type.name === section.nameID);
+            if((sectionTypeObject.access === 'private' || sectionTypeObject.access === 'public_scoped') && sectionTypeObject.app_status !== 'enabled') {
+              this.showToast(
+                  "Warning",
+                  "warning",
+                  `Make sure to activate the configurable section ${section.name} for your project`
+              );
+            }
           }
-          this.addSectionType(section);
+          this.addSectionType(section, false);
         })
+        this.showToast(
+            "Success",
+            "info",
+            `Successfully imported ${sectionsNames.length} sections: ${sectionsNames.join(', ')}`
+        );
       }
     },
     isJsonString(str) {
@@ -1109,7 +1131,7 @@ export default {
         this.synched = false;
       }, 1000);
     },
-    addSectionType(section) {
+    addSectionType(section, showToast) {
       try {
         if (this.savedView.linkedTo) {
           const confirmed = window.confirm(
@@ -1156,11 +1178,13 @@ export default {
         this.isModalOpen = false;
         this.savedView = {};
         this.loading = false;
-        this.showToast(
-          "Success",
-          "info",
-          "This sections was successfully added to your page but is now only visible to you."
-        );
+        if(showToast !== false) {
+          this.showToast(
+              "Success",
+              "info",
+              "This sections was successfully added to your page but is now only visible to you."
+          );
+        }
       } catch (e) {
         this.showToast(
           "Error",
@@ -1174,27 +1198,29 @@ export default {
       let views = this.displayVariations[variationName].views;
       views = Object.values(views);
       views.map((view) => {
-        const refactorView = {
-          id: view.id,
-          weight: view.weight,
-          name: view.name,
-          type: view.type,
-          linkedTo: view.linkedTo,
-        };
-        if (view.settings && view.type === "configurable") {
-          refactorView.name = view.nameID;
-          const options = [];
-          view.render_data.map((rData) => {
-            options.push(rData.settings);
-          });
-          refactorView.options = options;
-        } else if (view.settings) {
-          refactorView.options = JSON.stringify(view.settings);
+        if(!view.error) {
+          const refactorView = {
+            id: view.id,
+            weight: view.weight,
+            name: view.name,
+            type: view.type,
+            linkedTo: view.linkedTo,
+          };
+          if (view.settings && view.type === "configurable") {
+            refactorView.name = view.nameID;
+            const options = [];
+            view.render_data.map((rData) => {
+              options.push(rData.settings);
+            });
+            refactorView.options = options;
+          } else if (view.settings) {
+            refactorView.options = JSON.stringify(view.settings);
+          }
+          if (refactorView.id.startsWith("id-")) {
+            delete refactorView.id;
+          }
+          sections.push({ ...refactorView });
         }
-        if (refactorView.id.startsWith("id-")) {
-          delete refactorView.id;
-        }
-        sections.push({ ...refactorView });
       });
 
       const token = this.$cookies.get("sections-auth-token");
@@ -1300,7 +1326,7 @@ export default {
       // Then we remove the variation we want to delete
       this.$delete(this.displayVariations[this.selectedVariation].views, id);
       this.showToast(
-        "Deletet",
+        "Deleted",
         "info",
         "Your section has been removed, save your page to display this change to your visitors"
       );
@@ -1364,7 +1390,7 @@ export default {
             this.showToast(
                 "Success",
                 "info",
-                this.$t("authorizeSuccess")
+                this.$t("authorizeSuccess", {appName: this.selectedAppName})
             );
             this.isAuthModalOpen = false;
             this.requirementsInputs = {}
@@ -1373,7 +1399,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", "Couldn't authorize section type: " + error.response.data.message);
+            this.showToast("Error", "danger", `Couldn't authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1404,7 +1430,7 @@ export default {
             this.showToast(
                 "Success",
                 "info",
-                this.$t("unAuthorizeSuccess")
+                this.$t("unAuthorizeSuccess", {appName: this.selectedAppName})
             );
             this.isUnAuthModalOpen = false;
             this.types[index].app_status = "disabled"
@@ -1412,7 +1438,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", "Couldn't un-authorize section type: " + error.response.data.message);
+            this.showToast("Error", "danger", `Couldn't un-authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1422,17 +1448,19 @@ export default {
       this.selectedSectionTypeIndex = index
       this.isDeleteModalOpen = true
     },
-    openAuthConfigurableSectionTypeModal(sectionAppId, index, requirements, sectionTypeName) {
+    openAuthConfigurableSectionTypeModal(sectionAppId, index, requirements, sectionTypeName, applicationName) {
       this.selectedSectionTypeAppId = sectionAppId
       this.selectedSectionTypeIndex = index
       this.selectedSectionRequirements = requirements
       this.selectedSectionTypeName = sectionTypeName
+      this.selectedAppName = applicationName
       this.isAuthModalOpen = true
     },
-    openUnAuthConfigurableSectionTypeModal(sectionAppId, index, sectionTypeName) {
+    openUnAuthConfigurableSectionTypeModal(sectionAppId, index, sectionTypeName, applicationName) {
       this.selectedSectionTypeAppId = sectionAppId
       this.selectedSectionTypeIndex = index
       this.selectedSectionTypeName = sectionTypeName
+      this.selectedAppName = applicationName
       this.isUnAuthModalOpen = true
     },
     openCurrentSection(type) {

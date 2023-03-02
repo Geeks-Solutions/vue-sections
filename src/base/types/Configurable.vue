@@ -61,25 +61,32 @@
                 />
               </div>
               <div v-else>
-                <div v-if="field.type === 'media' && optionsData[field.key] && optionsData[field.key].files" class="py-4">
+                <div v-if="field.type === 'media' && optionsData[field.key] && optionsData[field.key].files && optionsData[field.key].files[0].url !== ''" class="py-4 flex align-items-center">
                   <img
                       v-if="optionsData[field.key].files[0].url"
                       :src="optionsData[field.key].files[0].url"
                       alt="image"
                       class="w-95px h-63px object-contain"
                   />
+                  <div class="cursor-pointer" @click="removeImage(field.key)">
+                    <CloseIcon />
+                  </div>
                 </div>
-                <div v-else-if="field.type === 'media' && previewMedia" class="py-4">
+                <div v-else-if="field.type === 'media' && previewMedia" class="py-4 flex align-items-center">
                   <img
                       :src="previewMedia"
                       alt="image"
                       class="w-95px h-63px object-contain"
                   />
+                  <div class="cursor-pointer" @click="removeImage(field.key)">
+                    <CloseIcon />
+                  </div>
                 </div>
                 <div v-else-if="field.type === 'media' && isInProgress" class="w-70px h-70px pl-4 p-2">
                   <loadingCircle />
                 </div>
                 <component
+                    v-show="field.type !== 'media' || (field.type === 'media' && (previewMedia === '' && optionsData[field.key] && optionsData[field.key].files[0].url === ''))"
                     :value="optionsData[field.key]"
                     class="d-input form-control"
                     :id="field.key"
@@ -101,17 +108,6 @@
                   >
                 </component>
               </div>
-              <a
-                  v-if="field.type === 'file' && savedFile(options, field, idx)"
-                  :href="savedFile(options, field, idx)"
-                  target="_blank"
-                  class="mt-3 text-left d-block text-primary"
-              >file : ...{{
-                  savedFile(options, field, idx).substr(
-                      savedFile(options, field, idx).length - 13
-                  )
-                }}
-              </a>
             </div>
             <div
                 v-if="options[idx] && props.fields && props.fields.length > 1"
@@ -151,12 +147,13 @@ import "quill/dist/quill.bubble.css";
 import {formatName, base64Img, sectionHeader, importComp} from "../helpers";
 import axios from "axios";
 import { quillEditor } from "vue-quill-editor";
-import {globalFileUpload} from "@/lib-components";
+import {deleteMedia, globalFileUpload} from "@/lib-components";
 import loadingCircle from "../icons/loadingCircle.vue";
+import CloseIcon from "../icons/close.vue";
 
 export default {
   components: {
-    quillEditor, loadingCircle
+    quillEditor, loadingCircle, CloseIcon
   },
   props: {
     props: {
@@ -293,16 +290,6 @@ export default {
     }
   },
   methods: {
-    savedFile(options, field, idx) {
-      if (options.length && options[idx]) {
-        const filename = options[idx][field.name];
-        if (filename && filename.includes("http")) {
-          return filename;
-        }
-        return false;
-      }
-      return false;
-    },
     formatFileName(name) {
       if (!name) {
         return "Choose a file...";
@@ -314,9 +301,9 @@ export default {
       this.props.fields.splice(idx, 1);
     },
     async changeFieldValue(e, idx, type, fieldname) {
-      const value = type === "file" || type === "media" ? e : e.target.value;
-      const name = type === "file" || type === "media" ? fieldname : e.target.name;
-      if (type === "file" || type === "media") {
+      const value = type === "media" ? e : e.target.value;
+      const name = type === "media" ? fieldname : e.target.name;
+      if (type === "media") {
         await this.mediaUpload(e, idx, name);
       } else if(type === 'integer') {
         this.options[0][name] = parseInt(value);
@@ -337,7 +324,7 @@ export default {
           }
         ]
       };
-      await globalFileUpload(e, this.options[0][name]).then(
+      await globalFileUpload(e).then(
           (result) => {
             this.isInProgress = false
             media.files[0].url = result.data.files[0].url;
@@ -347,6 +334,15 @@ export default {
             this.options[0][name] = media;
           }
       )
+    },
+    async removeImage(name) {
+      if(this.options[0][name]) {
+        await deleteMedia(this.options[0][name].id)
+      }
+      this.options[0][name].files[0].url = ''
+      this.options[0][name].id = null
+      this.options[0][name] = null
+      this.perviewMedia = ''
     },
     onEditorChange({ quill, html, text }, idx, fieldname) {
       this.options[0][fieldname] = html;
@@ -382,8 +378,6 @@ export default {
             return "select";
           }
           return "input";
-        case "file":
-          return "b-form-file";
         case "media":
           return "b-form-file";
         case "string":
@@ -425,6 +419,8 @@ export default {
         case "textfield":
           return "text";
         case "textarea":
+          return "text";
+        case "hidden":
           return "text";
       }
     },
