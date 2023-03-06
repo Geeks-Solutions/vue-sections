@@ -365,6 +365,9 @@
                 <div @click="deleteView(view.id)">
                   <TrashIcon class="trash-icon" />
                 </div>
+                <div @click="copyAnchor(`#${view.name}-${view.id}`)">
+                  <AnchorIcon :title="`Anchor id: #${view.name}-${view.id}, click to copy`" class="edit-icon" />
+                </div>
               </div>
               <div class="view-component" :style="{ background: viewsBgColor }">
                 <component
@@ -503,6 +506,7 @@ import CloseIcon from "./icons/close.vue";
 import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
+import AnchorIcon from "./icons/anchor.vue";
 import CreateIcon from "./icons/create.vue";
 import DotIcon from "./icons/dot.vue";
 import CelebrateIcon from "./icons/celebrate.vue";
@@ -539,6 +543,7 @@ export default {
     CloseIcon,
     draggable,
     LinkIcon,
+    AnchorIcon,
     CreateIcon,
     DotIcon,
     CelebrateIcon,
@@ -1340,6 +1345,12 @@ export default {
         "info",
         "Your section has been removed, save your page to display this change to your visitors"
       );
+    },
+    copyAnchor(anchor) {
+      // let copyText = document.getElementById("myInput");
+      // copyText.select();
+      // copyText.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(anchor);
     },
     errorAddingSection(error) {
       this.isModalOpen = !error.closeModal;

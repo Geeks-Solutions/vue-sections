@@ -2,7 +2,6 @@
   <div class="text-center">
     <div class="element-type">
       <h3>{{ $formatText(props.name, " / ") }}</h3>
-      <div class="text-xs pb-4 mb-4 text-TextGray">{{ `${props.name}-${props.id}` }}</div>
       <form>
         <div>
           <subType :name="props.name" @addStatic="addStatic" ref="viewSaved">
