@@ -349,6 +349,7 @@
           <section
             v-for="(view, index) in currentViews"
             :key="index"
+            :id="`${view.name}-${view.id}`"
             :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
           >
             <div class="section-view">

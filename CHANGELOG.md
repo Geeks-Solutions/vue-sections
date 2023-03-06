@@ -1,3 +1,9 @@
+### 1.0.20
+#### Additional Feature
+
+- Adding anchor id for all section types (sectionName-sectionId)
+- Showing anchor id under the title of each section in edit mode
+
 ### 1.0.19
 #### Additional features
 

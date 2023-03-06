@@ -19,6 +19,7 @@
         </div>
       </div>
     </div>
+    <div class="text-xs text-TextGray">{{ `${props.name}-${props.id}` }}</div>
 
     <div v-show="currentTab === 'config'">
       <div class="text-danger">
