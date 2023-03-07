@@ -2,7 +2,7 @@
 
 Sections is an efficient serverless app relying on modern technologies to increase page render speed and facilitate the work of frontend developers. This package provide a VueJS Component to use right off the bat to interface with Sections' server
 
-In order to benefit from this service you should register for free on the following [link](https://sections.geeks.solutions/register)
+In order to benefit from this service you should register for free on the following [link](https://sections.geeks.solutions/admin/register)
 
 # Vue Sections
 
@@ -25,7 +25,7 @@ Configure the library, the possible configurations are as follow:
 - `projectId`: The ID of you project, you get it from your project interface after your register to sections
 - `environment`: _to use only for development purposes_ set it to "testing" if you want your requests to be directed to sections test server
 - `projectUrl`: _to use only if you intend to run sections in SSR_ set it to the project url you defined in your project interface on sections back office.
-- `queryStringSupport`: _to use only if you intend to use query strings on your project.
+- `queryStringSupport`: _to use only if you intend to use query strings on your project_ set it to `enabled`. Enabling it on a project that does not have access to query strings will return errors when getting pages.
 
 Vue:
 ```

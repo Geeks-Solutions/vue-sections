@@ -349,6 +349,7 @@
           <section
             v-for="(view, index) in currentViews"
             :key="index"
+            :id="`${view.name}-${view.id}`"
             :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
           >
             <div class="section-view">
@@ -363,6 +364,9 @@
                 <DragIcon class="drag-icon handle" />
                 <div @click="deleteView(view.id)">
                   <TrashIcon class="trash-icon" />
+                </div>
+                <div @click="navigator.clipboard.writeText(`#${view.name}-${view.id}`)">
+                  <AnchorIcon :title="`Anchor id: #${view.name}-${view.id}, click to copy`" class="edit-icon" />
                 </div>
               </div>
               <div class="view-component" :style="{ background: viewsBgColor }">
@@ -502,6 +506,7 @@ import CloseIcon from "./icons/close.vue";
 import draggable from "vuedraggable";
 import SyncIcon from "./icons/sync.vue";
 import LinkIcon from "./icons/link.vue";
+import AnchorIcon from "./icons/anchor.vue";
 import CreateIcon from "./icons/create.vue";
 import DotIcon from "./icons/dot.vue";
 import CelebrateIcon from "./icons/celebrate.vue";
@@ -538,6 +543,7 @@ export default {
     CloseIcon,
     draggable,
     LinkIcon,
+    AnchorIcon,
     CreateIcon,
     DotIcon,
     CelebrateIcon,
