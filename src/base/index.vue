@@ -170,7 +170,7 @@
               </div>
               <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
                 <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name, type.application)">
-                  <div class="flex justify-between items-end">
+                  <div class="flex justify-content-between items-end">
                     <div v-if="type.type === 'configurable'" class="pl-1 pb-1" style="font-size: 8px;">
                       {{ 'By ' + type.application }}
                     </div>
@@ -180,7 +180,7 @@
               </div>
               <div v-else-if="type.type === 'configurable'" class="section-delete">
                 <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name, type.application)">
-                  <div class="flex justify-between items-end">
+                  <div class="flex justify-content-between items-end">
                     <div class="pl-1 pb-1" style="font-size: 8px;">
                       {{ 'By ' + type.application }}
                     </div>
@@ -365,7 +365,7 @@
                 <div @click="deleteView(view.id)">
                   <TrashIcon class="trash-icon" />
                 </div>
-                <div @click="navigator.clipboard.writeText(`#${view.name}-${view.id}`)">
+                <div @click="copyAnchor(`#${view.name}-${view.id}`)">
                   <AnchorIcon :title="`Anchor id: #${view.name}-${view.id}, click to copy`" class="edit-icon" />
                 </div>
               </div>
@@ -1345,6 +1345,9 @@ export default {
         "info",
         "Your section has been removed, save your page to display this change to your visitors"
       );
+    },
+    copyAnchor(anchor) {
+      navigator.clipboard.writeText(anchor);
     },
     errorAddingSection(error) {
       this.isModalOpen = !error.closeModal;

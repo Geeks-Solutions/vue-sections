@@ -68,7 +68,7 @@
                       alt="image"
                       class="w-95px h-63px object-contain"
                   />
-                  <div class="cursor-pointer" @click="removeImage(field.key)">
+                  <div class="cursor-pointer pl-2" @click="removeImage(field.key)">
                     <CloseIcon />
                   </div>
                 </div>
@@ -78,11 +78,11 @@
                       alt="image"
                       class="w-95px h-63px object-contain"
                   />
-                  <div class="cursor-pointer" @click="removeImage(field.key)">
+                  <div class="cursor-pointer pl-2" @click="removeImage(field.key)">
                     <CloseIcon />
                   </div>
                 </div>
-                <div v-else-if="field.type === 'media' && isInProgress" class="w-70px h-70px pl-4 p-2">
+                <div v-else-if="field.type === 'media' && isInProgress" class="loadingCircle pl-4 p-2">
                   <loadingCircle />
                 </div>
                 <component
@@ -540,5 +540,10 @@ export default {
 
 .containerWidth {
   min-width: 800px;
+}
+
+.loadingCircle {
+  width: 70px;
+  height: 70px;
 }
 </style>
