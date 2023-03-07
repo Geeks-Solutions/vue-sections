@@ -365,7 +365,7 @@
                 <div @click="deleteView(view.id)">
                   <TrashIcon class="trash-icon" />
                 </div>
-                <div @click="copyAnchor(`#${view.name}-${view.id}`)">
+                <div @click="navigator.clipboard.writeText(`#${view.name}-${view.id}`)">
                   <AnchorIcon :title="`Anchor id: #${view.name}-${view.id}, click to copy`" class="edit-icon" />
                 </div>
               </div>
@@ -1345,12 +1345,6 @@ export default {
         "info",
         "Your section has been removed, save your page to display this change to your visitors"
       );
-    },
-    copyAnchor(anchor) {
-      // let copyText = document.getElementById("myInput");
-      // copyText.select();
-      // copyText.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(anchor);
     },
     errorAddingSection(error) {
       this.isModalOpen = !error.closeModal;
