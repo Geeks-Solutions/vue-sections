@@ -1,3 +1,9 @@
+### 1.0.21
+#### Bug Fixes
+
+- Fixed copy anchor problem
+- Fixed some styles for configurable section
+
 ### 1.0.20
 #### Additional Feature
 
