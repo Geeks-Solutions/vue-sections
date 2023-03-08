@@ -1483,7 +1483,7 @@ export default {
     },
     openCurrentSection(type) {
       if(type.app_status === 'disbaled' || type.app_status === 'disabled') {
-        this.showToast("warning", "warning", this.$t("authorizeFirst"));
+        this.showToast("Authorisation warning", "warning", this.$t("authorizeFirst"));
       } else this.currentSection = type
     }
   },

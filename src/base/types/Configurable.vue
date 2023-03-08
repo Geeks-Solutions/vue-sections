@@ -45,7 +45,7 @@
                   v-if="field.name && field.type !== 'hidden'"
                   class="text-capitalize text-left"
               >
-                {{ field.name.replace("_", " ") }}
+                {{ field.name.replace("_", " ")+'*' }}
               </div>
               <div v-if="field.type === 'wysiwyg'">
                 <div class="input">
@@ -108,6 +108,7 @@
                   >
                 </component>
               </div>
+              <span v-if="field.type === 'media'" class="flex text-error py-2 text-xs">{{ mediaError }}</span>
             </div>
             <div
                 v-if="options[idx] && props.fields && props.fields.length > 1"
@@ -183,7 +184,8 @@ export default {
       optionsData: {},
       showCustomFormTab: false,
       previewMedia: "",
-      isInProgress: false
+      isInProgress: false,
+      mediaError: ''
     };
   },
   watch: {
@@ -324,14 +326,20 @@ export default {
           }
         ]
       };
+      this.mediaError = ''
       await globalFileUpload(e).then(
           (result) => {
-            this.isInProgress = false
-            media.files[0].url = result.data.files[0].url;
-            media.files[0].filename = result.data.files[0].filename;
-            media.id = result.data.id;
-            this.previewMedia = media.files[0].url;
-            this.options[0][name] = media;
+            if(result.success) {
+              this.isInProgress = false
+              media.files[0].url = result.data.files[0].url;
+              media.files[0].filename = result.data.files[0].filename;
+              media.id = result.data.id;
+              this.previewMedia = media.files[0].url;
+              this.options[0][name] = media;
+            } else {
+              this.isInProgress = false
+              this.mediaError = `${result.error.response.data.error}. ${result.error.response.data.message}`
+            }
           }
       )
     },
@@ -431,7 +439,7 @@ export default {
         const fields = this.props.fields[i];
         if (!this.options[0][key] || this.options[0][key][fields.key] === "no-value") {
           errorMessage =
-              "You must fill your current fields before submitting.";
+              "You must fill your required fields before submitting.";
         }
       });
       if (errorMessage) {
