@@ -42,7 +42,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style>
 .section-item {
   width: 100px;
   height: 100px;

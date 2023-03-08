@@ -41,9 +41,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-$sectionsBlue: #31a9db;
-$grey: #adadad;
+<style scoped>
 .item {
   color: white;
   display: flex;
@@ -52,23 +50,21 @@ $grey: #adadad;
   width: 100%;
   height: 100%;
   cursor: pointer;
-  background: $grey;
-  &.active {
-    background: $sectionsBlue;
-    transition: 0.2s;
-    &:hover {
-      transition: 0.2s;
-      background: darken($sectionsBlue, 10%);
-    }
-  }
+  background: #adadad;
 }
-.icon {
-  svg {
-    color: white;
-    fill: white;
-    min-width: 60px;
-    height: 60px;
-  }
+.item.active {
+  background: #31a9db;
+  transition: 0.2s;
+}
+.item.active:hover {
+  transition: 0.2s;
+  background: darken($sectionsBlue, 10%);
+}
+.icon svg {
+  color: white;
+  fill: white;
+  min-width: 60px;
+  height: 60px;
 }
 .card-content {
   display: flex;

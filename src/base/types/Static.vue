@@ -1,7 +1,7 @@
 <template>
   <div class="text-center">
     <div class="element-type">
-      <h3>{{ $formatText(props.name, " / ") }}</h3>
+      <h3>{{ formatName(props.name, " / ") }}</h3>
       <form>
         <div>
           <subType :name="props.name" @addStatic="addStatic" ref="viewSaved">
@@ -17,7 +17,7 @@
 
 <script>
 import subType from "../subType.vue";
-import { importComp } from "../helpers";
+import {formatName, importComp} from "../helpers";
 
 export default {
   components: {
@@ -72,6 +72,7 @@ export default {
     }, 10);
   },
   methods: {
+    formatName,
     addStatic(settings) {
       this.$emit("addSectionType", {
         name: this.props.name,
@@ -85,17 +86,18 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.dashboard {
-  button {
-    background: black;
-    margin: 10px;
-    width: auto;
-    height: auto;
-    max-height: auto;
-    padding: 5px;
-    min-width: 0;
-    max-width: 1000px;
-  }
+<style>
+.dashboard button {
+  background: black;
+  margin: 10px;
+  width: auto;
+  height: auto;
+  max-height: max-content;
+  padding: 5px;
+  min-width: 0;
+  max-width: 1000px;
+}
+h3 {
+  font-size: 29px;
 }
 </style>

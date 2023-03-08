@@ -27,7 +27,7 @@
       <div class="form-group">
         <form>
           <div
-              class=" d-flex flex-column justify-content-between"
+              class=" flex flex-col justify-between content-wrapper"
           >
             <div
                 class="element d-inline-block"
@@ -52,15 +52,15 @@
                   <quill-editor v-model="optionsData[field.key]" :ref="field.type+'Editor'" class="wyzywig" @change="onEditorChange($event, idx, field.key)" />
                 </div>
               </div>
-              <div v-else-if="field.type === 'textarea'">
+              <div v-else-if="field.type === 'textarea'" class="w-full">
                 <textarea
                     v-model="optionsData[field.key]"
-                    class="d-input form-control"
+                    class="d-input py-4 pl-6 border rounded-xl border-FieldGray h-48px w-full focus:outline-none"
                     :name="field.name"
                     @change="changeFieldValue($event, idx, field.type, field.key)"
                 />
               </div>
-              <div v-else>
+              <div v-else class="w-full justify-start">
                 <div v-if="field.type === 'media' && optionsData[field.key] && optionsData[field.key].files && optionsData[field.key].files[0].url !== ''" class="py-4 flex align-items-center">
                   <img
                       v-if="optionsData[field.key].files[0].url"
@@ -88,7 +88,7 @@
                 <component
                     v-show="field.type !== 'media' || (field.type === 'media' && previewMedia === '' && ( !optionsData[field.key] || (optionsData[field.key] && optionsData[field.key].files && optionsData[field.key].files[0].url === '')))"
                     :value="optionsData[field.key]"
-                    class="d-input form-control"
+                    :class="field.type !== 'media' ? 'd-input py-4 pl-6 border rounded-xl border-FieldGray h-48px w-full focus:outline-none' : ''"
                     :id="field.key"
                     :is="getTag(field.type, field.name)"
                     :type="getType(field.type)"
@@ -123,7 +123,7 @@
               Add another
             </button>
           </div>
-          <button class="form-control bg-info text-white" type="button" @click="addConfigurable()">
+          <button class="flex items-center justify-center form-control bg-Blue text-white border-Blue border hover:text-Blue px-3.5 h-53px py-3.5 rounded-xl hover:bg-white mt-4 mb-4" type="button" @click="addConfigurable()">
             Submit data
           </button>
         </form>
@@ -132,7 +132,7 @@
 
     <div v-show="currentTab === 'custom'" class="sub-types">
       <div>
-        <div class="text-video d-flex" v-show="formatName(props.name)">
+        <div class="text-video d-flex content-wrapper" v-show="formatName(props.name)">
           <component :is="getComponentForm" :ref="formatName(props.name)" :section-settings="props" :section-options="options[0]" @whitelistIdUpdated="updateWhitelistId" @load="(value) => $emit('load', value)" @customFormLoaded="showCustomFormTab = true" />
         </div>
       </div>
@@ -287,7 +287,7 @@ export default {
         })
         .catch((err) => {
           this.$emit("loading");
-          this.showToast("Error", "danger", err.response.data.message.toString());
+          this.showToast("Error", "error", err.response.data.message.toString());
         });
     }
   },
@@ -327,7 +327,7 @@ export default {
         ]
       };
       this.mediaError = ''
-      await globalFileUpload(e).then(
+      await globalFileUpload(e.target.files[0]).then(
           (result) => {
             if(result.success) {
               this.isInProgress = false
@@ -387,7 +387,7 @@ export default {
           }
           return "input";
         case "media":
-          return "b-form-file";
+          return "input";
         case "string":
           if (
             this.optionValues.field === name &&
@@ -501,17 +501,20 @@ export default {
         });
     },
     showToast(title, variant, message) {
-      const inBrowser = typeof window !== 'undefined';
-      if(inBrowser){
-        this.$bvToast.toast(message, {
-          title,
-          variant,
-          solid: true,
-          toaster: "b-toaster-top-right",
-        });
-      } else {
-        console.log(`## ${variant} ## ${title}: ${message}`)
-      }
+      this.$toast[variant](message, {
+        position: "top-right",
+        timeout: 5000,
+        closeOnClick: true,
+        pauseOnFocusLoss: true,
+        pauseOnHover: true,
+        draggable: true,
+        draggablePercent: 0.6,
+        showCloseButtonOnHover: false,
+        hideProgressBar: false,
+        closeButton: "button",
+        icon: false,
+        rtl: false
+      });
     },
     updateWhitelistId(id) {
       this.optionsData['whitelist_id'] = id;
@@ -521,20 +524,19 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .element {
   margin: 15px;
   flex-direction: column;
   align-items: flex-start;
   display: flex;
   text-align: left;
-  select {
-    width: 100%;
-    padding: 9px 19px;
-    border-radius: 6px;
-  }
 }
-
+.element select {
+  width: 100%;
+  padding: 9px 19px;
+  border-radius: 6px;
+}
 .deleteRow {
   display: flex;
   align-items: center;
@@ -549,9 +551,38 @@ export default {
 .containerWidth {
   min-width: 800px;
 }
+.border-FieldGray {
+  --tw-border-opacity: 1!important;
+  border-color: #f2f2f3!important;
+  border-color: rgba(242,242,243,var(--tw-border-opacity))!important;
+}
+.bg-blue {
+  background: #31a9db;
+  color: white;
+  border: none;
+  outline: none !important;
+  transition: 0.2s;
+}
+.bg-blue:hover {
+  background: #0881b3;
+  transition: 0.2s;
+}
+.text-Blue {
+  background: #31a9db;
+}
 
 .loadingCircle {
   width: 70px;
   height: 70px;
+}
+.content-wrapper {
+  overflow-y: scroll;
+  height: 550px;
+}
+@media only screen and (max-height: 800px) {
+  .content-wrapper {
+    overflow-y: scroll;
+    height: 450px;
+  }
 }
 </style>

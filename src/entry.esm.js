@@ -3,7 +3,8 @@
 import * as components from '@/lib-components/index';
 import VueCookies from "vue-cookies";
 // This is the way to have the toaster
-import { ToastPlugin } from 'bootstrap-vue';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 // install function executed by Vue.use()
 const install = function installVueSections(Vue,options) {
@@ -21,7 +22,11 @@ const install = function installVueSections(Vue,options) {
   });
 
   Vue.use(VueCookies);
-  Vue.use(ToastPlugin);
+  Vue.use(Toast, {
+    transition: "Vue-Toastification__fade",
+    maxToasts: 20,
+    newestOnTop: true
+  });
 
   Vue.prototype.$formatText = (text, sep = " ") => {
     const result = text.replace(/([A-Z])/g, `${sep}$1`);

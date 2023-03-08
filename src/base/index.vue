@@ -1,5 +1,5 @@
 <template>
-  <div class="sections-config justify-content-center">
+  <div class="sections-config justify-center">
     <div v-if="!pageNotFound">
       <!-- page buttons part 1-->
       <button
@@ -10,12 +10,12 @@
         {{ !editMode ? $t("Edit page") : $t("View page") }}
       </button>
       <div class="bg-light-grey-hp hide-mobile section-wrapper">
-        <div v-if="admin && editMode" class="p3 text-center mainmsg pt-3">
+        <div v-if="admin && editMode" class="p-3 text-center mainmsg pt-3">
           Your changes will be published when the page is saved.
         </div>
 
         <div
-          class="pb-3 pt-1 d-flex justify-content-center part1 hide-mobile"
+          class="pb-4 flex flex-row justify-center hide-mobile"
           v-if="admin && editMode"
         >
           <button
@@ -49,7 +49,7 @@
                 data-toggle="tooltip" data-placement="top" title="Export sections"
                 @click="exportSections"
             >
-              <ExportIcon />
+              <ImportIcon />
             </button>
             <a id="downloadAnchorElem" style="display:none"></a>
             <button
@@ -58,7 +58,7 @@
                 data-toggle="tooltip" data-placement="top" title="Import sections"
                 @click="initImportSections"
             >
-              <ImportIcon />
+              <ExportIcon />
             </button>
             <input ref="jsonFilePick" type="file" @change="e => importSections(e)" style="display:none" />
             <button
@@ -77,7 +77,7 @@
       </div>
       <!-- page buttons part 2-->
       <div
-        class="bg-light-grey-hp p-3 d-flex justify-content-center part2 hide-mobile"
+        class="bg-light-grey-hp p-3 flex flex-row justify-center part2 hide-mobile"
         v-if="admin && editMode"
       >
         <b-alert
@@ -117,7 +117,7 @@
             <div class="btn-text">{{ v.name }}</div>
           </button>
           <div
-            class="sync d-flex p4  justify-content-center"
+            class="sync flex flex-row p-4 justify-center"
             v-if="selectedVariation === v.pageName"
             @click="synch()"
           >
@@ -130,156 +130,123 @@
       <!-- ------------------------------------------------------------------------------------------- -->
 
       <!-- page section types popup 'edit' -->
-      <b-modal class="modal" v-model="isModalOpen" centered ref="modal">
-        <div class="section-modal-content">
-          <div class="text-center h4 my-3  pb-3" v-if="!currentSection">
-            {{ $t("Add") }}
-          </div>
-          <div class="closeIcon" @click="isModalOpen = false">
-            <CloseIcon />
-          </div>
-          <div
-            class="step-back"
-            v-if="currentSection"
-            @click="currentSection = null"
-          >
-            <BackIcon />
-          </div>
-
-          <div v-if="!currentSection" class="m-1 p-1 type-items">
+      <div v-if="isModalOpen" ref="modal" class="fixed section-modal-content z-50 bg-grey bg-opacity-25 inset-0 p-8 modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl">
+            <div class="flex flex-row relative justify-center">
+              <div class="text-center h4 my-3 pb-6" v-if="!currentSection">
+                {{ $t("Add") }}
+              </div>
+              <div class="closeIcon" @click="isModalOpen = false">
+                <CloseIcon />
+              </div>
+            </div>
             <div
-              class="section-item section-item-box bg-blue"
-              v-for="(type, index) in types"
-              :key="type.name"
+                class="step-back"
+                v-if="currentSection"
+                @click="currentSection = null"
             >
-              <div v-if="type.access === 'private'" class="section-delete">
-                <div class="section-delete-icon" @click="openDeleteSectionTypeModal(type.name, index)">
-                  <TrashIcon class="trash-icon-style" />
-                </div>
-              </div>
-              <div class="section-item" @click="openCurrentSection(type)">
-                <SectionItem
-                    v-if="type.name && !type.name.includes('local')"
-                    class="bg-light-blue"
-                    :title="formatName(type.name)"
-                    :icon="type.name"
-                />
-              </div>
-              <div v-if="type.type !== 'configurable'" class="pl-1 pb-1" style="font-size: 10px;">
-                {{ 'By ' + type.application }}
-              </div>
-              <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
-                <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name, type.application)">
-                  <div class="flex justify-content-between items-end">
-                    <div v-if="type.type === 'configurable'" class="pl-1 pb-1" style="font-size: 8px;">
-                      {{ 'By ' + type.application }}
-                    </div>
-                    <LockedIcon class="trash-icon-style p-1" />
+              <BackIcon />
+            </div>
+
+            <div v-if="!currentSection" class="m-1 p-1 type-items">
+              <div
+                  class="section-item section-item-box bg-blue"
+                  v-for="(type, index) in types"
+                  :key="type.name"
+              >
+                <div v-if="type.access === 'private'" class="section-delete">
+                  <div class="section-delete-icon" @click="openDeleteSectionTypeModal(type.name, index)">
+                    <TrashIcon class="trash-icon-style" />
                   </div>
                 </div>
-              </div>
-              <div v-else-if="type.type === 'configurable'" class="section-delete">
-                <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name, type.application)">
-                  <div class="flex justify-content-between items-end">
-                    <div class="pl-1 pb-1" style="font-size: 8px;">
-                      {{ 'By ' + type.application }}
+                <div class="section-item" @click="openCurrentSection(type)">
+                  <SectionItem
+                      v-if="type.name && !type.name.includes('local')"
+                      class="bg-light-blue"
+                      :title="formatName(type.name)"
+                      :icon="type.name"
+                  />
+                </div>
+                <div v-if="type.type !== 'configurable'" class="flex pl-2 pb-1" style="font-size: 10px;">
+                  {{ 'By ' + type.application }}
+                </div>
+                <div v-if="type.app_status === 'disbaled' || type.app_status === 'disabled'" class="section-delete">
+                  <div class="section-delete-icon" @click="openAuthConfigurableSectionTypeModal(type.application_id, index, type.requirements, type.name, type.application)">
+                    <div class="flex justify-between items-end">
+                      <div v-if="type.type === 'configurable'" class="flex pl-2 pb-1" style="font-size: 8px;">
+                        {{ 'By ' + type.application }}
+                      </div>
+                      <LockedIcon class="trash-icon-style p-1" />
                     </div>
-                    <UnlockedIcon class="trash-icon-style p-1" />
+                  </div>
+                </div>
+                <div v-else-if="type.type === 'configurable'" class="section-delete">
+                  <div class="section-delete-icon" @click="openUnAuthConfigurableSectionTypeModal(type.application_id, index, type.name, type.application)">
+                    <div class="flex justify-between items-end">
+                      <div class="flex pl-2 pb-1" style="font-size: 8px;">
+                        {{ 'By ' + type.application }}
+                      </div>
+                      <UnlockedIcon class="trash-icon-style p-1" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div v-else class="d-flex">
-            <div class="component-view">
-              <!-- we can use this short hand too -->
-              <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
-              <Static
-                v-if="currentSection.type === 'static'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                :savedView="savedView"
-              />
-              <Dynamic
-                v-if="currentSection.type === 'dynamic'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                @errorAddingSection="errorAddingSection"
-                :savedView="savedView"
-                :headers="headers"
-              />
-              <Configurable
-                v-if="currentSection.type === 'configurable'"
-                @addSectionType="addSectionType"
-                @errorAddingSection="errorAddingSection"
-                :props="currentSection"
-                :variation="variation"
-                :savedView="savedView"
-                :headers="headers"
-                @load="(value) => loading = value"
-              />
-              <Local
-                v-if="currentSection.type === 'local'"
-                :props="currentSection"
-                @addSectionType="addSectionType"
-                :savedView="savedView"
-              />
+            <div v-else class="flex">
+              <div class="component-view">
+                <!-- we can use this short hand too -->
+                <!-- <component :is="currentSection.type" :props="currentSection"  /> -->
+                <Static
+                    v-if="currentSection.type === 'static'"
+                    :props="currentSection"
+                    @addSectionType="addSectionType"
+                    :savedView="savedView"
+                />
+                <Dynamic
+                    v-if="currentSection.type === 'dynamic'"
+                    :props="currentSection"
+                    @addSectionType="addSectionType"
+                    @errorAddingSection="errorAddingSection"
+                    :savedView="savedView"
+                    :headers="headers"
+                />
+                <Configurable
+                    v-if="currentSection.type === 'configurable'"
+                    @addSectionType="addSectionType"
+                    @errorAddingSection="errorAddingSection"
+                    :props="currentSection"
+                    :variation="variation"
+                    :savedView="savedView"
+                    :headers="headers"
+                    @load="(value) => loading = value"
+                />
+                <Local
+                    v-if="currentSection.type === 'local'"
+                    :props="currentSection"
+                    @addSectionType="addSectionType"
+                    :savedView="savedView"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </b-modal>
+      </div>
+
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
       <!-- page section types popup 'delete' -->
-      <b-modal class="modal" v-model="isDeleteModalOpen" centered ref="modal">
-        <div class="section-modal-content">
-          <div class="text-center h4 my-3  pb-3">
-            {{ $t("delete-section-type") + selectedSectionTypeName}}
-          </div>
-          <div class="d-inline-flex">
-            <button
-                class="hp-button"
-                @click="deleteSectionType(selectedSectionTypeName, selectedSectionTypeIndex)"
-            >
-              <div class="btn-text">
-                {{ $t("Confirm") }}
-              </div>
-            </button>
-            <button
-                class="hp-button"
-                @click="isDeleteModalOpen = false"
-            >
-              <div class="btn-text">
-                {{ $t("Cancel") }}
-              </div>
-            </button>
-          </div>
-        </div>
-      </b-modal>
-
-      <!-- ------------------------------------------------------------------------------------------- -->
-
-      <!-- Authorize configurable section types popup -->
-      <b-modal class="modal" v-model="isAuthModalOpen" centered ref="modal">
-        <div class="section-modal-content">
-          <div class="text-center h4 my-3  pb-3">
-            {{ $t("authorize-section-type") + selectedAppName}}
-          </div>
-          <div class="d-flex flex-column gap-4">
-            <div v-for="requiredInput in selectedSectionRequirements">
-              <input
-                  class="form-control"
-                  type="text"
-                  :placeholder="requiredInput"
-                  v-model="requirementsInputs[requiredInput]"
-              />
+      <div v-show="isDeleteModalOpen" ref="modal" class="fixed z-50 overflow-hidden bg-grey bg-opacity-25 inset-0 p-8 overflow-y-auto modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex h-full items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl overflow-scroll">
+            <div class="text-center h4 my-3  pb-3">
+              {{ $t("delete-section-type") + selectedSectionTypeName}}
             </div>
-
-            <div class="d-inline-flex">
+            <div class="flex flex-row">
               <button
                   class="hp-button"
-                  @click="authorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
+                  @click="deleteSectionType(selectedSectionTypeName, selectedSectionTypeIndex)"
               >
                 <div class="btn-text">
                   {{ $t("Confirm") }}
@@ -287,52 +254,96 @@
               </button>
               <button
                   class="hp-button"
-                  @click="isAuthModalOpen = false; requirementsInputs = {}"
+                  @click="isDeleteModalOpen = false"
               >
                 <div class="btn-text">
                   {{ $t("Cancel") }}
                 </div>
               </button>
             </div>
-
           </div>
         </div>
-      </b-modal>
+      </div>
+
+      <!-- ------------------------------------------------------------------------------------------- -->
+
+      <!-- Authorize configurable section types popup -->
+      <div v-show="isAuthModalOpen" ref="modal" class="fixed z-50 overflow-hidden bg-grey bg-opacity-25 inset-0 p-8 overflow-y-auto modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex h-full items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl overflow-scroll">
+            <div class="text-center h4 my-3 pb-4">
+              {{ $t("authorize-section-type") + selectedAppName}}
+            </div>
+            <div class="flex flex-col gap-4">
+              <div v-for="requiredInput in selectedSectionRequirements">
+                <input
+                    class="py-4 pl-6 border rounded-xl border-FieldGray h-48px w-full focus:outline-none"
+                    type="text"
+                    :placeholder="requiredInput"
+                    v-model="requirementsInputs[requiredInput]"
+                />
+              </div>
+
+              <div class="flex flex-row">
+                <button
+                    class="hp-button"
+                    @click="authorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
+                >
+                  <div class="btn-text">
+                    {{ $t("Confirm") }}
+                  </div>
+                </button>
+                <button
+                    class="hp-button"
+                    @click="isAuthModalOpen = false; requirementsInputs = {}"
+                >
+                  <div class="btn-text">
+                    {{ $t("Cancel") }}
+                  </div>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
       <!-- UnAuthorize configurable section types popup -->
-      <b-modal class="modal" v-model="isUnAuthModalOpen" centered ref="modal">
-        <div class="section-modal-content">
-          <div class="text-center h4 my-3  pb-3">
-            {{ $t("un-authorize-section-type") + selectedAppName }}
-          </div>
-          <div class="d-flex flex-column gap-4">
-
-            <div class="d-inline-flex">
-              <button
-                  class="hp-button"
-                  @click="unAuthorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
-              >
-                <div class="btn-text">
-                  {{ $t("Confirm") }}
-                </div>
-              </button>
-              <button
-                  class="hp-button"
-                  @click="isUnAuthModalOpen = false;"
-              >
-                <div class="btn-text">
-                  {{ $t("Cancel") }}
-                </div>
-              </button>
+      <div v-show="isUnAuthModalOpen" ref="modal" class="fixed z-50 overflow-hidden bg-grey bg-opacity-25 inset-0 p-8 overflow-y-auto modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex h-full items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl overflow-scroll">
+            <div class="text-center h4 my-3  pb-3">
+              {{ $t("un-authorize-section-type") + selectedAppName }}
             </div>
+            <div class="flex flex-col gap-4">
 
+              <div class="flex flex-row">
+                <button
+                    class="hp-button"
+                    @click="unAuthorizeSectionType(selectedSectionTypeAppId, selectedSectionTypeIndex)"
+                >
+                  <div class="btn-text">
+                    {{ $t("Confirm") }}
+                  </div>
+                </button>
+                <button
+                    class="hp-button"
+                    @click="isUnAuthModalOpen = false;"
+                >
+                  <div class="btn-text">
+                    {{ $t("Cancel") }}
+                  </div>
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
-      </b-modal>
+      </div>
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
@@ -352,9 +363,9 @@
             :id="`${view.name}-${view.id}`"
             :class="{ [view.name]: true, 'view-in-edit-mode': editMode }"
           >
-            <div class="section-view">
+            <div class="section-view relative">
               <div
-                class="controls d-flex justify-content-center hide-mobile"
+                class="controls flex flex-row justify-center p-1 rounded-xl top-0 right-2 absolute z-9 hide-mobile"
                 v-if="admin && editMode"
               >
                 <LinkIcon v-if="view.linkedTo" />
@@ -389,88 +400,88 @@
           <!-- </transition-group> -->
         </draggable>
       </div>
-      <b-modal
-        class="modal"
-        :modal-class="'section-modal-main-wrapper'"
-        v-model="staticModal"
-        centered
-        ref="modal"
-      >
-        <div class="section-modal-wrapper">
-          <div class="text-center h4 header" v-if="!currentSection">
-            <div class="title">{{ $t("section-title") }}:</div>
-            <div class="closeIcon" @click="staticModal = false">
-              <CloseIcon />
-            </div>
-          </div>
-          <div class="body">
-            <div style="margin-bottom: 10px;">
-              {{ $t("section-input-title") }}
-            </div>
-            <input
-              class="section-input"
-              type="text"
-              v-model="sectionTypeName"
-            />
-          </div>
-          <div class="footer">
-            <button class="hp-button" @click="addNewStaticType">
-              <div class="btn-icon check-icon"></div>
-              <div class="btn-text">
-                {{ $t("Continue") }}
+      <div v-show="staticModal" :modal-class="'section-modal-main-wrapper'" ref="modal" class="fixed z-50 overflow-hidden bg-grey bg-opacity-25 inset-0 p-8 overflow-y-auto modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex h-full items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl overflow-scroll">
+            <div class="section-modal-wrapper">
+              <div class="text-center h4 header" v-if="!currentSection">
+                <div class="title">{{ $t("section-title") }}:</div>
+                <div class="closeIcon" @click="staticModal = false">
+                  <CloseIcon />
+                </div>
               </div>
-            </button>
+              <div class="flex w-full justify-center">
+                <div class="body">
+                  <div style="margin-bottom: 10px;">
+                    {{ $t("section-input-title") }}
+                  </div>
+                  <input
+                      class="py-4 pl-6 border rounded-xl border-FieldGray h-48px w-full focus:outline-none"
+                      type="text"
+                      v-model="sectionTypeName"
+                  />
+                </div>
+              </div>
+              <div class="footer">
+                <button class="hp-button" @click="addNewStaticType">
+                  <div class="btn-icon check-icon"></div>
+                  <div class="btn-text">
+                    {{ $t("Continue") }}
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </b-modal>
-      <b-modal
-        class="modal"
-        :modal-class="'section-modal-main-wrapper'"
-        v-model="staticSuccess"
-        centered
-        ref="modal"
-      >
-        <div class="section-modal-wrapper success-section-type">
-          <div class="text-center h4 header">
-            <div class="icon-head">
-              <CelebrateIcon />
-            </div>
-            <div class="title">
-              {{ $t("success-section-title") }}
-            </div>
-            <div class="closeIcon" @click="staticSuccess = false">
-              <CloseIcon />
-            </div>
-          </div>
-          <div class="body">
-            <div class="subtitle">{{ $t("success-section-subtitle") }}:</div>
-            <div class="section-list">
-              <div class="dot"><DotIcon /></div>
-              <div>
-                {{ $t("success-section-instruction-1") }}
+      </div>
+      <div v-show="staticSuccess" :modal-class="'section-modal-main-wrapper'" ref="modal" class="fixed z-50 overflow-hidden bg-grey bg-opacity-25 inset-0 p-8 overflow-y-auto modalContainer" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex h-full items-center justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="section-modal-content bg-white relative shadow rounded-xl overflow-scroll">
+            <div class="section-modal-wrapper success-section-type">
+              <div class="text-center h4 header">
+                <div class="icon-head">
+                  <CelebrateIcon />
+                </div>
+                <div class="title">
+                  {{ $t("success-section-title") }}
+                </div>
+                <div class="closeIcon" @click="staticSuccess = false">
+                  <CloseIcon />
+                </div>
+              </div>
+              <div class="flex w-full justify-center">
+                <div class="body">
+                  <div class="subtitle">{{ $t("success-section-subtitle") }}:</div>
+                  <div class="section-list">
+                    <div class="dot"><DotIcon /></div>
+                    <div>
+                      {{ $t("success-section-instruction-1") }}
+                    </div>
+                  </div>
+                  <div class="section-list">
+                    <div class="dot"><DotIcon /></div>
+                    <div>
+                      {{ $t("success-section-instruction-2") }}
+                    </div>
+                  </div>
+                  <div class="section-list">
+                    <div class="dot"><DotIcon /></div>
+                    <div>
+                      {{ $t("success-section-instruction-3") }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="footer">
+                <button class="hp-button" @click="staticSuccess = false">
+                  <div class="btn-icon check-icon"></div>
+                  <div class="btn-text">{{ $t("Done") }}</div>
+                </button>
               </div>
             </div>
-            <div class="section-list">
-              <div class="dot"><DotIcon /></div>
-              <div>
-                {{ $t("success-section-instruction-2") }}
-              </div>
-            </div>
-            <div class="section-list">
-              <div class="dot"><DotIcon /></div>
-              <div>
-                {{ $t("success-section-instruction-3") }}
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <button class="hp-button" @click="staticSuccess = false">
-              <div class="btn-icon check-icon"></div>
-              <div class="btn-text">{{ $t("Done") }}</div>
-            </button>
           </div>
         </div>
-      </b-modal>
+      </div>
       <Loading :loading="loading" />
     </div>
     <div v-else>
@@ -663,7 +674,7 @@ export default {
           this.loading = false;
         })
         .catch((error) => {
-          this.showToast("Error", "danger", "Couldn't load the page in server prefetch: " + error.response.data.error);
+          this.showToast("Error", "error", "Couldn't load the page in server prefetch: " + error.response.data.error);
           this.loading = false;
           this.pageNotFound = true;
         });
@@ -769,14 +780,24 @@ export default {
       })
       .catch((error) => {
         if(error.response.data.error) {
-          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.error);
+          this.showToast("Error", "error", "Couldn't load the page: " + error.response.data.error);
         } else {
-          this.showToast("Error", "danger", "Couldn't load the page: " + error.response.data.message);
+          this.showToast("Error", "error", "Couldn't load the page: " + error.response.data.message);
         }
         this.loading = false;
         this.pageNotFound = true;
         this.$emit("load", false);
       });
+  },
+  watch: {
+    isModalOpen(value) {
+      const body = document.querySelector("body");
+      if(value === true) {
+        body.style.overflow = "hidden";
+      } else {
+        body.style.overflow = "auto";
+      }
+    }
   },
   methods: {
     exportSections() {
@@ -851,11 +872,11 @@ export default {
           this.loading = false;
         })
         .catch((error) => {
-          this.showToast("Error", "danger", "Couldn't create the new section type: " + error.response.data.message);
+          this.showToast("Error", "error", "Couldn't create the new section type: " + error.response.data.message);
            this.loading = false;
         });
       } else {
-        this.showToast("Error", "danger", "Please enter the name of the section");
+        this.showToast("Error", "error", "Please enter the name of the section");
       }
     },
     openStaticSection() {
@@ -916,23 +937,26 @@ export default {
           this.loading = false
           this.showToast(
             "Error creating page",
-            "danger",
+            "error",
             "We are unable to create a new sections page for " + this.pageName + "\n" + err.response.data.message
           );
         });
     },
     showToast(title, variant, message) {
-      const inBrowser = typeof window !== 'undefined';
-      if(inBrowser){
-        this.$bvToast.toast(message, {
-          title,
-          variant,
-          solid: true,
-          toaster: "b-toaster-top-right",
-        });
-      } else {
-        console.log(`## ${variant} ## ${title}: ${message}`)
-      }
+      this.$toast[variant](message, {
+        position: "top-right",
+        timeout: 5000,
+        closeOnClick: true,
+        pauseOnFocusLoss: true,
+        pauseOnHover: true,
+        draggable: true,
+        draggablePercent: 0.6,
+        showCloseButtonOnHover: false,
+        hideProgressBar: false,
+        closeButton: "button",
+        icon: false,
+        rtl: false
+      });
     },
     checkToken() {
       const auth_code = this.$route.query.auth_code;
@@ -993,7 +1017,7 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          this.showToast("Error", "danger", error.toString());
+          this.showToast("Error", "error", error.toString());
         });
     },
     addSystemTypes() {
@@ -1203,7 +1227,7 @@ export default {
       } catch (e) {
         this.showToast(
           "Error",
-          "danger",
+          "error",
           "We are unable to preview your section, try again later"
         );
       }
@@ -1258,7 +1282,7 @@ export default {
         .put(URL, variables, config)
         .then((res) => {
           if (res.data && res.data.error) {
-            this.showToast("error", "danger", res.data.error);
+            this.showToast("error", "error", res.data.error);
             return;
           }
           this.sectionsPageLastUpdated = res.data.last_updated
@@ -1273,7 +1297,7 @@ export default {
         .catch((error) => {
           this.showToast(
             "Error saving your changes",
-            "danger",
+            "error",
               error.response.data.message
           );
           this.loading = false;
@@ -1351,7 +1375,7 @@ export default {
     },
     errorAddingSection(error) {
       this.isModalOpen = !error.closeModal;
-      this.showToast(error.title, "danger", error.message);
+      this.showToast(error.title, "error", error.message);
     },
     deleteSectionType(sectionTypeName, index) {
       this.isDeleteModalOpen = false
@@ -1377,7 +1401,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", "Couldn't delete section type: " + error.response.data.message);
+            this.showToast("Error", "error", "Couldn't delete section type: " + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1417,7 +1441,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", `Couldn't authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
+            this.showToast("Error", "error", `Couldn't authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1456,7 +1480,7 @@ export default {
             this.$emit("load", false);
           })
           .catch((error) => {
-            this.showToast("Error", "danger", `Couldn't un-authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
+            this.showToast("Error", "error", `Couldn't un-authorize sections from ${this.selectedAppName}: ` + error.response.data.message);
             this.loading = false
             this.$emit("load", false);
           });
@@ -1490,139 +1514,39 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.section-modal-main-wrapper {
-  .modal-body {
-    position: initial;
-  }
+<style>
+.sections-config {
+  min-height: 100vh;
 }
-</style>
-<style lang="scss" scoped>
-$sectionsBlue: #31a9db;
-$sectionsDarkBlue: #257596;
-$scetionGray: #454545;
-$sectionLightGray: #a7a7a7;
-
-.section-modal-wrapper {
-  max-width: 780px;
-  &.success-section-type {
-    .header {
-      flex-direction: column;
-      align-items: center;
-      .icon-head {
-        margin-bottom: 10px;
-      }
-    }
-    .body {
-      width: 60%;
-      margin: 20px auto;
-      .subtitle {
-        font-style: italic;
-        text-align: center;
-        width: 75%;
-        margin: 0 auto 10px auto;
-        color: $scetionGray;
-        font-weight: 400;
-      }
-      .section-list {
-        color: $sectionLightGray;
-        display: flex;
-        margin: 5px 0;
-        .dot {
-          color: $sectionsBlue;
-          margin-right: 10px;
-        }
-      }
-    }
-  }
-  .header {
-    margin: 20px 0 40px 0;
-    display: flex;
-    justify-content: center;
-    .title {
-      width: 75%;
-    }
-    .closeIcon {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      svg {
-        height: 40px;
-        width: 40px;
-      }
-    }
-  }
-  .body {
-    margin: 20px 0;
-    .section-input {
-      width: 100%;
-      height: 50px;
-    }
-  }
-  .footer {
-    display: flex;
-    justify-content: center;
-    .hp-button {
-      width: 200px;
-    }
-  }
+.sections-config .control-button {
+  position: absolute;
+  z-index: 999;
+  left: 0;
+  top: 60px;
 }
-.section-wrapper {
-  position: relative;
-  .create-static-section {
-    border-color: $sectionsDarkBlue;
-    color: $sectionsDarkBlue;
-    background: white;
-    position: absolute;
-    top: 50px;
-    left: 0;
-    padding: 0;
-    display: flex;
-    border-width: 2px;
-    border: 2px solid #257596;
-    &:hover {
-      background: $sectionsDarkBlue;
-      color: white;
-      .btn-icon {
-        background: white;
-        svg {
-          color: $sectionsDarkBlue;
-        }
-      }
-    }
-    .btn-icon {
-      background: $sectionsDarkBlue;
-      color: white;
-      width: 48px;
-      height: 36px;
-      border-top-left-radius: 14px;
-      border-bottom-left-radius: 14px;
-    }
-    .btn-text {
-      padding-right: 10px;
-    }
-  }
+.section-view .controls {
+  background: #f5f5f5;
+  position: absolute !important;
+  right: 10px !important;
+  top: 10px;
 }
-// .media-mobile(@rules) {
-//   @media only screen and (max-width: 1025px) {
-//     @rules();
-//   }
-// }
-// .media-wide(@rules) {
-//   @media only screen and (min-width: 1560px) {
-//     @rules();
-//   }
-// }
-span.handle {
-  width: 20px;
-  height: 20px;
-  display: block;
-  border: 1px solid grey;
+.section-view .controls svg {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  color: #31a9db;
+  margin: 3px;
 }
-
-.buttons-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
+.bg-blue {
+  background: #31a9db;
+  color: white;
+  border: none;
+  outline: none !important;
+  transition: 0.2s;
+}
+.bg-blue:hover {
+  background: #0881b3;
+  transition: 0.2s;
 }
 button {
   max-height: 64px;
@@ -1634,46 +1558,10 @@ button {
   min-height: auto;
   margin: 10px;
 }
-
-// modal styles
-.view-component {
-  position: relative;
-  // max-width: 1560px;
-  overflow-x: hidden;
-  margin: 0 auto;
-  // .media-mobile({width: 100%;});
+button svg {
+  width: 20px;
+  height: 20px;
 }
-.view-component > div {
-  margin: 0 auto;
-}
-.section-view {
-  position: relative;
-  .controls {
-    background: lightgray;
-    padding: 5px;
-    border-radius: 10px;
-    top: 3px;
-    right: 23px;
-    position: absolute;
-    z-index: 9;
-    // .media-mobile({top: -28px; right: 2px;});
-    svg {
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      color: $sectionsBlue;
-      margin: 3px;
-      // .media-mobile({width: 6vmin; height: 6vmin;});
-    }
-  }
-}
-.component-view {
-  margin: 0 auto;
-}
-.views {
-  margin: 0 auto;
-}
-
 .hp-button {
   outline: none;
   max-width: 1000px;
@@ -1683,214 +1571,73 @@ button {
   color: white;
   align-items: center;
   justify-content: center;
-  &:hover {
-    background: #298cb6;
-    transition: 0.1s;
-  }
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .btn-icon {
-    margin-right: 8px;
-    svg {
-      color: white;
-      width: 24px;
-      height: 24px;
-    }
-  }
-  &.danger {
-    background: red;
-    &:hover {
-      background: rgb(214, 1, 1);
-      transition: 0.1s;
-    }
-  }
-  &.grey {
-    background: #8b8b8b;
-    &:hover {
-      background: rgb(143, 142, 142);
-      transition: 0.1s;
-    }
-  }
 }
-.part2 {
-  margin-top: 3px;
-  z-index: 9;
-  position: relative;
+.hp-button:hover {
+  background: #298cb6;
+  transition: 0.1s;
 }
-
-.modal {
-  padding: 20px;
-  position: relative;
-  .closeIcon,
-  .step-back {
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    svg {
-      width: 3vw;
-      height: 3vw;
-      // .media-wide({width: 50px; height: 50px;});
-
-      transition: 0.2s;
-      &:hover {
-        transition: 0.2s;
-      }
-    }
-  }
-  .step-back {
-    left: 10px;
-    svg {
-      color: #8b8b8b;
-      &:hover {
-        color: darken(#8b8b8b, 10%);
-      }
-    }
-  }
-  .closeIcon {
-    right: 10px;
-    svg {
-      color: $sectionsBlue;
-      &:hover {
-        color: darken($sectionsBlue, 10%);
-      }
-    }
-  }
-}
-
-.sync {
-  color: red;
-  cursor: pointer;
-  svg {
-    width: 20px;
-    height: 20px;
-    color: red;
-    margin-right: 3px;
-  }
-}
-.synched {
+.hp-button div {
   display: flex;
   align-items: center;
-  svg {
-    -webkit-animation: spin 1.5s linear infinite;
-    -moz-animation: spin 1.5s linear infinite;
-    animation: spin 1.5s linear infinite;
-  }
-  @-moz-keyframes spin {
-    100% {
-      -moz-transform: rotate(360deg);
-    }
-  }
-  @-webkit-keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
-    }
-  }
-  @keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-    }
-  }
+  justify-content: center;
 }
-
-.modal {
-  .section-item {
-    width: 100%;
-    height: 130px;
-    margin: 0px;
-  }
-  .section-item-box {
-    display: flex;
-    flex-direction: column;
-  }
-  padding: 20px;
-  .type-items {
-    display: grid;
-    grid-template-columns: repeat(4, 130px);
-    grid-gap: 35px;
-    justify-content: center;
-  }
+.hp-button .btn-icon {
+  margin-right: 8px;
 }
-// .media-mobile(
-//   {.part2,
-//   .part1 {display: block;} .type-items {grid-template-columns: repeat(2, 1fr) ;}}
-// ) !important;
-
-.sections-config {
-  min-height: 100vh;
-  // position:relative;
-  .control-button {
-    position: absolute;
-    z-index: 999;
-    left: 0;
-    top: 60px;
-  }
-}
-</style>
-
-<style lang="scss">
-// .media-mobile(@rules) {
-//   @media only screen and (max-width: 1025px) {
-//     @rules();
-//   }
-// }
-.section-modal-content {
-  padding-bottom: 1rem;
-}
-
-.modal-header,
-.modal-footer {
-  display: none !important;
-}
-.modal-content {
-  padding: 15px;
-  border-radius: 1.3rem;
-  outline: none;
-  width: auto;
-  margin: 0 auto;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  min-width: 65%;
-  // .media-mobile({width: 95%; margin: 0 auto;});
-}
-.modal {
-  overflow: visible;
-}
-.modal-dialog {
-  width: 100% !important;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-</style>
-
-<style lang="scss">
-button {
-  font-size: 20px;
-  outline: none;
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-.bg-light-grey-hp {
-  background: #f5f5f5;
-}
-.bg-blue {
-  background: #31a9db;
+.hp-button .btn-icon svg {
   color: white;
-  border: none;
-  outline: none !important;
-  transition: 0.2s;
-
-  &:hover {
-    background: #0881b3;
-    transition: 0.2s;
-  }
+  width: 24px;
+  height: 24px;
+}
+.hp-button.danger {
+  background: red;
+}
+.hp-button.danger:hover {
+  background: rgb(214, 1, 1);
+  transition: 0.1s;
+}
+.hp-button.grey {
+  background: #8b8b8b;
+}
+.hp-button.grey:hover {
+  background: rgb(143, 142, 142);
+  transition: 0.1s;
+}
+.section-wrapper {
+  position: relative;
+}
+.section-wrapper .create-static-section {
+  border-color: #257596;
+  color: #257596;
+  background: white;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  padding: 0;
+  display: flex;
+  border-width: 2px;
+  border: 2px solid #257596;
+}
+.section-wrapper .create-static-section:hover {
+  background: #257596;
+  color: white;
+}
+.section-wrapper .create-static-section:hover .btn-icon {
+  background: white;
+}
+.section-wrapper .create-static-section:hover svg {
+  color: #257596;
+}
+.section-wrapper .create-static-section .btn-icon {
+  background: #257596;
+  color: white;
+  width: 48px;
+  height: 36px;
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+.section-wrapper .create-static-section .btn-text {
+  padding-right: 10px;
 }
 .danger {
   color: white;
@@ -1905,10 +1652,6 @@ button {
   padding: 15px;
   font-weight: 500;
 }
-
-// .hide-mobile {
-//   .media-mobile({display: none;}) !important;
-// }
 .mainmsg {
   color: #686868;
 }
@@ -1925,5 +1668,242 @@ button {
   height: 20px;
   width: 20px;
   color: white;
+}
+.section-modal-main-wrapper.modal-body {
+  position: initial;
+}
+span.handle {
+  width: 20px;
+  height: 20px;
+  display: block;
+  border: 1px solid grey;
+}
+
+.buttons-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.component-view {
+  margin: 0 auto;
+}
+.views {
+  margin: 0 auto;
+}
+.part2 {
+  margin-top: 3px;
+  z-index: 9;
+  position: relative;
+}
+.section-modal-content {
+  padding: 2rem;
+}
+.modal-header,
+.modal-footer {
+  display: none !important;
+}
+.modal-content {
+  padding: 15px;
+  border-radius: 1.3rem;
+  outline: none;
+  width: auto;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  min-width: 65%;
+}
+.modalContainer {
+  overflow: visible;
+}
+.modal-dialog {
+  width: 100% !important;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.bg-light-grey-hp {
+  background: #f5f5f5;
+}
+.sync {
+  color: red;
+  cursor: pointer;
+}
+.sync svg {
+  width: 20px;
+  height: 20px;
+  color: red;
+  margin-right: 3px;
+}
+
+.synched {
+  display: flex;
+  align-items: center;
+}
+.synched @-moz-keyframes spin {
+           100% {
+             -moz-transform: rotate(360deg);
+           }
+         }
+.synched @-webkit-keyframes spin {
+           100% {
+             -webkit-transform: rotate(360deg);
+           }
+         }
+.synched @keyframes spin {
+           100% {
+             -webkit-transform: rotate(360deg);
+             transform: rotate(360deg);
+           }
+         }
+.synched svg {
+  -webkit-animation: spin 1.5s linear infinite;
+  -moz-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
+}
+.modalContainer {
+  padding: 20px;
+  position: fixed !important;
+  inset: 0;
+}
+.modalContainer .section-item {
+  width: 100%;
+  height: 130px;
+  margin: 0px;
+}
+.modalContainer .section-item-box {
+  display: flex;
+  flex-direction: column;
+}
+.modalContainer .type-items {
+  display: grid;
+  grid-template-columns: repeat(4, 130px);
+  grid-gap: 35px;
+  justify-content: center;
+}
+.bg-grey {
+  --tw-bg-opacity: 0.5 !important;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important;
+}
+.h4 {
+  font-size: 1.5rem;
+}
+.modalContainer .closeIcon,
+.step-back {
+  cursor: pointer;
+}
+.modalContainer .closeIcon,
+.step-back svg {
+  width: 3vw;
+  height: 3vw;
+  transition: 0.2s;
+}
+.modalContainer .closeIcon,
+.step-back svg:hover {
+  transition: 0.2s;
+}
+.modalContainer
+.step-back {
+  position: absolute;
+}
+.modalContainer
+.step-back svg {
+  color: #8b8b8b;
+}
+.modalContainer
+.step-back svg:hover {
+  color: darken(#8b8b8b, 10%);
+}
+.modalContainer
+.closeIcon {
+  position: absolute;
+  right: 10px;
+}
+.modalContainer
+.closeIcon svg {
+  width: 45px;
+  height: 45px;
+  color: #31a9db;
+}
+.modalContainer
+.closeIcon svg:hover {
+  color: darken(#31a9db, 10%);
+}
+.widthSpace {
+  width: 45px;
+}
+.z-50 {
+  z-index: 2000 !important;
+}
+.section-modal-wrapper {
+  max-width: 780px;
+}
+.section-modal-wrapper.success-section-type .header {
+  flex-direction: column;
+  align-items: center;
+}
+.section-modal-wrapper.success-section-type .icon-head {
+  margin-bottom: 10px;
+}
+.section-modal-wrapper .body {
+  width: 60%;
+  margin: 20px auto;
+}
+.section-modal-wrapper .subtitle {
+  font-style: italic;
+  text-align: center;
+  width: 75%;
+  margin: 0 auto 10px auto;
+  color: #454545;
+  font-weight: 400;
+}
+.section-modal-wrapper .section-list {
+  color: #a7a7a7;
+  display: flex;
+  margin: 5px 0;
+}
+.section-modal-wrapper .dot {
+  color: #31a9db;
+  margin-right: 10px;
+}
+.section-modal-wrapper .header {
+  margin: 20px 0 40px 0;
+  display: flex;
+  justify-content: center;
+}
+.section-modal-wrapper .title {
+  width: 75%;
+}
+.section-modal-wrapper .closeIcon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.section-modal-wrapper .closeIcon svg {
+  height: 40px;
+  width: 40px;
+}
+.section-modal-wrapper .body {
+  margin: 20px 0;
+}
+.section-modal-wrapper .body .section-input {
+  width: 100%;
+  height: 50px;
+}
+.section-modal-wrapper .footer {
+  display: flex;
+  justify-content: center;
+}
+.section-modal-wrapper .footer {
+  display: flex;
+  justify-content: center;
+}
+.section-modal-wrapper .footer .hp-button {
+  width: 200px;
+}
+.flex {
+  display: flex !important;
+}
+.justify-between {
+  justify-content: space-between;
 }
 </style>
