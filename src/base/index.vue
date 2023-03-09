@@ -1793,8 +1793,8 @@ span.handle {
 }
 .modalContainer .closeIcon,
 .step-back svg {
-  width: 3vw;
-  height: 3vw;
+  width: 45px;
+  height: 45px;
   transition: 0.2s;
 }
 .modalContainer .closeIcon,
