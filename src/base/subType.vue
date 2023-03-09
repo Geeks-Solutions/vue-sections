@@ -1,12 +1,12 @@
 <template>
   <div class="sub-types">
     <div>
-      <div class="text-video d-flex" v-show="name">
+      <div class="text-video content-wrapper d-flex" v-show="name">
         <component :is="getComponentForm" :ref="name" />
       </div>
     </div>
     <button
-      class="bg-light-blue mt-4 submit-btn"
+      class="mt-4 submit-btn"
       type="button"
       @click="sendJsonData"
       :class="{ withTabs }"
@@ -54,26 +54,35 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-$sectionsBlue: #31a9db;
+<style>
 .submit-btn {
   border: none;
   font-size: 24px;
 
   padding: 7px;
-  background: $sectionsBlue;
+  background: #31a9db;
   color: white;
   border-radius: 16px;
   transition: 0.2s;
   width: 385px;
   height: 70px;
   text-align: center;
-  &.withTabs {
-    margin-left: 14%;
-  }
-  &:hover {
-    background-color: darken($sectionsBlue, 17%);
-    transition: 0.2s;
+}
+.submit-btn.withTabs {
+  margin-left: 14%;
+}
+.submit-btn.withTabs:hover {
+  background-color: darken(#31a9db, 17%);
+  transition: 0.2s;
+}
+.content-wrapper {
+  overflow-y: scroll;
+  height: 550px;
+}
+@media only screen and (max-height: 800px) {
+  .content-wrapper {
+    overflow-y: scroll;
+    height: 450px;
   }
 }
 </style>

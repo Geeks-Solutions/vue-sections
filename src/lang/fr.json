@@ -27,5 +27,5 @@
   "Cancel": "Annuler",
   "authorizeSuccess": "Toutes les section de {appName} sont maintenant disponibles",
   "unAuthorizeSuccess": "Toutes les sections de {appName} sont maintenant bloquées",
-  "authorizeFirst": "Veuillez autoriser cette section en cliquant sur l'icône du cadenas, pour pouvoir l'utiliser"
+  "authorizeFirst": "Vous devez déverrouiller cette section pour pouvoir l'utiliser et pour cela, vous devrez fournir les champs d'autorisation. Vous pouvez contacter le créateur de cette section pour obtenir la valeur de ces champs."
 }

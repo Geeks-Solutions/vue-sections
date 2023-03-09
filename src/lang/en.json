@@ -27,5 +27,5 @@
   "Cancel": "Cancel",
   "authorizeSuccess": "All sections from {appName} are now available",
   "unAuthorizeSuccess": "All sections from {appName} are now locked",
-  "authorizeFirst": "Please to authorize this section by clicking on the lock icon to be able use it"
+  "authorizeFirst": "You have to unlock this section to be able to use it and for this you will need to provide the authorisation fields. You can contact the creator of this section to get the value of those fields."
 }
