@@ -1,5 +1,5 @@
 <template>
-  <div class="input">
+  <div class="input mt-8">
     <quill-editor ref="myQuillEditor" class="wyzywig" v-model="settings" />
   </div>
 </template>

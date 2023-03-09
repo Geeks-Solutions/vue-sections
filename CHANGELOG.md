@@ -1,4 +1,11 @@
-### 1.0.21
+### 1.0.22
+#### Bug Fixes + Improvements
+
+- Migrate vue sections from Bootstrap to Tailwind
+- Fixes for error messages and required fields
+- Adjust the popup when clicking on configurable section not authorised yet
+- Update library name from @geeks-solutions/vue-sections to @geeks.solutions/vue-sections
+
 #### Bug Fixes
 
 - Fixed copy anchor problem
@@ -8,7 +15,7 @@
 #### Additional Feature
 
 - Adding anchor id for all section types (#sectionName-sectionId)
-- Showing anchor icon (to copy anchor id) next to the edit, drag and delete icons in edit mode 
+- Showing anchor icon (to copy anchor id) next to the edit, drag and delete icons in edit mode
 
 ### 1.0.19
 #### Additional features

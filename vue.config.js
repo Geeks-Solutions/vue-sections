@@ -3,13 +3,13 @@ module.exports = {
     host: 'pigrofelice.k8s-dev.geeks.solution',
     https: true
   },
-  css: {
-    loaderOptions: {
-      sass: {
-        data: `
-          @import "@/assets/scss/style.scss";
-        `
-      }
-    }
-  },
+  // css: {
+  //   loaderOptions: {
+  //     sass: {
+  //       data: `
+  //         @import "@/assets/scss/style.scss";
+  //       `
+  //     }
+  //   }
+  // },
 };

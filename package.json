@@ -1,6 +1,6 @@
 {
-  "name": "@geeks-solutions/vue-sections",
-  "version": "1.0.21",
+  "name": "@geeks.solutions/vue-sections",
+  "version": "1.0.22",
   "author": "Geeks Solutions info@geeks.solutions (https://www.geeks.solutions)",
   "repository": {
     "type": "git",
@@ -36,11 +36,13 @@
     "prepare": "npm run build"
   },
   "dependencies": {
+    "autoprefixer": "^10",
     "axios": "^0.21.1",
-    "bootstrap": "^4.6.0",
-    "bootstrap-vue": "^2.21.2",
+    "postcss": "^8",
+    "tailwindcss": "^3",
     "vue-cookies": "^1.7.4",
     "vue-quill-editor": "^3.0.6",
+    "vue-toastification": "^1.7.14",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
@@ -65,6 +67,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-vue": "^5.1.9",
     "sass-loader": "^7.1.0",
+    "vue-cli-plugin-tailwind": "~3.0.0",
     "vue-template-compiler": "^2.6.12"
   },
   "peerDependencies": {
