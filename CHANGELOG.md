@@ -1,3 +1,8 @@
+### 1.0.23
+#### Bug Fix
+
+- Fix a wrong import from @geeks-solutions/vue-sections to @geeks.solutions/vue-sections for wysiwyg.vue file
+
 ### 1.0.22
 #### Bug Fixes + Improvements
 
@@ -6,6 +11,7 @@
 - Adjust the popup when clicking on configurable section not authorised yet
 - Update library name from @geeks-solutions/vue-sections to @geeks.solutions/vue-sections
 
+### 1.0.21
 #### Bug Fixes
 
 - Fixed copy anchor problem

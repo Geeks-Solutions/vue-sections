@@ -149,7 +149,7 @@
               <BackIcon />
             </div>
 
-            <div v-if="!currentSection" class="m-1 p-1 type-items">
+            <div v-if="!currentSection" class="m-1 p-1 type-items content-wrapper">
               <div
                   class="section-item section-item-box bg-blue"
                   v-for="(type, index) in types"
@@ -1905,5 +1905,15 @@ span.handle {
 }
 .justify-between {
   justify-content: space-between;
+}
+.content-wrapper {
+  overflow-y: scroll;
+  height: 550px;
+}
+@media only screen and (max-height: 800px) {
+  .content-wrapper {
+    overflow-y: scroll;
+    height: 450px;
+  }
 }
 </style>
